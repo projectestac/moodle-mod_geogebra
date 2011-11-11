@@ -447,7 +447,6 @@ function geogebra_grade_item_delete($geogebra) {
     return grade_update('mod/geogebra', $geogebra->course, 'mod', 'geogebra', $geogebra->id, 0, NULL, array('deleted' => 1));
 }
 
-//TO DO: Document
 function geogebra_get_user_grades($geogebra, $userid) {
 
     switch ($geogebra->grademethod) {
