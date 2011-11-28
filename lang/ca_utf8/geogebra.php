@@ -71,4 +71,5 @@ $string['unfinished'] = 'No finalitzat';
 $string['language']='Idioma';
 $string['resumeattempt'] = 'Continuació d\'un intent anterior';
 $string['coursewithoutstudents'] = 'No hi ha estudiants inscrits en el curs actual';
+$string['deleteallattempts'] = 'Suprimeix tots els intents';
 ?>

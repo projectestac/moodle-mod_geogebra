@@ -71,4 +71,5 @@ $string['unfinished'] = 'Unfinished';
 $string['language']='Language';
 $string['resumeattempt'] = 'Resuming unfinished attempt';
 $string['coursewithoutstudents'] = 'Course without students';
+$string['deleteallattempts'] = 'Delete all attempts';
 ?>

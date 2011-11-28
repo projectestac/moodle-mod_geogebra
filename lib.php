@@ -900,4 +900,69 @@ function geogebra_get_languages(){
     return $langlist;
 }
 
+
+/**
+ * Removes all grades from gradebook
+ * @param int $courseid
+ * @param string optional type
+ */
+function geogebra_reset_gradebook($courseid, $type='') {
+    global $CFG;
+    $sql = "SELECT g.*, cm.idnumber as cmidnumber, g.course as courseid
+              FROM {$CFG->prefix}geogebra g, {$CFG->prefix}course_modules cm, {$CFG->prefix}modules m
+             WHERE m.name='geogebra' AND m.id=cm.module AND cm.instance=g.id AND g.course=$courseid";
+    if ($datas = get_records_sql($sql)) {
+        foreach ($datas as $data) {
+            geogebra_grade_item_update($data, 'reset');
+        }
+    }
+
+}
+
+
+/**
+ * This function is used by the reset_course_userdata function in moodlelib.
+ * This function will remove all geogebra sessions in the specified course.
+ * @param $data the data submitted from the reset course.
+ * @return array status array
+ */
+function geogebra_reset_userdata($data) {
+    global $CFG;
+
+    $status = array();
+    if (!empty($data->reset_geogebra_deleteallattempts)) {
+        $select = 'geogebra IN'
+            . " (SELECT g.id FROM {$CFG->prefix}geogebra g"
+            . " WHERE g.course = {$data->courseid})";
+        delete_records_select('geogebra_attempts', $select);
+
+        if (empty($data->reset_gradebook_grades)) {
+	    // remove all grades from gradebook
+	    geogebra_reset_gradebook($data->courseid);
+	}
+
+        $status[] = array('component' => get_string('modulenameplural', 'geogebra'),
+                          'item' => get_string('deleteallattempts', 'geogebra'),
+                          'error' => false);
+    }
+    return $status;
+}
+
+
+/**
+ * Called by course/reset.php
+ * @param $mform form passed by reference
+ */
+function geogebra_reset_course_form_definition(&$mform) {
+    $mform->addElement('header', 'geogebraheader', get_string('modulenameplural', 'geogebra'));
+    $mform->addElement('checkbox', 'reset_geogebra_deleteallattempts', get_string('deleteallattempts', 'geogebra'));
+}
+
+/**
+ * Course reset form defaults.
+ */
+function geogebra_reset_course_form_defaults($course) {
+    return array('reset_geogebra_deleteallattempts' => 1);
+}
+
 ?>
