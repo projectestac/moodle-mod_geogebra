@@ -20,6 +20,16 @@ function geogebra_get_javacodebase() {
     return GEOGEBRA_DEFAULT_CODEBASE;
 }
 
+/**
+ * Returns a geogebra attempt
+ *
+ * @param int $attemptid ID of the attempt
+ * @return object attempt
+ */
+function geogebra_get_attempt($attemptid) {
+    return (get_record('geogebra_attempts', 'id', $attemptid));
+}
+
 
 function geogebra_add_attempt($geogebraid, $userid, $vars, $finished = 1) {
     $register->geogebra = $geogebraid;
@@ -37,16 +47,35 @@ function geogebra_add_attempt($geogebraid, $userid, $vars, $finished = 1) {
  *
  * @param int $attemptid ID of the attempt to be updated
  * @param string $vars Attempt vars to be updated
+ * @param string $gradecomment Comment to the grade
  * @param boolean $finished Attempt finished/unfinished
  * @return boolean Success/Fail
  */
-function geogebra_update_attempt($attemptid, $vars, $finished = 1) {
+function geogebra_update_attempt($attemptid, $vars, $gradecomment=null, $finished = 1) {
 
     $register->id = $attemptid;
     $register->vars = $vars;
+    $register->gradecomment = $gradecomment;
     $register->finished = $finished;
     $register->date = time();   //Save the last date
 
+    return (update_record('geogebra_attempts', $register) !== false);
+}
+
+/**
+ * Updates an existing intance of a geogebra attempt
+ * with new grading information.
+ *
+ * @param int $attemptid ID of the attempt to be updated
+ * @param string $vars Attempt vars to be updated
+ * @param string $gradecomment Comment to the grade
+ * @return boolean Success/Fail
+ */
+function geogebra_update_attempt_grade($attemptid, $vars, $gradecomment=null) {
+    $register->id = $attemptid;
+    $register->vars = $vars;
+    $register->gradecomment = $gradecomment;
+    
     return (update_record('geogebra_attempts', $register) !== false);
 }
 
@@ -422,7 +451,7 @@ function geogebra_grade_item_update($geogebra, $grades=NULL) {
         $params['gradetype'] = GRADE_TYPE_NONE;
     } else {
         $params['gradetype'] = GRADE_TYPE_VALUE;
-        $params['grademax'] = $geogebra->maxgrade;
+        $params['grademax'] = $geogebra->grade;
         $params['grademin'] = 0;
     }
 
@@ -447,8 +476,18 @@ function geogebra_grade_item_delete($geogebra) {
     return grade_update('mod/geogebra', $geogebra->course, 'mod', 'geogebra', $geogebra->id, 0, NULL, array('deleted' => 1));
 }
 
-function geogebra_get_user_grades($geogebra, $userid) {
+/**
+ * Returns if a geogegra activity is configured to allow attempts.
+ *
+ * @param object $geogebra object
+ * @return boolean
+ */
+function geogebra_attempts_allowed($geogebra) {
+    
+  
+}
 
+function geogebra_get_user_grades($geogebra, $userid) {
     switch ($geogebra->grademethod) {
         case GEOGEBRA_NO_GRADING:
             $attempt = geogebra_get_nograding_grade($geogebra->id, $userid);
@@ -867,7 +906,7 @@ function geogebra_show_applet($geogebra, $attributes, $parsedVars=null) {
         // New attempt
         $attempts = geogebra_count_finished_attempts($geogebra->id, $USER->id) + 1;
         $edu_xtec_adapter_parameters = http_build_query(array(
-            'grade' => '0',
+      //      'grade' => '0',
             'attempts' => $attempts
                 ), '', '&');
     }

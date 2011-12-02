@@ -1,6 +1,6 @@
 <?php //$Id: access.php,v 1.2 2008/01/24 15:31:25 sarjona Exp $
 //
-// Capability definitions for the jclic module.
+// Capability definitions for the geogebra module.
 //
 // The capabilities are loaded into the database table when the module is
 // installed or updated. Whenever the capability definitions are updated,
@@ -35,6 +35,15 @@ $mod_geogebra_capabilities = array(
 
     'mod/geogebra:viewreports' => array(
         'captype' => 'read',
+        'contextlevel' => CONTEXT_MODULE,
+        'legacy' => array(
+            'teacher' => CAP_ALLOW,
+            'editingteacher' => CAP_ALLOW,
+            'admin' => CAP_ALLOW
+        )
+    ), 
+    'mod/geogebra:gradeactivity' => array(
+        'captype' => 'write',
         'contextlevel' => CONTEXT_MODULE,
         'legacy' => array(
             'teacher' => CAP_ALLOW,

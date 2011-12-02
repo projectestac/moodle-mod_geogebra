@@ -4,14 +4,18 @@ function showDetailTable($attempt, $context, $navlinks, $geogebra, $cm, $course,
     $title = get_string('report', 'geogebra') . ' ' . $geogebra->name . ' ' . get_string('for', 'geogebra') . ' ' . $attempt->user_firstname . ' ' . $attempt->user_lastname;
 
     if ($geogebra->grademethod != GEOGEBRA_NO_GRADING) {
-        $table->head = array(get_string('attempt', 'geogebra'), get_string('duration', 'geogebra'), get_string('grade', 'geogebra') . '/' . $geogebra->maxgrade, get_string('date'));
+        if ($geogebra->grade > 0) {
+            $max = '/' . $geogebra->grade;
+        } else {
+            $max = '';
+        }
+        $table->head = array(get_string('attempt', 'geogebra'), get_string('duration', 'geogebra'), get_string('grade', 'geogebra') . $max, get_string('date'));
         $table->align = array('center', 'center', 'center', 'center');
     } else {
         $table->head = array(get_string('attempt', 'geogebra'), get_string('duration', 'geogebra'), get_string('date'));
         $table->align = array('center', 'center', 'center');
     }
     parse_str($attempt->vars, $parsedVars);
-    $grademax = (isset($geogebra->grademax)) ? $geogebra->grademax : 100;
 
     $grade = $parsedVars['grade'];
 
@@ -47,7 +51,12 @@ function showDetailTable($attempt, $context, $navlinks, $geogebra, $cm, $course,
 
     if ($questionsNumber > 0) {
         echo '<br/>';
-        $table_detailed->head = array(get_string('description', 'geogebra'), 'Grade/' . $geogebra->maxgrade, get_string('weight', 'geogebra'));
+        if ($geogebra->grade > 0) {
+            $max = '/' . $geogebra->grade;
+        } else {
+            $max = '';
+        }
+        $table_detailed->head = array(get_string('description', 'geogebra'), get_string('grade', 'geogebra') . $max, get_string('weight', 'geogebra'));
         $table_detailed->align = array('center', 'center', 'center');
         $table_detailed->data = array();
 
@@ -68,6 +77,30 @@ function showDetailTable($attempt, $context, $navlinks, $geogebra, $cm, $course,
         print_table($table_detailed);
     }
 
+    if (has_capability('mod/geogebra:gradeactivity', $context)) {
+
+        echo '<form id="grade_form" action="" method="POST" >';
+        echo '<div style="text-align: center">';
+        choose_from_menu(make_grades_menu($geogebra->grade), 'manualgrade', $parsedVars['grade'], get_string('nograde'), '', -1, false);
+
+
+        $usehtmleditor = can_use_html_editor();
+        print_textarea($usehtmleditor, 10, 100, 0, 0, 'gradecomment', $attempt->gradecomment);
+        if ($usehtmleditor) {
+            use_html_editor("gradecomment");
+        }
+        echo '<br>';
+        echo '<input type="hidden" name="updated" value="1" />';
+        echo '<input type="submit" value="' . get_string('save') . '" />';
+        echo ' </form>';
+
+        echo '</div>';
+    } else {
+        //SHOW COMMENTS TO STUDENTS??
+    }
+
+
+
     parse_str($geogebra->url, $attributes);
     echo '<br/><div style="text-align: center">';
     echo '<form id="geogebra_form" method="POST" >';
@@ -78,6 +111,7 @@ function showDetailTable($attempt, $context, $navlinks, $geogebra, $cm, $course,
 
 function geogebra_show_attempt($cm, $course, $context, $navlinks, $geogebra, $userid, $attemptid) {
     global $CFG;
+
 
     //We need to get all attempts in order to know de attempt number
     $select = 'SELECT ga.*, u.id AS user_id, u.firstname AS user_firstname, u.lastname AS user_lastname, u.picture, u.imagealt ';
@@ -117,6 +151,7 @@ function geogebra_show_attempt($cm, $course, $context, $navlinks, $geogebra, $us
         )
             ), '', 'grade');
     $parsedVars = null;
+
     showDetailTable($attempt, $context, $navlinks, $geogebra, $cm, $course, $parsedVars, $attemptnumber);
 }
 
@@ -170,7 +205,7 @@ function geogebra_show_all_attempts($cm, $course, $context, $navlinks, $geogebra
         $users = get_records_sql($select . $sql);
         $table->id = "mod-geogebra-grades";
         if ($geogebra->grademethod != GEOGEBRA_NO_GRADING) {
-            $table->head = array(get_string('user'), get_string('attempts', 'geogebra') . ($geogebra->maxattempts > 0 ? ' / ' . $geogebra->maxattempts : ''), get_string('duration', 'geogebra'), get_string('grade', 'geogebra') . ' / ' . $geogebra->maxgrade, get_string('date'));
+            $table->head = array(get_string('user'), get_string('attempts', 'geogebra') . ($geogebra->maxattempts > 0 ? ' / ' . $geogebra->maxattempts : ''), get_string('duration', 'geogebra'), get_string('grade', 'geogebra') . ' / ' . $geogebra->grade, get_string('date'));
             $table->align = array('left', 'left', 'right', 'right', 'center');
         } else {
             $table->head = array(get_string('user'), get_string('attempts', 'geogebra') . ($geogebra->maxattempts > 0 ? ' / ' . $geogebra->maxattempts : ''), get_string('duration', 'geogebra'), get_string('date'));
@@ -188,13 +223,8 @@ function geogebra_show_all_attempts($cm, $course, $context, $navlinks, $geogebra
             $attemptsgrade = geogebra_get_user_grades($geogebra, $user->user_id);
             if ($attemptsgrade) {
 
-                $grademax = (isset($geogebra->grademax)) ? $geogebra->grademax : 100;
-
                 $grade = $attemptsgrade->grade;
 
-                if ($grade > $grademax) {
-                    $grade = $grademax;
-                }
 
                 if ($geogebra->grademethod != GEOGEBRA_NO_GRADING) {
                     array_push($table->data, array(
@@ -274,13 +304,9 @@ function geogebra_show_user_attempts($geogebra, $userid, $table, $id) {
         $i = 1;
         foreach ($attempts as $attempt) {
             parse_str($attempt->vars, $parsedVars);
-            $grademax = (isset($parsedVars['grademax'])) ? $parsedVars['grademax'] : 100;
 
             $grade = $parsedVars['grade'];
 
-            if ($grade > $grademax) {
-                $grade = $grademax;
-            }
 
             $notice = '';
             if (!$attempt->finished) {
@@ -318,7 +344,9 @@ $id = optional_param('id', 0, PARAM_INT);      // Course Module ID, or
 $q = optional_param('q', 0, PARAM_INT);       // geogebra ID
 $student = optional_param('student', 0, PARAM_INT);    // student id
 $attemptid = optional_param('attempt', 0, PARAM_INT);
-
+$gradecomment = optional_param('gradecomment', NULL, PARAM_TEXT);
+$manualgrade = optional_param('manualgrade', NULL);
+$updated = optional_param('updated', 0, PARAM_INT);
 
 
 if ($id) {
@@ -364,7 +392,22 @@ $navlinks = array(
 );
 
 
-if (has_capability('mod/geogebra:viewreports', $context)) {
+if (has_capability('mod/geogebra:gradeactivity', $context)) {
+    //Update grades and comments if requiered
+    if (!empty($updated)) {
+        // if (($gradecomment != NULL) && ($manualgrade != NULL)) {
+        $attempt = geogebra_get_attempt($attemptid);
+        parse_str($attempt->vars, $parsedVars);
+        $parsedVars['grade'] = $manualgrade;
+        $vars = http_build_query(array(
+            'state' => $parsedVars['state'],
+            'grade' => $parsedVars['grade'],
+            'duration' => $parsedVars['duration'],
+            'attempts' => $parsedVars['attempts']
+                ), '', '&');
+        geogebra_update_attempt_grade($attemptid, $vars, $gradecomment);
+        geogebra_update_grades($geogebra, $student);
+    }
     /*
      * Teacher view
      */
@@ -407,15 +450,18 @@ if (has_capability('mod/geogebra:viewreports', $context)) {
             print_heading($title, 'center');
 
             if ($geogebra->grademethod != GEOGEBRA_NO_GRADING) {
-                $table->head = array(get_string('attempt', 'geogebra') . ($geogebra->maxattempts > 0 ? ' / ' . $geogebra->maxattempts : ''), get_string('duration', 'geogebra'), get_string('grade', 'geogebra') . ' / ' . $geogebra->maxgrade, get_string('date'));
+                if ($geogebra->grade > 0) {
+                    $max = '/' . $geogebra->grade;
+                } else {
+                    $max = '';
+                }
+                $table->head = array(get_string('attempt', 'geogebra') . ($geogebra->maxattempts > 0 ? ' / ' . $geogebra->maxattempts : ''), get_string('duration', 'geogebra'), get_string('grade', 'geogebra') . $max, get_string('date'));
                 $table->align = array('center', 'center', 'center', 'center');
                 $table->data = array();
 
-                $attemptnumber = 1;
                 foreach ($attempts as $attempt) {
                     parse_str($attempt->vars, $parsedVars);
-                    $grademax = (isset($parsedVars['grademax'])) ? $parsedVars['grademax'] : 100;
-                    $grade = $parsedVars['grade'] / $grademax * 100;
+                    $grade = $parsedVars['grade'];
 
                     $notice = '';
                     if ($attempt->finished == 0) { //Don't show grade if attempt is unfinished
@@ -425,14 +471,16 @@ if (has_capability('mod/geogebra:viewreports', $context)) {
                         $grade = 100;
                     }
 
+                    //USER of attempt in vars
+
+
                     array_push($table->data, array(
-                        '<a href="' . $CFG->wwwroot . '/mod/geogebra/grade.php?id=' . $id . '&student=' . $USER->id . '&attempt=' . $attempt->id . '"> ' . $attemptnumber . '</a>' . $notice,
+                        '<a href="' . $CFG->wwwroot . '/mod/geogebra/grade.php?id=' . $id . '&student=' . $USER->id . '&attempt=' . $attempt->id . '"> ' . $parsedVars['attempts'] . '</a>' . $notice,
                         htmlentities(geogebra_time2str($parsedVars['duration']), ENT_QUOTES, 'UTF-8'),
                         $grade,
                         //htmlentities($parsedVars['attempts'], ENT_QUOTES, 'UTF-8'),
                         userdate($attempt->date)
                     ));
-                    $attemptnumber++;
                 }
                 print_table($table);
             } else {
@@ -441,7 +489,6 @@ if (has_capability('mod/geogebra:viewreports', $context)) {
                 $table->align = array('center', 'center', 'center');
                 $table->data = array();
 
-                $attemptnumber = 1;
                 foreach ($attempts as $attempt) {
                     parse_str($attempt->vars, $parsedVars);
                     $duration = array_key_exists('duration', $parsedVars) ? $parsedVars['duration'] : 0;
@@ -452,11 +499,10 @@ if (has_capability('mod/geogebra:viewreports', $context)) {
                     }
 
                     array_push($table->data, array(
-                        '<a href="' . $CFG->wwwroot . '/mod/geogebra/grade.php?id=' . $id . '&student=' . $attempt->user_id . '&attempt=' . $attempt->id . '"> ' . $attemptnumber . '</a>' . $notice,
+                        '<a href="' . $CFG->wwwroot . '/mod/geogebra/grade.php?id=' . $id . '&student=' . $attempt->user_id . '&attempt=' . $attempt->id . '"> ' . $parsedVars['attempts'] . '</a>' . $notice,
                         htmlentities(geogebra_time2str($duration), ENT_QUOTES, 'UTF-8'),
                         userdate($attempt->date)
                     ));
-                    $attemptnumber++;
                 }
                 print_table($table);
             }
@@ -468,10 +514,7 @@ if (has_capability('mod/geogebra:viewreports', $context)) {
     }
 }
 
-geogebra_update_grades(null, 4);
-
 // Print footer
-
 print_footer($course);
 ?>
 

@@ -68,11 +68,18 @@ class mod_geogebra_mod_form extends moodleform_mod {
         // ------ Adding the "grades" fieldset, where all the grade settings are showed ------
         $mform->addElement('header', 'grades', get_string('grades'));
 
+        $mform->addElement('modgrade', 'grade', get_string('grade'));
+        $mform->setDefault('grade', 100);
+        
         $maxattempts = array('-1' => get_string('unlimited'));
         for ($i = 1; $i <= 10; $i++) {
             $maxattempts[$i] = "$i";
         }
         $mform->addElement('select', 'maxattempts', get_string('maxattempts', 'geogebra'), $maxattempts);
+        $mform->setDefault('maxattempts', '1');
+        
+  //      $mform->disabledIf('maxattempts', 'grade', 'gt' , 0);
+        
         $grademethod = array(
             GEOGEBRA_AVERAGE_GRADE => get_string('average', 'geogebra'),
             GEOGEBRA_HIGHEST_GRADE => get_string('highestattempt', 'geogebra'),
@@ -81,13 +88,14 @@ class mod_geogebra_mod_form extends moodleform_mod {
             GEOGEBRA_LAST_GRADE => get_string('lastattempt', 'geogebra'),
             GEOGEBRA_NO_GRADING => get_string('nograding', 'geogebra'));
         $mform->addElement('select', 'grademethod', get_string('grademethod', 'geogebra'), $grademethod);
-
+        $mform->disabledIf('grademethod', 'grade', 'eq' , 0);
+/*
         for ($i = 1; $i <= 100; $i++) {
             $grades[$i] = "$i";
         }
         $mform->addElement('select', 'maxgrade', get_string('maximumgrade'), $grades);
         $mform->setDefault('maxgrade', 10);
-
+*/
 
         $mform->addElement('date_time_selector', 'timeavailable', get_string('availabledate', 'assignment'), array('optional' => true));
         $mform->setDefault('timeavailable', time());

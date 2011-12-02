@@ -42,7 +42,7 @@ if ($id !== false) {
 }
 
 //Activity was sended before the applet was fully loaded
-if (empty($vars) ){
+if (empty($vars)) {
     error('The applet has not sent correct data');
 }
 
@@ -82,11 +82,11 @@ print_tabs(array(
 $attempt = geogebra_get_unfinished_attempt($geogebra->id, $USER->id);
 
 if ($attempt) { //Exists a unfishined attempt
-    if (!(geogebra_update_attempt($attempt->id, $vars, $f)))
+    if (!(geogebra_update_attempt($attempt->id, $vars, $attempt->gradecomment, $f)))
         error(get_string('errorattempt', 'geogebra'));
 } else {
     if (!(geogebra_add_attempt($geogebra->id, $USER->id, $vars, $f)))
-        error(get_string('errorattempt', 'geogebra'));;
+        error(get_string('errorattempt', 'geogebra'));
 }
 
 
@@ -95,14 +95,16 @@ if ($f) { //Show review information
 
     if ($geogebra->grademethod != GEOGEBRA_NO_GRADING) {
         // Print the main part of the page
-
-        $grademax = (isset($geogebra->maxgrade)) ? $geogebra->maxgrade : 100;
-
         // Update Moodle Gradebook
         geogebra_update_grades($geogebra, $USER->id);
 
         //Print table
-        $table->head = array(get_string('attempts', 'geogebra') . ($geogebra->maxattempts > 0 ? ' / ' . $geogebra->maxattempts : ''), get_string('duration', 'geogebra'), get_string('grade', 'geogebra') . ' / ' . $geogebra->maxgrade);
+        if ($geogebra->grade > 0) {
+            $max = '/' . $geogebra->grade;
+        } else {
+            $max = '';
+        }
+        $table->head = array(get_string('attempts', 'geogebra') . ($geogebra->maxattempts > 0 ? ' / ' . $geogebra->maxattempts : ''), get_string('duration', 'geogebra'), get_string('grade', 'geogebra') . $max);
         $table->align = array('center', 'center', 'center');
         $grade = $parsedVars['grade'];
 
@@ -153,7 +155,7 @@ if ($f) { //Show review information
 // Finish the page
     print_footer($course);
 } else {
-    echo '<div class="mod-geogebra-redirect">' . get_string("redirecttocourse", "geogebra"). '</div>';
+    echo '<div class="mod-geogebra-redirect">' . get_string("redirecttocourse", "geogebra") . '</div>';
     redirect($CFG->wwwroot . '/course/view.php?id=' . $course->id);
 }
 ?>

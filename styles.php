@@ -14,6 +14,11 @@
    font-size: big;
 }
 
+.grade{
+   float: right;
+   padding-right:100px;
+}
+
 table#mod-geogebra-grades th.header{
     text-align:center!important;
 }
