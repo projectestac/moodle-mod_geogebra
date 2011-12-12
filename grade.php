@@ -360,6 +360,8 @@ if ($id) {
 
     if (($geogebra = get_record('geogebra', 'id', $cm->instance)) === false) {
         error('The geogebra with id ' . $cm->instance . ' corresponding to this coursemodule ' . $id . ' is missing');
+    } else {
+        $geogebra->cmidnumber = $cm->id;
     }
 } else {
     if (($geogebra = get_record('geogebra', 'id', $q)) === false) {
@@ -372,6 +374,8 @@ if ($id) {
 
     if (($cm = get_coursemodule_from_instance('geogebra', $geogebra->id, $course->id)) === false) {
         error('The course module for the geogebra with id ' . $q . ' is missing');
+    } else {
+        $geogebra->cmidnumber = $cm->id;
     }
 }
 

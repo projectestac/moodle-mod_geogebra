@@ -910,7 +910,10 @@ function geogebra_show_applet($geogebra, $attributes, $parsedVars=null) {
             'attempts' => $attempts
                 ), '', '&');
     }
-    echo '<param name="framePossible" value="false" />';
+    
+    $context = get_context_instance(CONTEXT_MODULE, $geogebra->cmidnumber);
+    $attributes['framePossible'] = has_capability('mod/geogebra:gradeactivity', $context);
+    echo geogebra_get_applet_param('framePossible', $attributes);
     echo '<param name="useBrowserForJS" value="true" />';
     echo get_string('warningnojava', 'geogebra');
 
