@@ -9,7 +9,7 @@ function xmldb_geogebra_upgrade($oldversion = 0) {
         //Add grade field
         $table = new XMLDBTable('geogebra');
         $field = new XMLDBField('grade');
-        $field->setAttributes(XMLDB_TYPE_INTEGER, '10', XMLDB_UNSIGNED, XMLDB_NOTNULL, null, null, null, '100', 'showsubmit');
+        $field->setAttributes(XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, null, null, '100', 'showsubmit');
         $result = $result && add_field($table, $field);
         
         //Delete maxgrade field

@@ -20,6 +20,8 @@ $string['highestattempt'] = 'Highest attempt';
 $string['lowestattempt'] = 'Lowest attempt';
 $string['firstattempt'] = 'First attempt';
 $string['lastattempt'] = 'Last attempt';
+$string['viewattempts'] = 'View ttemtps';
+$string['comment'] = 'Comment';
 
 $string['unlimitedattempts'] = 'Unlimited attempts for this activity';
 $string['lastattemptremaining'] = 'This is your last attempt for this activity';

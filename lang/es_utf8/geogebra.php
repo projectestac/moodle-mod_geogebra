@@ -19,6 +19,8 @@ $string['highestattempt'] = 'Mejor intento';
 $string['lowestattempt'] = 'Peor intento';
 $string['firstattempt'] = 'Primer intento';
 $string['lastattempt'] = 'Último intento';
+$string['viewattempts'] = 'Ver intentos';
+$string['comment'] = 'Comentario';
 
 $string['unlimitedattempts'] = 'Esta actividad no tiene límite de intentos';
 $string['lastattemptremaining'] = 'Este es tu último intento en esta actividad';

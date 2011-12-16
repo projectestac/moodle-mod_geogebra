@@ -23,6 +23,10 @@ table#mod-geogebra-grades th.header{
     text-align:center!important;
 }
 
+#mod-geogebra-grade .commands {
+    display: inline;
+}
+
 #mod-geogebra-view #dates .c0{
   font-weight:bold;
   padding-right:10px;
@@ -35,4 +39,3 @@ table#mod-geogebra-grades th.header{
 #mod-geogebra-view #dates{
   margin:10px;
 }
-

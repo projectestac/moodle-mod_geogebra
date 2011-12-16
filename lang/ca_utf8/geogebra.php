@@ -20,6 +20,8 @@ $string['highestattempt'] = 'Millor intent';
 $string['lowestattempt'] = 'Pitjor intent';
 $string['firstattempt'] = 'Primer intent';
 $string['lastattempt'] = 'Darrer intent';
+$string['viewattempts'] = 'Veure intents';
+$string['comment'] = 'Comentari';
 
 $string['unlimitedattempts'] = 'Aquesta activitat no té límit d\'intents';
 $string['lastattemptremaining'] = 'Aquest és el teu darrer intent en aquesta activitat';
