@@ -30,7 +30,6 @@ function geogebra_get_attempt($attemptid) {
     return (get_record('geogebra_attempts', 'id', $attemptid));
 }
 
-
 function geogebra_add_attempt($geogebraid, $userid, $vars, $finished = 1) {
     $register->geogebra = $geogebraid;
     $register->userid = $userid;
@@ -75,31 +74,31 @@ function geogebra_update_attempt_grade($attemptid, $vars, $gradecomment=null) {
     $register->id = $attemptid;
     $register->vars = $vars;
     $register->gradecomment = $gradecomment;
-    
+
     return (update_record('geogebra_attempts', $register) !== false);
 }
 
 function geogebra_setValues(&$geogebra) {
 
-        $enableRightClick = isset($geogebra->enableRightClick) && $geogebra->enableRightClick;
-        $enableLabelDrags = isset($geogebra->enableLabelDrags) && $geogebra->enableLabelDrags;
-        $showResetIcon = isset($geogebra->showResetIcon) && $geogebra->showResetIcon;
-        $showMenuBar = isset($geogebra->showMenuBar) && $geogebra->showMenuBar;
-        $showToolBar = isset($geogebra->showToolBar) && $geogebra->showToolBar;
-        $showToolBarHelp = isset($geogebra->showToolBarHelp) && $geogebra->showToolBarHelp;
-        $language = $geogebra->language;
-        //$showAlgebraInput = isset($geogebra->showAlgebraInput) && $geogebra->showAlgebraInput;
-        $geogebra->url = http_build_query(array(
-            'filename' => $geogebra->filename,
-            'enableRightClick' => $enableRightClick,
-            'enableLabelDrags' => $enableLabelDrags,
-            'showResetIcon' => $showResetIcon,
-            'showMenuBar' => $showMenuBar,
-            'showToolBar' => $showToolBar,
-            'showToolBarHelp' => $showToolBarHelp,
-            'language' => $language
-                ), '', '&');
-    
+    $enableRightClick = isset($geogebra->enableRightClick) && $geogebra->enableRightClick;
+    $enableLabelDrags = isset($geogebra->enableLabelDrags) && $geogebra->enableLabelDrags;
+    $showResetIcon = isset($geogebra->showResetIcon) && $geogebra->showResetIcon;
+    $showMenuBar = isset($geogebra->showMenuBar) && $geogebra->showMenuBar;
+    $showToolBar = isset($geogebra->showToolBar) && $geogebra->showToolBar;
+    $showToolBarHelp = isset($geogebra->showToolBarHelp) && $geogebra->showToolBarHelp;
+    $language = $geogebra->language;
+    //$showAlgebraInput = isset($geogebra->showAlgebraInput) && $geogebra->showAlgebraInput;
+    $geogebra->url = http_build_query(array(
+        'filename' => $geogebra->filename,
+        'enableRightClick' => $enableRightClick,
+        'enableLabelDrags' => $enableLabelDrags,
+        'showResetIcon' => $showResetIcon,
+        'showMenuBar' => $showMenuBar,
+        'showToolBar' => $showToolBar,
+        'showToolBarHelp' => $showToolBarHelp,
+        'language' => $language
+            ), '', '&');
+
     $geogebra->showsubmit = isset($geogebra->showsubmit);
 }
 
@@ -165,7 +164,7 @@ function geogebra_add_instance($geogebra) {
 
             add_event($event);
         }
-        
+
         geogebra_grade_item_update($geogebra);
     }
 
@@ -484,31 +483,66 @@ function geogebra_grade_item_delete($geogebra) {
  */
 function geogebra_attempts_allowed($geogebra) {
     
-  
 }
 
 function geogebra_get_user_grades($geogebra, $userid) {
-    switch ($geogebra->grademethod) {
-        case GEOGEBRA_NO_GRADING:
-            $attempt = geogebra_get_nograding_grade($geogebra->id, $userid);
-            break;
-        case GEOGEBRA_AVERAGE_GRADE:
-            $attempt = (geogebra_get_average_grade($geogebra->id, $userid));
-            break;
-        case GEOGEBRA_HIGHEST_GRADE:
-            $attempt = (geogebra_get_highest_attempt_grade($geogebra->id, $userid));
-            break;
-        case GEOGEBRA_LOWEST_GRADE:
-            $attempt = (geogebra_get_lowest_attempt_grade($geogebra->id, $userid));
-            break;
-        case GEOGEBRA_FIRST_GRADE:
-            $attempt = (geogebra_get_first_attempt_grade($geogebra->id, $userid));
-            break;
-        case GEOGEBRA_LAST_GRADE:
-            $attempt = (geogebra_get_last_attempt_grade($geogebra->id, $userid));
-            break;
+    if ($geogebra->maxattempts == 0) {
+        $attempt = geogebra_get_unique_attempt_grade($geogebra->id, $userid);
+    } else {
+        switch ($geogebra->grademethod) {
+            case GEOGEBRA_NO_GRADING:
+                $attempt = geogebra_get_nograding_grade($geogebra->id, $userid);
+                break;
+            case GEOGEBRA_AVERAGE_GRADE:
+                $attempt = (geogebra_get_average_grade($geogebra->id, $userid));
+                break;
+            case GEOGEBRA_HIGHEST_GRADE:
+                $attempt = (geogebra_get_highest_attempt_grade($geogebra->id, $userid));
+                break;
+            case GEOGEBRA_LOWEST_GRADE:
+                $attempt = (geogebra_get_lowest_attempt_grade($geogebra->id, $userid));
+                break;
+            case GEOGEBRA_FIRST_GRADE:
+                $attempt = (geogebra_get_first_attempt_grade($geogebra->id, $userid));
+                break;
+            case GEOGEBRA_LAST_GRADE:
+                $attempt = (geogebra_get_last_attempt_grade($geogebra->id, $userid));
+                break;
+        }
     }
     return $attempt;
+}
+/**
+ * Finds the unique attempt for a given user and geogebra.
+ *
+ * @param int $geogebraid ID of an instance of this module
+ * @param int $userid ID of a user
+ * @return mixed boolean/object with userid, grade, rawgrade, grademax, attempts, duration and date
+ */
+function geogebra_get_unique_attempt_grade($geogebraid, $userid) {
+    global $CFG;
+    $select = 'SELECT *';
+    $from = ' FROM ' . $CFG->prefix . 'geogebra_attempts';
+    $where = ' WHERE userid = ' . $userid . ' AND geogebra = ' . $geogebraid . ' AND finished = 1';
+
+    if ($attempt = get_record_sql($select . $from . $where)) {
+        if (empty($attempt)) {
+            return false;
+        } else {
+            parse_str($attempt->vars, $parsedVars);
+
+            $result->userid = $userid;
+            $result->grade = $parsedVars['grade'];
+            $result->rawgrade = $result->grade;
+            $result->grademax = $parsedVars['maxGrade'];
+            $result->attempts = geogebra_count_finished_attempts($geogebraid, $userid);
+            $result->duration = $parsedVars['duration'];
+            $result->date = $attempt->date;
+
+            return $result;
+        }
+    } else
+        return false;
 }
 
 /**
@@ -599,7 +633,7 @@ function geogebra_get_last_attempt_grade($geogebraid, $userid) {
     $select = 'SELECT *';
     $from = ' FROM ' . $CFG->prefix . 'geogebra_attempts';
     $where = ' WHERE `date` = (SELECT MAX(date) FROM ' . $CFG->prefix . 'geogebra_attempts WHERE 
-        userid = ' . $userid . ' AND geogebra = ' . $geogebraid. ' AND finished = 1)';
+        userid = ' . $userid . ' AND geogebra = ' . $geogebraid . ' AND finished = 1)';
 
 
     if ($attempt = get_record_sql($select . $from . $where)) {
@@ -900,17 +934,17 @@ function geogebra_show_applet($geogebra, $attributes, $parsedVars=null) {
             'state' => $parsedVars['state'],
             'grade' => $parsedVars['grade'],
             'duration' => $parsedVars['duration'],
-            'attempts' => $parsedVars['attempts'] 
+            'attempts' => $parsedVars['attempts']
                 ), '', '&');
     } else {
         // New attempt
         $attempts = geogebra_count_finished_attempts($geogebra->id, $USER->id) + 1;
         $edu_xtec_adapter_parameters = http_build_query(array(
-      //      'grade' => '0',
+            //      'grade' => '0',
             'attempts' => $attempts
                 ), '', '&');
     }
-    
+
     $context = get_context_instance(CONTEXT_MODULE, $geogebra->cmidnumber);
     $attributes['framePossible'] = has_capability('mod/geogebra:gradeactivity', $context);
     echo geogebra_get_applet_param('framePossible', $attributes);
@@ -918,30 +952,29 @@ function geogebra_show_applet($geogebra, $attributes, $parsedVars=null) {
     echo get_string('warningnojava', 'geogebra');
 
     echo '</applet>';
-    echo '<input type="hidden" name="prevAppletInformation" value="'.$edu_xtec_adapter_parameters.'" />';
+    echo '<input type="hidden" name="prevAppletInformation" value="' . $edu_xtec_adapter_parameters . '" />';
     echo '<br/>';
 
     print_r(geogebra_get_js_from_geogebra($filename));
 }
 
 /**
-* Get an array with the languages
-*
-* @return array   The array with each language.
-*/
-function geogebra_get_languages(){
+ * Get an array with the languages
+ *
+ * @return array   The array with each language.
+ */
+function geogebra_get_languages() {
     global $CFG;
     $tmplanglist = get_list_of_languages();
     $langlist = array();
-    foreach ($tmplanglist as $lang=>$langname) {
+    foreach ($tmplanglist as $lang => $langname) {
         if (substr($lang, -5) == '_utf8') {   //Remove the _utf8 suffix from the lang to show
             $lang = substr($lang, 0, -5);
         }
-        $langlist[$lang]=$langname;
+        $langlist[$lang] = $langname;
     }
     return $langlist;
 }
-
 
 /**
  * Removes all grades from gradebook
@@ -958,9 +991,7 @@ function geogebra_reset_gradebook($courseid, $type='') {
             geogebra_grade_item_update($data, 'reset');
         }
     }
-
 }
-
 
 /**
  * This function is used by the reset_course_userdata function in moodlelib.
@@ -974,22 +1005,21 @@ function geogebra_reset_userdata($data) {
     $status = array();
     if (!empty($data->reset_geogebra_deleteallattempts)) {
         $select = 'geogebra IN'
-            . " (SELECT g.id FROM {$CFG->prefix}geogebra g"
-            . " WHERE g.course = {$data->courseid})";
+                . " (SELECT g.id FROM {$CFG->prefix}geogebra g"
+                . " WHERE g.course = {$data->courseid})";
         delete_records_select('geogebra_attempts', $select);
 
         if (empty($data->reset_gradebook_grades)) {
-	    // remove all grades from gradebook
-	    geogebra_reset_gradebook($data->courseid);
-	}
+            // remove all grades from gradebook
+            geogebra_reset_gradebook($data->courseid);
+        }
 
         $status[] = array('component' => get_string('modulenameplural', 'geogebra'),
-                          'item' => get_string('deleteallattempts', 'geogebra'),
-                          'error' => false);
+            'item' => get_string('deleteallattempts', 'geogebra'),
+            'error' => false);
     }
     return $status;
 }
-
 
 /**
  * Called by course/reset.php
@@ -1005,6 +1035,45 @@ function geogebra_reset_course_form_definition(&$mform) {
  */
 function geogebra_reset_course_form_defaults($course) {
     return array('reset_geogebra_deleteallattempts' => 1);
+}
+
+function geogebra_define_table($table, $geogebra) {
+
+    if ($geogebra->grade != GEOGEBRA_NO_GRADING) {
+        $tablecolumns = array('picture', 'fullname', 'attempts', 'duration', 'comment', 'grade', 'date', 'status');
+        $tableheaders = array('',
+            get_string('fullname'),
+            get_string('attempts', 'geogebra') . ($geogebra->maxattempts > 0 ? ' / ' . $geogebra->maxattempts : ''),
+            get_string('duration', 'geogebra'),
+            get_string('comment', 'geogebra'),
+            get_string('grade', 'geogebra') . ' / ' . $geogebra->grade,
+            get_string('date'),
+            get_string('status'));
+    } else {
+        $tablecolumns = array('picture', 'fullname', 'attempts', 'duration', 'date', 'status');
+        $tableheaders = array('',
+            get_string('fullname'),
+            get_string('attempts', 'geogebra') . ($geogebra->maxattempts > 0 ? ' / ' . $geogebra->maxattempts : ''),
+            get_string('duration', 'geogebra'),
+            get_string('date'),
+            get_string('status'));
+    }
+    $table->define_columns($tablecolumns);
+    $table->define_headers($tableheaders);
+
+    $table->column_class('picture', 'picture');
+
+    $table->collapsible(true);
+    $table->sortable(true, 'lastname');
+    $table->initialbars(true);
+
+    $table->set_attribute('cellspacing', '0');
+    $table->set_attribute('id', 'attempts');
+    $table->set_attribute('class', 'grade');
+    $table->set_attribute('width', '100%');
+    $table->setup();
+
+    return $table;
 }
 
 ?>

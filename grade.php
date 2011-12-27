@@ -151,6 +151,12 @@ function geogebra_show_attempt($cm, $course, $context, $navlinks, $geogebra, $us
     showDetailTable($attempt, $context, $navlinks, $geogebra, $cm, $course, $parsedVars, $attemptnumber);
 }
 
+/**
+ * Prints all the attempts of all the students for a given activity.
+ *
+ * @param TODO
+ * 
+ */
 function geogebra_show_all_attempts($cm, $course, $context, $navlinks, $geogebra, $id, $student) {
     global $CFG;
 
@@ -208,46 +214,24 @@ function geogebra_show_all_attempts($cm, $course, $context, $navlinks, $geogebra
 
         $users = get_records_sql($select . $sql);
 
-        if ($geogebra->grade != GEOGEBRA_NO_GRADING) {
-            $tablecolumns = array('picture', 'fullname', 'attempts', 'duration', 'comment', 'grade', 'date', 'status');
-            $tableheaders = array('',
-                get_string('fullname'),
-                get_string('attempts', 'geogebra') . ($geogebra->maxattempts > 0 ? ' / ' . $geogebra->maxattempts : ''),
-                get_string('duration', 'geogebra'),
-                get_string('comment', 'geogebra'),
-                get_string('grade', 'geogebra') . ' / ' . $geogebra->grade,
-                get_string('date'),
-                get_string('status'));
-        } else {
-            $tablecolumns = array('picture', 'fullname', 'attempts', 'duration', 'date', 'status');
-            $tableheaders = array('',
-                get_string('fullname'),
-                get_string('attempts', 'geogebra') . ($geogebra->maxattempts > 0 ? ' / ' . $geogebra->maxattempts : ''),
-                get_string('duration', 'geogebra'),
-                get_string('date'),
-                get_string('status'));
-        }
-
         require_once($CFG->libdir . '/tablelib.php');
         $table = new flexible_table('mod-geogebra');
 
-        $table->define_columns($tablecolumns);
-        $table->define_headers($tableheaders);
+        $table = geogebra_define_table($table, $geogebra);
+
+        if ($geogebra->maxattempts == 0) {
+            
+            //recorrer $users fent crida a geogebra_get_user_grades amb la nova 
+            //opció geogebra_get_unique_attempt_grade
+            
+        } else {
+            //recorrer $users, per a cadascun cridant a geogebra_show_user_attempts
+            // després d'haverla modificat mostrar, a més del cada attempt, el resum
+            //dels attempts (tal com es fa just aquí sota)
+        }
         
-        $table->column_class('picture', 'picture');
-
-        $table->collapsible(true);
-        $table->sortable(true, 'lastname');
-        $table->initialbars(true);
-
-        $table->set_attribute('cellspacing', '0');
-        $table->set_attribute('id', 'attempts');
-        $table->set_attribute('class', 'grade');
-        $table->set_attribute('width', '100%');
-        $table->setup();
-
         foreach ($users as $user) {
-
+            
             $any_unfinished = 0; //To show correct number of attempts when there is an unfinished one.
             if (geogebra_get_unfinished_attempt($geogebra->id, $user->id)) {
                 $any_unfinished = 1;
@@ -260,6 +244,7 @@ function geogebra_show_all_attempts($cm, $course, $context, $navlinks, $geogebra
             //Something to show?
             if ($attemptsgrade) {
                 if ($geogebra->grade != GEOGEBRA_NO_GRADING) {
+
                     $row = array($picture, $userlink,
                         $attemptsgrade->attempts + $any_unfinished . '<a href="' . $CFG->wwwroot . '/mod/geogebra/grade.php?id=' . $id . '&student=' . $user->id . '"> ' . '(' . get_string('viewattempts', 'geogebra') . ')' . '</a>',
                         geogebra_time2str($attemptsgrade->duration),
@@ -275,8 +260,8 @@ function geogebra_show_all_attempts($cm, $course, $context, $navlinks, $geogebra
                         !empty($attemptsgrade->date) ? userdate($attemptsgrade->date) : '',
                         '');
                     $table->add_data($row);
-                 }
-                 
+                }
+
                 if ($student == $user->id) {
                     geogebra_show_user_attempts($geogebra, $user->id, $table, $id);
                 }
@@ -338,6 +323,13 @@ function geogebra_show_all_attempts($cm, $course, $context, $navlinks, $geogebra
     }
 }
 
+//Adds to the table one row for each attempt of the given user.
+/**
+ * Returns a geogebra attempt
+ *
+ * @param int $attemptid ID of the attempt
+ * @return object attempt
+ */
 function geogebra_show_user_attempts($geogebra, $userid, $table, $id) {
     global $CFG;
 
@@ -385,7 +377,6 @@ function geogebra_show_user_attempts($geogebra, $userid, $table, $id) {
                     !empty($attempt->date) ? userdate($attempt->date) : '',
                     '<a href="' . $CFG->wwwroot . '/mod/geogebra/grade.php?id=' . $id . '&student=' . $userid . '&attempt=' . $attempt->attempt_id . '"> ' . get_string('view', 'geogebra') . '</a>');
                 $table->add_data($row);
-
             }
             $i++;
         }
