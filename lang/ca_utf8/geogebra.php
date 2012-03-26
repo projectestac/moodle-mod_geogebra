@@ -74,4 +74,9 @@ $string['language']='Idioma';
 $string['resumeattempt'] = 'Continuació d\'un intent anterior';
 $string['coursewithoutstudents'] = 'No hi ha estudiants inscrits en el curs actual';
 $string['deleteallattempts'] = 'Suprimeix tots els intents';
+$string['view'] = 'Veure';
+$string['gradeit'] = 'Qualificació';
+$string['ungraded'] = 'Sense qualificar';
+$string['save'] = 'Desa';
+$string['autograde'] = 'Activitat autopuntuable';
 ?>

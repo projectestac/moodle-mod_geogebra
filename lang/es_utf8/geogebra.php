@@ -73,4 +73,9 @@ $string['language']='Idioma';
 $string['resumeattempt'] = 'Continuación de un intento anterior';
 $string['coursewithoutstudents'] = 'No hay estudiantes inscritos en este curso';
 $string['deleteallattempts'] = 'Eliminar todos los intentos';
+$string['view'] = 'Ver';
+$string['gradeit'] = 'Calificación';
+$string['ungraded'] = 'Sin calificar';
+$string['save'] = 'Guardar';
+$string['autograde'] = 'Actividad autopuntuable';
 ?>

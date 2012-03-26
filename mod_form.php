@@ -1,11 +1,12 @@
 <?php
+
 require_once($CFG->dirroot . '/course/moodleform_mod.php');
 
 class mod_geogebra_mod_form extends moodleform_mod {
 
     function definition() {
         global $CFG, $COURSE;
-        
+
         $mform = & $this->_form;
 
         // ------ Adding the "general" fieldset, where all the common settings are showed ------
@@ -22,27 +23,27 @@ class mod_geogebra_mod_form extends moodleform_mod {
 
         // ------ Adding the "settings" fieldset, where the module settings are showed ------
         $mform->addElement('header', 'settings', get_string('settings'));
-        
+
         $mform->addElement('choosecoursefile', 'filename', get_string('filename', 'geogebra'), array('maxlength' => 255, 'size' => 64));
         $filenamegrprules = array();
         $filenamegrprules['value'][] = array(get_string('maximumchars', '', 255), 'maxlength', 255, 'client');
         $filenamegrprules['value'][] = array(null, 'required', null, 'client');
         $mform->addGroupRule('filename', $filenamegrprules);
         $mform->addRule('filename', null, 'required', null, 'client');
-        
-        $mform->setHelpButton('filename', array('filename', get_string('filename', 'geogebra'), 'geogebra'));        
-        
+
+        $mform->setHelpButton('filename', array('filename', get_string('filename', 'geogebra'), 'geogebra'));
+
         $mform->addElement('text', 'width', get_string('width', 'geogebra'), array('size' => 2, 'value' => 800));
         $mform->addElement('text', 'height', get_string('height', 'geogebra'), array('size' => 2, 'value' => 600));
 
         $options = geogebra_get_languages();
         $mform->addElement('select', 'language', get_string('language', 'geogebra'), $options);
         $mform->setDefault('language', substr($CFG->lang, 0, -5));
-        
+
         //From flashapplet module
         $mform->addElement('hidden', 'showsubmit', 1);
 
-        $functionalityoptionsgrp=array();
+        $functionalityoptionsgrp = array();
         $functionalityoptionsgrp[] = &$mform->createElement('checkbox', 'enableRightClick', '', get_string('enableRightClick', 'geogebra'));
         $functionalityoptionsgrp[] = &$mform->createElement('checkbox', 'enableLabelDrags', '', get_string('enableLabelDrags', 'geogebra'));
         $functionalityoptionsgrp[] = &$mform->createElement('checkbox', 'showResetIcon', '', get_string('showResetIcon', 'geogebra'));
@@ -51,8 +52,8 @@ class mod_geogebra_mod_form extends moodleform_mod {
         $mform->setDefault('enableLabelDrags', 0);
         $mform->setDefault('showResetIcon', 0);
         $mform->setAdvanced('functionalityoptionsgrp');
-        
-        $interfaceoptionsgrp=array();
+
+        $interfaceoptionsgrp = array();
         $interfaceoptionsgrp[] = &$mform->createElement('checkbox', 'showMenuBar', '', get_string('showMenuBar', 'geogebra'));
         $interfaceoptionsgrp[] = &$mform->createElement('checkbox', 'showToolBar', '', get_string('showToolBar', 'geogebra'));
         $interfaceoptionsgrp[] = &$mform->createElement('checkbox', 'showToolBarHelp', '', get_string('showToolBarHelp', 'geogebra'));
@@ -68,18 +69,30 @@ class mod_geogebra_mod_form extends moodleform_mod {
         // ------ Adding the "grades" fieldset, where all the grade settings are showed ------
         $mform->addElement('header', 'grades', get_string('grades'));
 
-        $mform->addElement('modgrade', 'grade', get_string('grade'));
-        $mform->setDefault('grade', 100);
-        
+        /*      To use scales
+          $mform->addElement('modgrade', 'grade', get_string('grade'));
+          $mform->setDefault('grade', 100);
+         */
+
+        for ($i = 1; $i <= 100; $i++) {
+            $grades[$i] = "$i";
+        }
+        $mform->addElement('select', 'grade', get_string('maximumgrade'), $grades);
+        $mform->setDefault('grade', 10);
+
+        $mform->addElement('advcheckbox', 'autograde', get_string('autograde', 'geogebra'));
+        $mform->setDefault('autograde', 0);
+        $mform->setAdvanced('autograde');
+
         $maxattempts = array('-1' => get_string('unlimited'));
         for ($i = 1; $i <= 10; $i++) {
             $maxattempts[$i] = "$i";
         }
         $mform->addElement('select', 'maxattempts', get_string('maxattempts', 'geogebra'), $maxattempts);
         $mform->setDefault('maxattempts', '1');
-        
-  //      $mform->disabledIf('maxattempts', 'grade', 'gt' , 0);
-        
+
+        //      $mform->disabledIf('maxattempts', 'grade', 'gt' , 0);
+
         $grademethod = array(
             GEOGEBRA_AVERAGE_GRADE => get_string('average', 'geogebra'),
             GEOGEBRA_HIGHEST_GRADE => get_string('highestattempt', 'geogebra'),
@@ -88,14 +101,14 @@ class mod_geogebra_mod_form extends moodleform_mod {
             GEOGEBRA_LAST_GRADE => get_string('lastattempt', 'geogebra'),
             GEOGEBRA_NO_GRADING => get_string('nograding', 'geogebra'));
         $mform->addElement('select', 'grademethod', get_string('grademethod', 'geogebra'), $grademethod);
-        $mform->disabledIf('grademethod', 'grade', 'eq' , 0);
-/*
-        for ($i = 1; $i <= 100; $i++) {
-            $grades[$i] = "$i";
-        }
-        $mform->addElement('select', 'maxgrade', get_string('maximumgrade'), $grades);
-        $mform->setDefault('maxgrade', 10);
-*/
+        $mform->disabledIf('grademethod', 'grade', 'eq', 0);
+        /*
+          for ($i = 1; $i <= 100; $i++) {
+          $grades[$i] = "$i";
+          }
+          $mform->addElement('select', 'maxgrade', get_string('maximumgrade'), $grades);
+          $mform->setDefault('maxgrade', 10);
+         */
 
         $mform->addElement('date_time_selector', 'timeavailable', get_string('availabledate', 'assignment'), array('optional' => true));
         $mform->setDefault('timeavailable', time());
@@ -128,18 +141,17 @@ class mod_geogebra_mod_form extends moodleform_mod {
         if (isset($question->url)) {
             parse_str($question->url, $attributes);
             $question->filename = $attributes['filename'];
-            $question->enableRightClick = isset($attributes['enableRightClick'])?$attributes['enableRightClick']:0;
-            $question->enableLabelDrags = isset($attributes['enableLabelDrags'])?$attributes['enableLabelDrags']:0;
-            $question->showResetIcon = isset($attributes['showResetIcon'])?$attributes['showResetIcon']:0;
-            $question->showMenuBar = isset($attributes['showMenuBar'])?$attributes['showMenuBar']:0;
-            $question->showToolBar = isset($attributes['showToolBar'])?$attributes['showToolBar']:0;
-            $question->showToolBarHelp = isset($attributes['showToolBarHelp'])?$attributes['showToolBarHelp']:0;
+            $question->enableRightClick = isset($attributes['enableRightClick']) ? $attributes['enableRightClick'] : 0;
+            $question->enableLabelDrags = isset($attributes['enableLabelDrags']) ? $attributes['enableLabelDrags'] : 0;
+            $question->showResetIcon = isset($attributes['showResetIcon']) ? $attributes['showResetIcon'] : 0;
+            $question->showMenuBar = isset($attributes['showMenuBar']) ? $attributes['showMenuBar'] : 0;
+            $question->showToolBar = isset($attributes['showToolBar']) ? $attributes['showToolBar'] : 0;
+            $question->showToolBarHelp = isset($attributes['showToolBarHelp']) ? $attributes['showToolBarHelp'] : 0;
             //$question->showAlgebraInput = isset($attributes['showAlgebraInput'])?$attributes['showAlgebraInput']:0;
-
         }
         return parent::set_data($question);
     }
-    
+
     function validation($data, $files) {
         $errors = parent::validation($data, $files);
 
@@ -151,7 +163,7 @@ class mod_geogebra_mod_form extends moodleform_mod {
 
         return $errors;
     }
-    
 
 }
+
 ?>

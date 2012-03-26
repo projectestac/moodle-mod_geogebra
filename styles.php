@@ -39,3 +39,7 @@ table#mod-geogebra-grades th.header{
 #mod-geogebra-view #dates{
   margin:10px;
 }
+
+#mod-geogebra-grade .picture {
+  width: 35px;
+}

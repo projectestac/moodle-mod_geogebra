@@ -81,7 +81,19 @@ print_tabs(array(
 
 $attempt = geogebra_get_unfinished_attempt($geogebra->id, $USER->id);
 
-if ($attempt) { //Exists a unfishined attempt
+//If geogebra is not autograding, change grade from 0 to undefined
+
+if ($geogebra->autograde == 0) {
+    $vars = http_build_query(array(
+            'grade' => '-1',
+            'duration' => $parsedVars['duration'],
+            'attempts' => $parsedVars['attempts'],
+            'state' => $parsedVars['state']
+                ), '', '&');
+    parse_str($vars, $parsedVars);
+}
+
+if ($attempt) { //Exists an unfishined attempt
     if (!(geogebra_update_attempt($attempt->id, $vars, $attempt->gradecomment, $f)))
         error(get_string('errorattempt', 'geogebra'));
 } else {
@@ -93,7 +105,7 @@ if ($attempt) { //Exists a unfishined attempt
 if ($f) { //Show review information
     print_heading(get_string('review', 'geogebra') . ' ' . $geogebra->name);
 
-    if ($geogebra->grademethod != GEOGEBRA_NO_GRADING) {
+    if ($geogebra->grade != GEOGEBRA_NO_GRADING) {
         // Print the main part of the page
         // Update Moodle Gradebook
         geogebra_update_grades($geogebra, $USER->id);
@@ -142,7 +154,7 @@ if ($f) { //Show review information
     } else {
         // No grading; only attempts
         $table->head = array(get_string('attempts', 'geogebra'), get_string('duration', 'geogebra'));
-        $table->align = array('center', 'right');
+        $table->align = array('center', 'center');
         $table->data = array(array(
                 htmlentities($parsedVars['attempts'], ENT_QUOTES, 'UTF-8'),
                 htmlentities(geogebra_time2str($parsedVars['duration']), ENT_QUOTES, 'UTF-8')

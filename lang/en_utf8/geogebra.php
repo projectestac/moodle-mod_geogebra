@@ -74,4 +74,9 @@ $string['language']='Language';
 $string['resumeattempt'] = 'Resuming unfinished attempt';
 $string['coursewithoutstudents'] = 'Course without students';
 $string['deleteallattempts'] = 'Delete all attempts';
+$string['view'] = 'View';
+$string['gradeit'] = 'Grade';
+$string['ungraded'] = 'Ungraded';
+$string['save'] = 'Save';
+$string['autograde'] = 'Selfgrade activity';
 ?>

@@ -42,9 +42,9 @@ function geogebra_restore_mods($mod, $restore) {
         $geogebra->width = backup_todb($info['MOD']['#']['WIDTH']['0']['#']);
         $geogebra->height = backup_todb($info['MOD']['#']['HEIGHT']['0']['#']);
         $geogebra->showsubmit = backup_todb($info['MOD']['#']['SHOWSUBMIT']['0']['#']);
+        $geogebra->grade = backup_todb($info['MOD']['#']['GRADE']['0']['#']);
         $geogebra->maxattempts = backup_todb($info['MOD']['#']['MAXATTEMPTS']['0']['#']);
         $geogebra->grademethod = backup_todb($info['MOD']['#']['GRADEMETHOD']['0']['#']);
-        $geogebra->maxgrade = backup_todb($info['MOD']['#']['MAXGRADE']['0']['#']);
         $geogebra->timeavailable = backup_todb($info['MOD']['#']['TIMEAVAILABLE']['0']['#']);
         $geogebra->timedue = backup_todb($info['MOD']['#']['TIMEDUE']['0']['#']);
         $geogebra->timecreated = backup_todb($info['MOD']['#']['TIMECREATED']['0']['#']);
@@ -97,6 +97,7 @@ function geogebra_attempts_restore_mods($old_attempt_id, $new_attempt_id, $info,
         $attempt->geogebra = $new_attempt_id;
         $attempt->userid = backup_todb($attempt_info['#']['USERID']['0']['#']);
         $attempt->vars = backup_todb($attempt_info['#']['VARS']['0']['#']);
+        $attempt->gradecooment = backup_todb($attempt_info['#']['GRADECOMMENT']['0']['#']);
         $attempt->finished = backup_todb($attempt_info['#']['FINISHED']['0']['#']);
         $attempt->date = backup_todb($attempt_info['#']['DATE']['0']['#']);
 
