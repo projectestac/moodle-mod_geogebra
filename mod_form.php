@@ -1,3 +1,6 @@
+
+
+
 <?php
 
 require_once($CFG->dirroot . '/course/moodleform_mod.php');
@@ -69,20 +72,20 @@ class mod_geogebra_mod_form extends moodleform_mod {
         // ------ Adding the "grades" fieldset, where all the grade settings are showed ------
         $mform->addElement('header', 'grades', get_string('grades'));
 
-        /*      To use scales
+        //      To use scales
           $mform->addElement('modgrade', 'grade', get_string('grade'));
           $mform->setDefault('grade', 100);
-         */
+         
 
-        for ($i = 1; $i <= 100; $i++) {
+    /*    for ($i = 1; $i <= 100; $i++) {
             $grades[$i] = "$i";
         }
         $mform->addElement('select', 'grade', get_string('maximumgrade'), $grades);
         $mform->setDefault('grade', 10);
-
+*/
         $mform->addElement('advcheckbox', 'autograde', get_string('autograde', 'geogebra'));
         $mform->setDefault('autograde', 0);
-        $mform->setAdvanced('autograde');
+  //      $mform->setAdvanced('autograde');
 
         $maxattempts = array('-1' => get_string('unlimited'));
         for ($i = 1; $i <= 10; $i++) {
@@ -91,17 +94,18 @@ class mod_geogebra_mod_form extends moodleform_mod {
         $mform->addElement('select', 'maxattempts', get_string('maxattempts', 'geogebra'), $maxattempts);
         $mform->setDefault('maxattempts', '1');
 
-        //      $mform->disabledIf('maxattempts', 'grade', 'gt' , 0);
-
         $grademethod = array(
             GEOGEBRA_AVERAGE_GRADE => get_string('average', 'geogebra'),
             GEOGEBRA_HIGHEST_GRADE => get_string('highestattempt', 'geogebra'),
             GEOGEBRA_LOWEST_GRADE => get_string('lowestattempt', 'geogebra'),
             GEOGEBRA_FIRST_GRADE => get_string('firstattempt', 'geogebra'),
-            GEOGEBRA_LAST_GRADE => get_string('lastattempt', 'geogebra'),
-            GEOGEBRA_NO_GRADING => get_string('nograding', 'geogebra'));
+            GEOGEBRA_LAST_GRADE => get_string('lastattempt', 'geogebra'));
+     // Not needed. It is especifyed in 'grade' param
+     //              GEOGEBRA_NO_GRADING => get_string('nograding', 'geogebra'));
         $mform->addElement('select', 'grademethod', get_string('grademethod', 'geogebra'), $grademethod);
-        $mform->disabledIf('grademethod', 'grade', 'eq', 0);
+  //    Incompatibily with JS
+  //    $mform->disabledIf('grademethod', 'grade', 'eq', 0);
+       
         /*
           for ($i = 1; $i <= 100; $i++) {
           $grades[$i] = "$i";
@@ -167,3 +171,59 @@ class mod_geogebra_mod_form extends moodleform_mod {
 }
 
 ?>
+
+<script src="http://yui.yahooapis.com/3.3.0/build/yui/yui-min.js"charset="utf-8"></script>
+<script type="text/javascript">
+
+    YUI().use("node", function(Y) {
+        
+        Y.on("change", changeFields, "#id_grade");
+    //    Y.on('contentready', changeFields, '#id_grade');
+    });
+    /*
+  YUI().use('event-base', function (Y) {
+      
+        Y.on('contentready', changeFields, '#id_grade');
+    });  
+    */
+    function changeFields(e){
+        var node = e.currentTarget;
+        node.get("options").each(function(){
+            var selected = this.get("selected");
+            var value = this.get("value");
+            if( selected ){ 
+                if (value < 0) {
+                //    alert(document.getElementsByName('autograde')[0].checked);
+                document.getElementById('id_grademethod').options.length=0
+                document.getElementById('id_grademethod').options[0]=new Option("<?php echo get_string('firstattempt', 'geogebra'); ?>", "4", true, false);
+         /*           document.getElementsByName('autograde')[0].value = "0";
+                    document.getElementsByName('autograde')[1].checked = false;
+                    document.getElementsByName('autograde')[1].disabled = true;
+                    document.getElementById('id_grademethod').selectedIndex = 3;
+                    document.getElementById('id_grademethod').disabled = true;
+                    document.getElementById('id_maxattempts').selectedIndex = 1;
+                    document.getElementById('id_maxattempts').disabled = true;
+                    */
+                } else if(value == 0) {
+                    document.getElementsByName('autograde')[0].value = "0";
+                    document.getElementsByName('autograde')[1].checked = false;
+                    document.getElementsByName('autograde')[1].disabled = true;
+                    document.getElementById('id_grademethod').selectedIndex = 3;
+                    document.getElementById('id_grademethod').disabled = true;
+                    document.getElementById('id_maxattempts').disabled = false;
+                } else {
+                    document.getElementsByName('autograde')[0].value = "0";
+                    document.getElementsByName('autograde')[1].disabled = false;
+                    document.getElementById('id_grademethod').disabled = false;
+                    document.getElementById('id_maxattempts').disabled = false;
+                }
+            }
+        });
+      
+    }
+
+
+
+</script>
+
+

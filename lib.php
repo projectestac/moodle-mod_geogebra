@@ -450,9 +450,13 @@ function geogebra_grade_item_update($geogebra, $grades = NULL) {
 
     $params = array('itemname' => $geogebra->name, 'idnumber' => $geogebra->cmidnumber);
 
-    if ($geogebra->grademethod == GEOGEBRA_NO_GRADING) {
+    if ($geogebra->grade == GEOGEBRA_NO_GRADING) {
         $params['gradetype'] = GRADE_TYPE_NONE;
-    } else {
+    } else if ($geogebra->grade < 0) {
+        $params['gradetype'] = GRADE_TYPE_SCALE;
+        $params['scaleid']   = -$geogebra->grade;
+    }
+    else {
         $params['gradetype'] = GRADE_TYPE_VALUE;
         $params['grademax'] = $geogebra->grade;
         $params['grademin'] = 0;
