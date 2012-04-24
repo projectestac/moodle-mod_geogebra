@@ -83,37 +83,40 @@ function showDetailTable($attempt, $context, $navlinks, $geogebra, $cm, $course,
 
         print_table($table_detailed);
     }
-
+    
+    $usehtmleditor = false;
     if (has_capability('mod/geogebra:gradeactivity', $context) && $geogebra->grade != GEOGEBRA_NO_GRADING) {
         echo '<form id="grade_form" action="" method="POST" >';
-        echo '<div style="text-align: center">';
+        echo '<div class="gradecontent">';
+        echo '<label for="menugrade">'.get_string('grade').' </label>';
         choose_from_menu(make_grades_menu($geogebra->grade), 'manualgrade', $parsedVars['grade'], get_string('nograde'), '', -1, false);
-        echo '</br>';
+        echo '<br/>';
         
-        $usehtmleditor = can_use_html_editor();
-     //   print_textarea($usehtmleditor, 20, 60, 680, 400, "c$entry->id", $entry->comment);
-        print_textarea($usehtmleditor,10, 50, 0, 0, 'gradecomment', $attempt->gradecomment);
-        if ($usehtmleditor) {
-            use_html_editor("gradecomment");
-        }
-
-        echo '<br>';
+        echo '<div id="gradecommenthtmleditor" >';
+        $usehtmleditor = can_use_html_editor();        
+        print_textarea($usehtmleditor, 14, 58, 0, 0, 'gradecomment', $attempt->gradecomment, $course->id);
+        echo '</div>';
         echo '<input type="hidden" name="updated" value="1" />';
         echo '<input type="submit" value="' . get_string('save', 'geogebra') . '" />';
         echo ' </form>';
-
         echo '</div>';
+        
     } else {
         
         print_box(format_text($attempt->gradecomment, FORMAT_HTML), 'generalbox boxwidthwide boxaligncenter', 'online');
     }
 
     parse_str($geogebra->url, $attributes);
-    echo '<br/><div style="text-align: center">';
+    echo '<div class="gradecontent">';
     echo '<form id="geogebra_form" method="POST" >';
     geogebra_show_applet($geogebra, $attributes, $parsedVars);
     echo '</form>';
     echo '</div>';
+    
+    if ($usehtmleditor) {
+        use_html_editor();
+    }
+    
 }
 /**
  * Prints the header of a single attempt page.

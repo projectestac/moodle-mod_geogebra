@@ -43,3 +43,16 @@ table#mod-geogebra-grades th.header{
 #mod-geogebra-grade .picture {
   width: 35px;
 }
+
+#gradecommenthtmleditor{
+  width:700px;
+  margin-bottom:10px;
+}
+
+#menumanualgrade{
+margin-bottom: 10px;
+}
+
+.gradecontent{
+text-align: left;margin:20px 10%;
+}
