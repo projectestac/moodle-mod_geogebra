@@ -95,6 +95,9 @@ function showDetailTable($attempt, $context, $navlinks, $geogebra, $cm, $course,
         echo '<div id="gradecommenthtmleditor" >';
         $usehtmleditor = can_use_html_editor();        
         print_textarea($usehtmleditor, 14, 58, 0, 0, 'gradecomment', $attempt->gradecomment, $course->id);
+        if ($usehtmleditor) {
+            echo '<input type="hidden" name="format" value="'.FORMAT_HTML.'" />';
+        }
         echo '</div>';
         echo '<input type="hidden" name="updated" value="1" />';
         echo '<input type="submit" value="' . get_string('save', 'geogebra') . '" />';
@@ -102,7 +105,6 @@ function showDetailTable($attempt, $context, $navlinks, $geogebra, $cm, $course,
         echo '</div>';
         
     } else {
-        
         print_box(format_text($attempt->gradecomment, FORMAT_HTML), 'generalbox boxwidthwide boxaligncenter', 'online');
     }
 
@@ -393,10 +395,9 @@ $id = optional_param('id', 0, PARAM_INT);      // Course Module ID, or
 $q = optional_param('q', 0, PARAM_INT);       // geogebra ID
 $student = optional_param('student', 0, PARAM_INT);    // student id
 $attemptid = optional_param('attempt', 0, PARAM_INT);
-$gradecomment = optional_param('gradecomment', NULL, PARAM_TEXT);
+$gradecomment = optional_param('gradecomment', NULL);
 $manualgrade = optional_param('manualgrade', NULL);
 $updated = optional_param('updated', 0, PARAM_INT);
-print(format_text($gradecomment));
 
 if ($id) {
     if (($cm = get_coursemodule_from_id('geogebra', $id)) === false) {
