@@ -2,7 +2,6 @@
 
 $string['modulename'] = 'GeoGebra';
 $string['modulenameplural'] = 'GeoGebra';
-
 $string['noattempts'] = '-';
 $string['name'] = 'Nom';
 $string['choosescripttype'] = 'Escull el tipus d\'activitat';

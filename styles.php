@@ -14,13 +14,13 @@
    font-size: big;
 }
 
-.grade{
+.grade-table{
    float: right;
    padding-right:100px;
 }
 
 table#mod-geogebra-grades th.header{
-    text-align:center!important;
+    text-align:center !important;
 }
 
 #mod-geogebra-grade .commands {
@@ -28,31 +28,43 @@ table#mod-geogebra-grades th.header{
 }
 
 #mod-geogebra-view #dates .c0{
-  font-weight:bold;
-  padding-right:10px;
+    font-weight:bold;
+    padding-right:10px;
 }
 
 #mod-geogebra-view #dates table{
-  font-size: smaller;
+    font-size: smaller;
+    border-width: 1px;
+    border-style: solid;
+    border-color: #DDDDDD;
 }
 
 #mod-geogebra-view #dates{
-  margin:10px;
+    margin:10px;
 }
 
 #mod-geogebra-grade .picture {
-  width: 35px;
+    width: 0px;
 }
 
 #gradecommenthtmleditor{
-  width:700px;
-  margin-bottom:10px;
+    width:700px;
+    margin-bottom:10px;
 }
 
 #menumanualgrade{
-margin-bottom: 10px;
+    margin-bottom: 10px;
 }
 
 .gradecontent{
-text-align: left;margin:20px 10%;
+    text-align: left;margin:20px 10%;
+}
+
+.generaltable td.cell.c0 {
+    font-weight: normal !important
+}
+
+.generaltable {
+    margin-top: 10px;
+    margin-left: 10%; !important
 }

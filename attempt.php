@@ -123,7 +123,7 @@ if ($f) { //Show review information
         $table->data = array(array(
                 htmlentities($parsedVars['attempts'], ENT_QUOTES, 'UTF-8'),
                 htmlentities(geogebra_time2str($parsedVars['duration']), ENT_QUOTES, 'UTF-8'),
-                $grade
+                ($grade == -1) ? get_string('ungraded', 'geogebra') : $grade
                 ));
 
         print_table($table);

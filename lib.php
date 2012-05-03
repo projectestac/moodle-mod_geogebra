@@ -340,13 +340,15 @@ function geogebra_get_participants($geogebraid) {
  * @todo Finish documenting this function
  */
 function geogebra_scale_used($geogebraid, $scaleid) {
+//This function returns if a scale is being used by one geogebra
+
     $return = false;
 
-    //$rec = get_record("geogebra","id","$geogebraid","scale","-$scaleid");
-    //
-	//if (!empty($rec) && !empty($scaleid)) {
-    //    $return = true;
-    //}
+    $rec = get_record("glossary", "id", "$geogebraid", "grade", "-$scaleid");
+
+    if (!empty($rec) && !empty($scaleid)) {
+        $return = true;
+    }
 
     return $return;
 }
@@ -401,7 +403,7 @@ function geogebra_update_grades($geogebra = null, $userid = 0, $nullifnone = tru
             if (!empty($students)) {
                 foreach ($students as $student) {
                     if ($grades = geogebra_get_user_grades($geogebra, $student->id)) {
-                        if ($grade->grade = !'') {
+                        if ($grades->grade !='') {
                             geogebra_grade_item_update($geogebra, $grades);
                         }
                     }
@@ -409,7 +411,7 @@ function geogebra_update_grades($geogebra = null, $userid = 0, $nullifnone = tru
             }
         } else {
             if ($grades = geogebra_get_user_grades($geogebra, $userid)) {
-                if ($grade->grade = !'') {
+                if ($grades->grade != '') {
                     geogebra_grade_item_update($geogebra, $grades);
                 }
             } else if ($userid and $nullifnone) {
@@ -454,9 +456,8 @@ function geogebra_grade_item_update($geogebra, $grades = NULL) {
         $params['gradetype'] = GRADE_TYPE_NONE;
     } else if ($geogebra->grade < 0) {
         $params['gradetype'] = GRADE_TYPE_SCALE;
-        $params['scaleid']   = -$geogebra->grade;
-    }
-    else {
+        $params['scaleid'] = -$geogebra->grade;
+    } else {
         $params['gradetype'] = GRADE_TYPE_VALUE;
         $params['grademax'] = $geogebra->grade;
         $params['grademin'] = 0;
@@ -497,7 +498,7 @@ function geogebra_attempts_allowed($geogebra) {
  * Returns the grade informacion for a user and geogebra activity
  * acording to the chosen grademethod.
  *
- * @param object $geogebra object
+ * @param object $geogebra
  * @param int $userid
  * @return mixed
  */
@@ -680,7 +681,6 @@ function geogebra_get_last_attempt_grade($geogebraid, $userid) {
 
             return $result;
         } else {
-
             $result->userid = $userid;
             $result->grade = $parsedVars['grade'];
             $result->rawgrade = $result->grade;
@@ -708,7 +708,6 @@ function geogebra_get_first_attempt_grade($geogebraid, $userid) {
     $from = ' FROM ' . $CFG->prefix . 'geogebra_attempts';
     $where = ' WHERE `date` = (SELECT MIN(date) FROM ' . $CFG->prefix . 'geogebra_attempts WHERE 
         userid = ' . $userid . ' AND geogebra = ' . $geogebraid . ' AND finished = 1)';
-
 
     if ($attempt = get_record_sql($select . $from . $where)) {
         if (empty($attempt)) {
@@ -883,9 +882,11 @@ function geogebra_count_finished_attempts($geogebraid, $userid) {
 
     return count_records_sql($select . $from . $where);
 }
+
 /*
  * Not sure if needed
  */
+
 function geogebra_count_attempts($geogebraid, $userid) {
     global $CFG;
 
@@ -1131,7 +1132,7 @@ function geogebra_define_table($table, $geogebra) {
             get_string('attempts', 'geogebra') . ($geogebra->maxattempts > 0 ? ' / ' . $geogebra->maxattempts : ''),
             get_string('duration', 'geogebra'),
             get_string('comment', 'geogebra'),
-            get_string('grade', 'geogebra') . ' / ' . $geogebra->grade,
+            ($geogebra->grade < 0) ? get_string('grade', 'geogebra') : get_string('grade', 'geogebra') . ' / ' . $geogebra->grade,
             get_string('date'),
             get_string('status'));
     } else {
@@ -1154,9 +1155,14 @@ function geogebra_define_table($table, $geogebra) {
 
     $table->set_attribute('cellspacing', '0');
     $table->set_attribute('id', 'attempts');
-    $table->set_attribute('class', 'grade');
+    $table->set_attribute('class', 'grade-table');
     $table->set_attribute('width', '100%');
     $table->set_attribute('align', 'center');
+    $table->column_style_all('vertical-align', 'middle');
+//    $table->column_style_all('text-align', 'center');
+    $table->column_style_all('border-width', '1px');
+    $table->column_style_all('border-style', 'solid');
+    $table->column_style_all('border-color', '#DDDDDD');
 
     $table->setup();
 
