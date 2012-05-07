@@ -61,6 +61,7 @@ function geogebra_backup_one_mod($bf, $preferences, $geogebra) {
     fwrite($bf, full_tag("SHOWSUBMIT", 4, false, $geogebra->showsubmit));
     fwrite($bf, full_tag("GRADE", 4, false, $geogebra->grade));
     fwrite($bf, full_tag("MAXATTEMPTS", 4, false, $geogebra->maxattempts));
+    fwrite($bf, full_tag("AUTOGRADE", 4, false, $geogebra->autograde));
     fwrite($bf, full_tag("GRADEMETHOD", 4, false, $geogebra->grademethod));
     fwrite($bf, full_tag("TIMEAVAILABLE", 4, false, $geogebra->timeavailable));
     fwrite($bf, full_tag("TIMEDUE", 4, false, $geogebra->timedue));
@@ -101,6 +102,7 @@ function backup_geogebra_attempts($bf, $preferences, $geogebra) {
             fwrite($bf, full_tag("VARS", 6, false, $attempt->vars));
             fwrite($bf, full_tag("GRADECOMMENT", 6, false, $attempt->gradecomment));
             fwrite($bf, full_tag("FINISHED", 6, false, $attempt->finished));
+            fwrite($bf, full_tag("DATETEACHER", 6, false, $attempt->dateteacher));
             fwrite($bf, full_tag("DATE", 6, false, $attempt->date));
             //End entry
             $status = fwrite($bf, end_tag("ATTEMPT", 5, true));
