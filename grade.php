@@ -377,11 +377,13 @@ function geogebra_show_user_attempts($course, $geogebra, $userid, $table, $id) {
             $grade = $parsedVars['grade'];
 
             $notice = '';
+             $teachernotice = '<a href="' . $CFG->wwwroot . '/mod/geogebra/grade.php?id=' . $id . '&student=' . $userid . '&attempt=' . $attempt->attempt_id . '"> ' . $state = get_string('update') . '</a>';
             if ($attempt->finished == 0) { //Don't show grade if attempt is unfinished
                 $grade = '-';
                 $notice = ' (' . get_string('unfinished', 'geogebra') . ')';
             } else if ($grade == -1) {
                 $grade = get_string('ungraded', 'geogebra');
+                $teachernotice = '<a style="background: #FFD991;" href="' . $CFG->wwwroot . '/mod/geogebra/grade.php?id=' . $id . '&student=' . $userid . '&attempt=' . $attempt->attempt_id . '"> ' . $state = get_string('gradeit', 'geogebra') . '</a>';
             } else if ($geogebra->grade < 0) {
                 $finalgrade = grade_get_grades($course->id, 'mod', 'geogebra', $geogebra->id, $userid);
                 $grade = $finalgrade->items[0]->grades[$userid]->str_grade;
@@ -396,7 +398,7 @@ function geogebra_show_user_attempts($course, $geogebra, $userid, $table, $id) {
                     $grade,
                     !empty($attempt->date) ? userdate($attempt->date) : '',
                     !empty($attempt->dateteacher) ? userdate($attempt->dateteacher) : '',
-                    '<a href="' . $CFG->wwwroot . '/mod/geogebra/grade.php?id=' . $id . '&student=' . $userid . '&attempt=' . $attempt->attempt_id . '"> ' . $state = get_string('gradeit', 'geogebra') . '</a>',
+                    $teachernotice,
                 );
                 $table->add_data($row);
             } else {

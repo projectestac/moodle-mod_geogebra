@@ -1169,6 +1169,8 @@ function geogebra_define_table($table, $geogebra, $course) {
     $table->define_headers($tableheaders);
 
     $table->column_class('picture', 'picture');
+    
+    $table->column_style['status']['text-align'] =  'center';
 
     $table->sortable(false);
     $table->collapsible(true);
