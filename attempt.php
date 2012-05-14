@@ -94,7 +94,7 @@ if ($geogebra->autograde == 0) {
 }
 
 if ($attempt) { //Exists an unfishined attempt
-    if (!(geogebra_update_attempt($attempt->id, GEOGEBRA_UPDATE_STUDENT, $vars, $attempt->gradecomment, $f)))
+    if (!(geogebra_update_attempt($attempt->id, $vars, GEOGEBRA_UPDATE_STUDENT, $attempt->gradecomment, $f)))
         error(get_string('errorattempt', 'geogebra'));
 } else {
     if (!(geogebra_add_attempt($geogebra->id, $USER->id, $vars, $f)))

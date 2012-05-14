@@ -44,7 +44,7 @@ table#mod-geogebra-grades th.header{
 }
 
 #mod-geogebra-grade .picture {
-    width: 0px;
+    width: 1px;
 }
 
 #gradecommenthtmleditor{

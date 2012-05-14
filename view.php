@@ -17,6 +17,8 @@ if ($id !== false) {
 
     if (($geogebra = get_record('geogebra', 'id', $cm->instance)) === false) {
         error('Course module is incorrect');
+    } else {
+        $geogebra->cmidnumber = $cm->id;
     }
 } else if ($a !== false) {
     if (($geogebra = get_record('geogebra', 'id', $a)) === false) {
@@ -29,6 +31,8 @@ if ($id !== false) {
 
     if (($cm = get_coursemodule_from_instance('geogebra', $geogebra->id, $course->id)) === false) {
         error('Course Module ID was incorrect');
+    } else {
+        $geogebra->cmidnumber = $cm->id;
     }
 } else {
     error('You must specify a course_module ID or an instance ID');

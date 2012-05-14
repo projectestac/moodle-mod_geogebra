@@ -411,7 +411,7 @@ function geogebra_update_grades($geogebra = null, $userid = 0, $nullifnone = tru
             if (!empty($students)) {
                 foreach ($students as $student) {
                     if ($grades = geogebra_get_user_grades($geogebra, $student->id)) {
-                        if ($grades->grade !='') {
+                        if ($grades->grade != '') {
                             geogebra_grade_item_update($geogebra, $grades);
                         }
                     }
@@ -686,6 +686,7 @@ function geogebra_get_last_attempt_grade($geogebraid, $userid) {
         if ($parsedVars['grade'] < 0) { //last attempt not graded
             $result->userid = $userid;
             $result->grade = '';
+            $result->gradecomment = '';
             $result->rawgrade = '';
             $result->attempts = geogebra_count_finished_attempts($geogebraid, $userid);
             $result->duration = '';
@@ -696,6 +697,7 @@ function geogebra_get_last_attempt_grade($geogebraid, $userid) {
         } else {
             $result->userid = $userid;
             $result->grade = $parsedVars['grade'];
+            $result->gradecomment = $attempt->gradecomment;
             $result->rawgrade = $result->grade;
             $result->attempts = geogebra_count_finished_attempts($geogebraid, $userid);
             $result->duration = $parsedVars['duration'];
@@ -731,6 +733,7 @@ function geogebra_get_first_attempt_grade($geogebraid, $userid) {
         if ($parsedVars['grade'] < 0) { //first attempt not graded
             $result->userid = $userid;
             $result->grade = '';
+            $result->gradecomment = '';
             $result->rawgrade = '';
             $result->attempts = geogebra_count_finished_attempts($geogebraid, $userid);
             $result->duration = '';
@@ -742,6 +745,7 @@ function geogebra_get_first_attempt_grade($geogebraid, $userid) {
 
             $result->userid = $userid;
             $result->grade = $parsedVars['grade'];
+            $result->gradecomment = $attempt->gradecomment;
             $result->rawgrade = $result->grade;
             $result->attempts = geogebra_count_finished_attempts($geogebraid, $userid);
             $result->duration = $parsedVars['duration'];
@@ -801,6 +805,7 @@ function geogebra_get_highest_attempt_grade($geogebraid, $userid) {
             $result->userid = $userid;
             $result->grade = $parsedVars['grade'];
             $result->rawgrade = $result->grade;
+            $result->gradecomment = $maxattempt->gradecomment;
             $result->attempts = sizeof($attempts);
             $result->duration = $parsedVars['duration'];
             $result->dateteacher = $maxattempt->dateteacher;
@@ -811,6 +816,7 @@ function geogebra_get_highest_attempt_grade($geogebraid, $userid) {
             $result->userid = $userid;
             $result->grade = '';
             $result->rawgrade = '';
+            $result->gradecomment = '';
             $result->attempts = count($attempts);
             $result->duration = '';
             $result->dateteacher = '';
@@ -871,6 +877,7 @@ function geogebra_get_lowest_attempt_grade($geogebraid, $userid) {
             $result->userid = $userid;
             $result->grade = $parsedVars['grade'];
             $result->rawgrade = $result->grade;
+            $result->gradecomment = $minattempt->gradecomment;
             $result->attempts = sizeof($attempts);
             $result->duration = $parsedVars['duration'];
             $result->dateteacher = $minattempt->dateteacher;
@@ -881,6 +888,7 @@ function geogebra_get_lowest_attempt_grade($geogebraid, $userid) {
             $result->userid = $userid;
             $result->grade = '';
             $result->rawgrade = '';
+            $result->gradecomment = '';
             $result->attempts = count($attempts);
             $result->duration = '';
             $result->dateteacher = '';
