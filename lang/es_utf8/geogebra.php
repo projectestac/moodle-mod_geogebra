@@ -78,4 +78,8 @@ $string['gradeit'] = 'Calificación';
 $string['ungraded'] = 'Sin calificar';
 $string['save'] = 'Guardar';
 $string['autograde'] = 'Actividad autopuntuable';
+
+
+$string['savechanges'] = 'Guardar los cambios';
+$string['savereturn'] = 'Guardar y volver';
 ?>

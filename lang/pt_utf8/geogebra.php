@@ -76,6 +76,6 @@ $string['deleteallattempts'] = 'Eliminar todas as tentativas';
 $string['view'] = 'Ver';
 $string['gradeit'] = 'Classificação';
 $string['ungraded'] = 'Sem classificar';
-$string['save'] = 'Guardar';
+//$string['save'] = 'Guardar';
 $string['autograde'] = 'Actividade autoavaliada';
 ?>

@@ -9,6 +9,7 @@
  */
 function showDetailTable($attempt, $context, $navlinks, $geogebra, $cm, $course, $parsedVars, $attemptnumber) {
 
+    global $CFG;
     $title = get_string('report', 'geogebra') . ' ' . $geogebra->name . ' ' . get_string('for', 'geogebra') . ' ' . $attempt->user_firstname . ' ' . $attempt->user_lastname;
 
     if ($geogebra->grade != GEOGEBRA_NO_GRADING) {
@@ -88,7 +89,7 @@ function showDetailTable($attempt, $context, $navlinks, $geogebra, $cm, $course,
 
     $usehtmleditor = false;
     if (has_capability('mod/geogebra:gradeactivity', $context) && $geogebra->grade != GEOGEBRA_NO_GRADING) {
-        echo '<form id="grade_form" action="" method="POST" >';
+        echo '<form id="grade_form" method="POST" >';
         echo '<div class="gradecontent">';
         echo '<label for="menugrade">' . get_string('grade') . ' </label>';
         choose_from_menu(make_grades_menu($geogebra->grade), 'manualgrade', $parsedVars['grade'], get_string('nograde'), '', -1, false);
@@ -102,9 +103,12 @@ function showDetailTable($attempt, $context, $navlinks, $geogebra, $cm, $course,
         }
         echo '</div>';
         echo '<input type="hidden" name="updated" value="1" />';
-        echo '<input type="submit" value="' . get_string('save', 'geogebra') . '" />';
+        //    echo '<input type="submit" value="' . get_string('savechanges', 'geogebra') . '" />';
+        echo '<input type="submit" onclick = "this.form.action = ' . "'" . $CFG->wwwroot . "/mod/geogebra/grade.php?id=" . $cm->id . "&student=" . $attempt->userid . "&attempt=" . $attempt->id . "'" . '" value="' . get_string('savechanges', 'geogebra') . '" />';
+        echo '<input type="submit" onclick = "this.form.action = ' . "'" . $CFG->wwwroot . "/mod/geogebra/grade.php?id=" . $cm->id . "&student=" . $attempt->userid . "&attempt=" . $attempt->id . "&list=" . "1" . "'" . '" value="' . get_string('savereturn', 'geogebra') . '" />';
         echo ' </form>';
         echo '</div>';
+        //   $CFG->wwwroot . '/mod/geogebra/grade.php?id=' . $cm->id, get_string('resultstab', 'geogebra')
     } else {
         //    echo '<br>';
 
@@ -116,8 +120,7 @@ function showDetailTable($attempt, $context, $navlinks, $geogebra, $cm, $course,
         $table_detailed->tablealign = 'left';
         array_push($table_comment->data, array(
             !empty($attempt->gradecomment) ? format_text($attempt->gradecomment, FORMAT_HTML) : ''
-
-            ));
+        ));
         print_table($table_comment);
         //    print_box(format_text($attempt->gradecomment, FORMAT_HTML), 'generalbox boxwidthwide boxaligncenter', 'online');
     }
@@ -162,6 +165,10 @@ function geogebra_show_attempt($cm, $course, $context, $navlinks, $geogebra, $us
         }
     }
 
+    // And check that the attempt actually exist
+    if (get_record('geogebra_attempts', 'id', $attemptid, 'userid', $userid, 'geogebra', $geogebra->id) === false) {
+        error('This requested attempt does not exist');
+    }
     array_push($navlinks, array(
         'name' => $attempt->user_firstname . ' ' . $attempt->user_lastname,
         'link' => '',
@@ -274,7 +281,7 @@ function geogebra_show_all_attempts($cm, $course, $context, $navlinks, $geogebra
                     $row = array($picture, $userlink,
                         $attemptsgrade->attempts + $any_unfinished . '<a href="' . $CFG->wwwroot . '/mod/geogebra/grade.php?id=' . $id . '&student=' . $user->id . '"> ' . '(' . get_string('viewattempts', 'geogebra') . ')' . '</a>',
                         !empty($attemptsgrade->duration) ? geogebra_time2str($attemptsgrade->duration) : '',
-                     //   '',
+                        //   '',
                         !empty($attemptsgrade->gradecomment) ? shorten_text(trim(strip_tags(format_text($attemptsgrade->gradecomment))), 25) : '',
                         $attemptsgrade->grade,
                         !empty($attemptsgrade->date) ? userdate($attemptsgrade->date) : '',
@@ -378,7 +385,7 @@ function geogebra_show_user_attempts($course, $geogebra, $userid, $table, $id) {
             $grade = $parsedVars['grade'];
 
             $notice = '';
-             $teachernotice = '<a href="' . $CFG->wwwroot . '/mod/geogebra/grade.php?id=' . $id . '&student=' . $userid . '&attempt=' . $attempt->attempt_id . '"> ' . $state = get_string('update') . '</a>';
+            $teachernotice = '<a href="' . $CFG->wwwroot . '/mod/geogebra/grade.php?id=' . $id . '&student=' . $userid . '&attempt=' . $attempt->attempt_id . '"> ' . $state = get_string('update') . '</a>';
             if ($attempt->finished == 0) { //Don't show grade if attempt is unfinished
                 $grade = '-';
                 $notice = ' (' . get_string('unfinished', 'geogebra') . ')';
@@ -426,7 +433,8 @@ $student = optional_param('student', 0, PARAM_INT);    // student id
 $attemptid = optional_param('attempt', 0, PARAM_INT);
 $gradecomment = optional_param('gradecomment', NULL);
 $manualgrade = optional_param('manualgrade', NULL);
-$updated = optional_param('updated', 0, PARAM_INT);
+$updated = optional_param('updated', 0, PARAM_INT); //Has attempt been updated?
+$list = optional_param('list', 0, PARAM_INT); //Show list or attempt info?
 
 if ($id) {
     if (($cm = get_coursemodule_from_id('geogebra', $id)) === false) {
@@ -480,7 +488,7 @@ $navlinks = array(
 
 if (has_capability('mod/geogebra:gradeactivity', $context)) {
     //Update grades and comments if requiered
-    if (!empty($updated)) {
+    if ($updated) {
         // if (($gradecomment != NULL) && ($manualgrade != NULL)) {
         $attempt = geogebra_get_attempt($attemptid);
         parse_str($attempt->vars, $parsedVars);
@@ -497,7 +505,10 @@ if (has_capability('mod/geogebra:gradeactivity', $context)) {
     /*
      * Teacher view
      */
-    if ($attemptid && $student) {
+    if ($list) {
+        // General view - Summary for each student
+        geogebra_show_all_attempts($cm, $course, $context, $navlinks, $geogebra, $id, $student);
+    } else if ($attemptid && $student) {
         // Detailed view of one attempt
         geogebra_show_attempt($cm, $course, $context, $navlinks, $geogebra, $student, $attemptid);
     } else {
@@ -508,8 +519,8 @@ if (has_capability('mod/geogebra:gradeactivity', $context)) {
     /*
      *  Student view
      */
+    // Show only one attempt if attemptid is specified and userid is the current user (to avoid security problems)
     if ($attemptid && $student && $student == $USER->id) {
-        // Show only one attempt if attemptid is specified and userid is the current user (to avoid security problems)
         geogebra_show_attempt($cm, $course, $context, $navlinks, $geogebra, $student, $attemptid);
     } else {
         // Show all his/her attempts

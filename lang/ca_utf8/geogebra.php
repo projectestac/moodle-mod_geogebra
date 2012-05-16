@@ -76,6 +76,11 @@ $string['deleteallattempts'] = 'Suprimeix tots els intents';
 $string['view'] = 'Veure';
 $string['gradeit'] = 'Qualificació';
 $string['ungraded'] = 'Sense qualificar';
-$string['save'] = 'Desa';
+//$string['save'] = 'Desa';
 $string['autograde'] = 'Activitat autopuntuable';
+
+
+$string['savechanges'] = 'Desa els canvis';
+$string['savereturn'] = 'Desa i torna';
+
 ?>

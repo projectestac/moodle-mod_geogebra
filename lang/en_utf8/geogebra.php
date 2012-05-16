@@ -79,4 +79,8 @@ $string['gradeit'] = 'Grade';
 $string['ungraded'] = 'Ungraded';
 $string['save'] = 'Save';
 $string['autograde'] = 'Selfgrade activity';
+
+
+$string['savechanges'] = 'Save changes';
+$string['savereturn'] = 'Save and return';
 ?>
