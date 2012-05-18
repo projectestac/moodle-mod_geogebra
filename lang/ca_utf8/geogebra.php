@@ -81,6 +81,6 @@ $string['autograde'] = 'Activitat autopuntuable';
 
 
 $string['savechanges'] = 'Desa els canvis';
-$string['savereturn'] = 'Desa i torna';
+$string['discardchanges'] = 'Torna sense desar';
 
 ?>

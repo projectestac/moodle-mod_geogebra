@@ -81,5 +81,5 @@ $string['autograde'] = 'Actividad autopuntuable';
 
 
 $string['savechanges'] = 'Guardar los cambios';
-$string['savereturn'] = 'Guardar y volver';
+$string['discardchanges'] = 'Volver sin guardar';
 ?>

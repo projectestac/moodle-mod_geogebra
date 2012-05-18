@@ -82,5 +82,5 @@ $string['autograde'] = 'Selfgrade activity';
 
 
 $string['savechanges'] = 'Save changes';
-$string['savereturn'] = 'Save and return';
+$string['discardchanges'] = 'Discard changes and return';
 ?>
