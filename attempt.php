@@ -91,6 +91,14 @@ if ($geogebra->autograde == 0) {
             'state' => $parsedVars['state']
                 ), '', '&');
     parse_str($vars, $parsedVars);
+} else {
+    $vars = http_build_query(array(
+            'grade' => round($parsedVars['grade'], 2),
+            'duration' => $parsedVars['duration'],
+            'attempts' => $parsedVars['attempts'],
+            'state' => $parsedVars['state']
+                ), '', '&');
+    parse_str($vars, $parsedVars);
 }
 
 if ($attempt) { //Exists an unfishined attempt
