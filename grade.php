@@ -314,12 +314,13 @@ function geogebra_show_all_attempts($cm, $course, $context, $navlinks, $geogebra
                     }
                 } else {
                     if ($any_unfinished) {
-                        array_push($table->data, array(
-                            print_user_picture($user->id, $geogebra->course, NULL, 0, true) . ' ' . ' <a href="' . $CFG->wwwroot . '/mod/geogebra/grade.php?id=' . $id . '&student=' . $user->id . '">' . $user->firstname . ' ' . $user->lastname . '</a>',
-                            htmlentities($any_unfinished, ENT_QUOTES, 'UTF-8'),
+                        $row = array($picture, $userlink,
+                            $any_unfinished . '<a href="' . $CFG->wwwroot . '/mod/geogebra/grade.php?id=' . $id . '&student=' . $user->id . '"> ' . '(' . get_string('viewattempts', 'geogebra') . ')' . '</a>',
+                            '',
                             '',
                             ''
-                        ));
+                        );
+                        $table->add_data($row);
                         if ($student == $user->id) {
                             geogebra_show_user_attempts($course, $geogebra, $user->id, $table, $id);
                         }
