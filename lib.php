@@ -352,7 +352,7 @@ function geogebra_scale_used($geogebraid, $scaleid) {
 
     $return = false;
 
-    $rec = get_record("glossary", "id", "$geogebraid", "grade", "-$scaleid");
+    $rec = get_record("geogebra", "id", "$geogebraid", "grade", "-$scaleid");
 
     if (!empty($rec) && !empty($scaleid)) {
         $return = true;
