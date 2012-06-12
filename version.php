@@ -1,4 +1,10 @@
 <?php
+
+// To avoid 1.9 Notice
+if (!defined('MATURITY_RC')) {
+    define('MATURITY_RC', 150);
+}
+
 $module->version   = 2012030101;      // The current module version (Date: YYYYMMDDXX)
 $module->requires  = 2007101512;      // Requires this Moodle version
 $module->cron      = 0;               // Period for cron to check this module (secs)
