@@ -41,8 +41,12 @@ function xmldb_geogebra_upgrade($oldversion = 0) {
     }
     
     if ($result && $oldversion < 2012082100) {
-        $table = new XMLDBTable('geogebra_attempts');
+        $table = new XMLDBTable('geogebra');
+        $field = new XMLDBField('url');
+        $field->setAttributes(XMLDB_TYPE_CHAR, '255', null, XMLDB_NOTNULL, null, null, null, null, 'intro');
+        $result = $result && change_field_precision($table, $field);        
         
+        $table = new XMLDBTable('geogebra_attempts');        
         $field = new XMLDBField('gradecomment');
         $field->setAttributes(XMLDB_TYPE_TEXT, 'small', null, false, null, null, null, null, 'vars');
         $result = $result && change_field_notnull($table, $field);
