@@ -19,7 +19,7 @@ $string['highestattempt'] = 'Millor intent';
 $string['lowestattempt'] = 'Pitjor intent';
 $string['firstattempt'] = 'Primer intent';
 $string['lastattempt'] = 'Darrer intent';
-$string['viewattempts'] = 'Veure intents';
+$string['viewattempts'] = 'Visualitza intents';
 $string['comment'] = 'Comentari';
 
 $string['unlimitedattempts'] = 'Aquesta activitat no té límit d\'intents';
@@ -73,7 +73,7 @@ $string['language']='Idioma';
 $string['resumeattempt'] = 'Continuació d\'un intent anterior';
 $string['coursewithoutstudents'] = 'No hi ha estudiants inscrits en el curs actual';
 $string['deleteallattempts'] = 'Suprimeix tots els intents';
-$string['view'] = 'Veure';
+$string['view'] = 'Visualitza';
 $string['gradeit'] = 'Qualificació';
 $string['ungraded'] = 'Sense qualificar';
 //$string['save'] = 'Desa';

@@ -39,6 +39,20 @@ function xmldb_geogebra_upgrade($oldversion = 0) {
         $field->setAttributes(XMLDB_TYPE_INTEGER, '10', XMLDB_UNSIGNED, XMLDB_NOTNULL, null, null, null, '0', 'finished');
         $result = $result && add_field($table, $field);
     }
+    
+    if ($result && $oldversion < 2012082100) {
+        $table = new XMLDBTable('geogebra_attempts');
+        
+        $field = new XMLDBField('gradecomment');
+        $field->setAttributes(XMLDB_TYPE_TEXT, 'small', null, false, null, null, null, null, 'vars');
+        $result = $result && change_field_notnull($table, $field);
+        
+        $field = new XMLDBField('date');
+        $field->setAttributes(XMLDB_TYPE_INTEGER, '10', XMLDB_UNSIGNED, XMLDB_NOTNULL, null, null, null, '0');
+        $result = $result && rename_field($table, $field, 'datestudent');
+        
+    }
+    
     return $result;
 }
 

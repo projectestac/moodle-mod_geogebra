@@ -103,7 +103,7 @@ function backup_geogebra_attempts($bf, $preferences, $geogebra) {
             fwrite($bf, full_tag("GRADECOMMENT", 6, false, $attempt->gradecomment));
             fwrite($bf, full_tag("FINISHED", 6, false, $attempt->finished));
             fwrite($bf, full_tag("DATETEACHER", 6, false, $attempt->dateteacher));
-            fwrite($bf, full_tag("DATE", 6, false, $attempt->date));
+            fwrite($bf, full_tag("DATESTUDENT", 6, false, $attempt->datestudent));
             //End entry
             $status = fwrite($bf, end_tag("ATTEMPT", 5, true));
         }

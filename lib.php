@@ -38,7 +38,7 @@ function geogebra_add_attempt($geogebraid, $userid, $vars, $finished = 1) {
     $register->userid = $userid;
     $register->vars = $vars;
     $register->finished = $finished;
-    $register->date = time();
+    $register->datestudent = time();
 
     return (insert_record('geogebra_attempts', $register) !== false);
 }
@@ -61,7 +61,7 @@ function geogebra_update_attempt($attemptid, $vars, $actionby, $gradecomment = n
     $register->finished = $finished;
     //Modified by student or teacher
     if ($actionby == GEOGEBRA_UPDATE_STUDENT) {
-        $register->date = time();
+        $register->datestudent = time();
     } else if ($actionby == GEOGEBRA_UPDATE_TEACHER) {
         $register->dateteacher = time();
     }
@@ -564,7 +564,7 @@ function geogebra_get_unique_attempt_grade($geogebraid, $userid) {
             $result->attempts = geogebra_count_finished_attempts($geogebraid, $userid);
             $result->duration = $parsedVars['duration'];
             $result->dateteacher = $attempt->dateteacher;
-            $result->date = $attempt->date;
+            $result->datestudent = $attempt->datestudent;
 
             return $result;
         }
@@ -602,7 +602,7 @@ function geogebra_get_nograding_grade($geogebraid, $userid) {
         $result->attempts = $count; //A revisar quan ATTEMPS estigui llest
         $result->duration = round($durationsum, 2);
         $result->dateteacher = '';
-        $result->date = '';
+        $result->datestudent = '';
 
         return $result;
     } else
@@ -644,7 +644,7 @@ function geogebra_get_average_grade($geogebraid, $userid) {
             $result->attempts = count($attempts); //A revisar quan ATTEMPS estigui llest
             $result->duration = round($durationsum / $count, 2);
             $result->dateteacher = '';
-            $result->date = '';
+            $result->datestudent = '';
 
             return $result;
         } else {
@@ -654,7 +654,7 @@ function geogebra_get_average_grade($geogebraid, $userid) {
             $result->attempts = count($attempts);
             $result->duration = '';
             $result->dateteacher = '';
-            $result->date = '';
+            $result->datestudent = '';
 
             return $result;
         }
@@ -674,7 +674,7 @@ function geogebra_get_last_attempt_grade($geogebraid, $userid) {
 
     $select = 'SELECT *';
     $from = ' FROM ' . $CFG->prefix . 'geogebra_attempts';
-    $where = ' WHERE `date` = (SELECT MAX(date) FROM ' . $CFG->prefix . 'geogebra_attempts WHERE 
+    $where = ' WHERE `datestudent` = (SELECT MAX(datestudent) FROM ' . $CFG->prefix . 'geogebra_attempts WHERE 
         userid = ' . $userid . ' AND geogebra = ' . $geogebraid . ' AND finished = 1)';
 
 
@@ -691,7 +691,7 @@ function geogebra_get_last_attempt_grade($geogebraid, $userid) {
             $result->attempts = geogebra_count_finished_attempts($geogebraid, $userid);
             $result->duration = '';
             $result->dateteacher = '';
-            $result->date = '';
+            $result->datestudent = '';
 
             return $result;
         } else {
@@ -702,7 +702,7 @@ function geogebra_get_last_attempt_grade($geogebraid, $userid) {
             $result->attempts = geogebra_count_finished_attempts($geogebraid, $userid);
             $result->duration = $parsedVars['duration'];
             $result->dateteacher = $attempt->dateteacher;
-            $result->date = $attempt->date;
+            $result->datestudent = $attempt->datestudent;
 
             return $result;
         }
@@ -722,7 +722,7 @@ function geogebra_get_first_attempt_grade($geogebraid, $userid) {
 
     $select = 'SELECT *';
     $from = ' FROM ' . $CFG->prefix . 'geogebra_attempts';
-    $where = ' WHERE `date` = (SELECT MIN(date) FROM ' . $CFG->prefix . 'geogebra_attempts WHERE 
+    $where = ' WHERE `datestudent` = (SELECT MIN(datestudent) FROM ' . $CFG->prefix . 'geogebra_attempts WHERE 
         userid = ' . $userid . ' AND geogebra = ' . $geogebraid . ' AND finished = 1)';
 
     if ($attempt = get_record_sql($select . $from . $where)) {
@@ -738,7 +738,7 @@ function geogebra_get_first_attempt_grade($geogebraid, $userid) {
             $result->attempts = geogebra_count_finished_attempts($geogebraid, $userid);
             $result->duration = '';
             $result->dateteacher = '';
-            $result->date = '';
+            $result->datestudent = '';
 
             return $result;
         } else {
@@ -750,7 +750,7 @@ function geogebra_get_first_attempt_grade($geogebraid, $userid) {
             $result->attempts = geogebra_count_finished_attempts($geogebraid, $userid);
             $result->duration = $parsedVars['duration'];
             $result->dateteacher = $attempt->dateteacher;
-            $result->date = $attempt->date;
+            $result->datestudent = $attempt->datestudent;
 
             return $result;
         }
@@ -809,7 +809,7 @@ function geogebra_get_highest_attempt_grade($geogebraid, $userid) {
             $result->attempts = sizeof($attempts);
             $result->duration = $parsedVars['duration'];
             $result->dateteacher = $maxattempt->dateteacher;
-            $result->date = $maxattempt->date;
+            $result->datestudent = $maxattempt->datestudent;
 
             return $result;
         } else {
@@ -820,7 +820,7 @@ function geogebra_get_highest_attempt_grade($geogebraid, $userid) {
             $result->attempts = count($attempts);
             $result->duration = '';
             $result->dateteacher = '';
-            $result->date = '';
+            $result->datestudent = '';
 
             return $result;
         }
@@ -881,7 +881,7 @@ function geogebra_get_lowest_attempt_grade($geogebraid, $userid) {
             $result->attempts = sizeof($attempts);
             $result->duration = $parsedVars['duration'];
             $result->dateteacher = $minattempt->dateteacher;
-            $result->date = $minattempt->date;
+            $result->datestudent = $minattempt->datestudent;
 
             return $result;
         } else {
@@ -892,7 +892,7 @@ function geogebra_get_lowest_attempt_grade($geogebraid, $userid) {
             $result->attempts = count($attempts);
             $result->duration = '';
             $result->dateteacher = '';
-            $result->date = '';
+            $result->datestudent = '';
 
             return $result;
         }
@@ -1154,23 +1154,23 @@ function geogebra_reset_course_form_defaults($course) {
 function geogebra_define_table($table, $geogebra, $course) {
 
     if ($geogebra->grade != GEOGEBRA_NO_GRADING) {
-        $tablecolumns = array('picture', 'fullname', 'attempts', 'duration', 'comment', 'grade', 'date', 'dateteacher', 'status');
+        $tablecolumns = array('picture', 'fullname', 'attempts', 'duration', 'grade', 'comment', 'datestudent', 'dateteacher', 'status');
         $tableheaders = array('',
             get_string('fullname'),
             get_string('attempts', 'geogebra') . ($geogebra->maxattempts > 0 ? ' / ' . $geogebra->maxattempts : ''),
             get_string('duration', 'geogebra'),
-            get_string('comment', 'geogebra'),
             ($geogebra->grade < 0) ? get_string('grade', 'geogebra') : get_string('grade', 'geogebra') . ' / ' . $geogebra->grade,
+            get_string('comment', 'geogebra'),
             get_string('lastmodified').' ('.$course->student.')',
             get_string('lastmodified').' ('.$course->teacher.')',
             get_string('status'));
     } else {
-        $tablecolumns = array('picture', 'fullname', 'attempts', 'duration', 'date', 'status');
+        $tablecolumns = array('picture', 'fullname', 'attempts', 'duration', 'datestudent', 'status');
         $tableheaders = array('',
             get_string('fullname'),
             get_string('attempts', 'geogebra') . ($geogebra->maxattempts > 0 ? ' / ' . $geogebra->maxattempts : ''),
             get_string('duration', 'geogebra'),
-            get_string('date'),
+            get_string('lastmodified').' ('.$course->student.')',
             get_string('status'));
     }
     $table->define_columns($tablecolumns);

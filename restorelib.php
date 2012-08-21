@@ -101,7 +101,7 @@ function geogebra_attempts_restore_mods($old_attempt_id, $new_attempt_id, $info,
         $attempt->gradecooment = backup_todb($attempt_info['#']['GRADECOMMENT']['0']['#']);
         $attempt->finished = backup_todb($attempt_info['#']['FINISHED']['0']['#']);
         $attempt->dateteacher = backup_todb($attempt_info['#']['DATETEACHER']['0']['#']);
-        $attempt->date = backup_todb($attempt_info['#']['DATE']['0']['#']);
+        $attempt->datestudent = backup_todb($attempt_info['#']['DATESTUDENT']['0']['#']);
 
 
         //We have to recode the userid field

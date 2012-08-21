@@ -81,11 +81,15 @@ print_tabs(array(
 
 $attempt = geogebra_get_unfinished_attempt($geogebra->id, $USER->id);
 
-//If geogebra is not autograding, change grade from 0 to undefined
-
 if ($geogebra->autograde == 0) {
+//If geogebra is not autograding, change grade from 0 to undefined or get the one specified by the teacher
+    $grade = '-1';
+    if ($attempt){
+        parse_str($attempt->vars, $attemptVars);
+        $grade = $attemptVars['grade'];
+    }
     $vars = http_build_query(array(
-            'grade' => '-1',
+            'grade' => $grade,
             'duration' => $parsedVars['duration'],
             'attempts' => $parsedVars['attempts'],
             'state' => $parsedVars['state']
