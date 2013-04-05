@@ -1,9 +1,49 @@
 <?php
 
-function xmldb_geogebra_upgrade($oldversion = 0) {
-    global $CFG;
+// This file is part of Moodle - http://moodle.org/
+//
+// Moodle is free software: you can redistribute it and/or modify
+// it under the terms of the GNU General Public License as published by
+// the Free Software Foundation, either version 3 of the License, or
+// (at your option) any later version.
+//
+// Moodle is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// GNU General Public License for more details.
+//
+// You should have received a copy of the GNU General Public License
+// along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
-    $result = true;
+/**
+ * This file keeps track of upgrades to the geogebra module
+ *
+ * Sometimes, changes between versions involve alterations to database
+ * structures and other major things that may break installations. The upgrade
+ * function in this file will attempt to perform all the necessary actions to
+ * upgrade your older installation to the current version. If there's something
+ * it cannot do itself, it will tell you what you need to do.  The commands in
+ * here will all be database-neutral, using the functions defined in DLL libraries.
+ *
+ * @package    mod
+ * @subpackage geogebra
+ * @copyright  2011 Departament d'Ensenyament de la Generalitat de Catalunya
+ * @author     Sara Arjona Téllez <sarjona@xtec.cat>
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ */
+
+defined('MOODLE_INTERNAL') || die();
+
+/**
+ * Execute geogebra upgrade from the given old version
+ *
+ * @param int $oldversion
+ * @return bool
+ */
+function xmldb_geogebra_upgrade($oldversion) {
+    global $CFG, $DB;
+
+    $dbman = $DB->get_manager(); // loads ddl manager and xmldb classes
 
     if ($result && $oldversion < 2012030100) {
         //Add grade field
@@ -57,7 +97,47 @@ function xmldb_geogebra_upgrade($oldversion = 0) {
         
     }
     
-    return $result;
-}
+    if ($oldversion < 2013030500) {
 
-?>
+        /// Define field introformat to be added to geogebra
+        $table = new xmldb_table('geogebra');
+        $field = new xmldb_field('introformat');
+        $field->set_attributes(XMLDB_TYPE_INTEGER, '4', XMLDB_UNSIGNED, XMLDB_NOTNULL, null, '0', 'intro');
+
+        /// Launch add field introformat
+        if (!$dbman->field_exists($table, $field)) {
+            $dbman->add_field($table, $field);
+        }
+
+        // conditionally migrate to html format in intro
+        if ($CFG->texteditors !== 'textarea') {
+            $rs = $DB->get_recordset('geogebra', array('introformat'=>FORMAT_MOODLE), '', 'id,intro,introformat');
+            foreach ($rs as $f) {
+                $f->intro       = text_to_html($f->intro, false, false, true);
+                $f->introformat = FORMAT_HTML;
+                $DB->update_record('geogebra', $f);
+                upgrade_set_timeout();
+            }
+            $rs->close();
+        }
+        
+        /// geogebra savepoint reached
+        upgrade_mod_savepoint(true, 2011122902, 'geogebra');
+    }
+    
+//===== 1.9.0 upgrade line ======//
+    
+    if ($oldversion < 2012042700) {
+
+        require_once("$CFG->dirroot/mod/geogebra/db/upgradelib.php");
+        // Add upgrading code from 1.9 (+ new file storage system)
+        // @TODO: test it!!!!
+        geogebra_migrate_files();
+     
+        // geogebra savepoint reached
+        upgrade_mod_savepoint(true, 2012042700, 'geogebra');
+    }
+    
+    // Final return of upgrade result (true, all went good) to Moodle.
+    return true;
+}

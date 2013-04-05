@@ -1,6 +1,43 @@
 <?php
 
-//Contants defining grading method
+// This file is part of Moodle - http://moodle.org/
+//
+// Moodle is free software: you can redistribute it and/or modify
+// it under the terms of the GNU General Public License as published by
+// the Free Software Foundation, either version 3 of the License, or
+// (at your option) any later version.
+//
+// Moodle is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// GNU General Public License for more details.
+//
+// You should have received a copy of the GNU General Public License
+// along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
+
+/**
+ * Library of interface functions and constants for module geogebra
+ *
+ * All the core Moodle functions, neeeded to allow the module to work
+ * integrated in Moodle should be placed here.
+ * All the geogebra specific functions, needed to implement all the module
+ * logic, should go to locallib.php. This will help to save some memory when
+ * Moodle is performing actions across all modules.
+ *
+ * @package    mod
+ * @subpackage geogebra
+ * @copyright  2011 Departament d'Ensenyament de la Generalitat de Catalunya
+ * @author     Sara Arjona Téllez <sarjona@xtec.cat>
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ */
+
+defined('MOODLE_INTERNAL') || die();
+
+// File types
+define('GEOGEBRA_FILE_TYPE_LOCAL', 'local');
+define('GEOGEBRA_FILE_TYPE_EXTERNAL', 'external');
+
+// Grading method
 define('GEOGEBRA_NO_GRADING', 0);
 define('GEOGEBRA_AVERAGE_GRADE', 1);
 define('GEOGEBRA_HIGHEST_GRADE', 2);
@@ -8,299 +45,308 @@ define('GEOGEBRA_LOWEST_GRADE', 3);
 define('GEOGEBRA_FIRST_GRADE', 4);
 define('GEOGEBRA_LAST_GRADE', 5);
 
-define('GEOGEBRA_UPDATE_STUDENT', 0);
-define('GEOGEBRA_UPDATE_TEACHER', 1);
-
 // GeoGebra applet vars
 define('GEOGEBRA_DEFAULT_CODEBASE', 'http://www.geogebra.org/webstart/4.0/unsigned/');
 define('GEOGEBRA_ARCHIVE', 'geogebra.jar');
 define('GEOGEBRA_CODE', 'geogebra.GeoGebraApplet');
 
-function geogebra_get_javacodebase() {
-    global $CFG;
-    if (isset($CFG->geogebra_javacodebase))
-        return $CFG->geogebra_javacodebase;
-    return GEOGEBRA_DEFAULT_CODEBASE;
-}
+
+/** Include eventslib.php */
+require_once($CFG->libdir.'/eventslib.php');
+/** Include formslib.php */
+require_once($CFG->libdir.'/formslib.php');
+/** Include calendar/lib.php */
+require_once($CFG->dirroot.'/calendar/lib.php');
+
+
+////////////////////////////////////////////////////////////////////////////////
+// Moodle core API                                                            //
+////////////////////////////////////////////////////////////////////////////////
 
 /**
- * Returns a geogebra attempt
+ * Returns the information on whether the module supports a feature
+ * 
+ * @todo: review features before publishing the module
  *
- * @param int $attemptid ID of the attempt
- * @return object attempt
+ * @see plugin_supports() in lib/moodlelib.php
+ * @param string $feature FEATURE_xx constant for requested feature
+ * @return mixed true if the feature is supported, null if unknown
  */
-function geogebra_get_attempt($attemptid) {
-    return (get_record('geogebra_attempts', 'id', $attemptid));
-}
-
-function geogebra_add_attempt($geogebraid, $userid, $vars, $finished = 1) {
-    $register->geogebra = $geogebraid;
-    $register->userid = $userid;
-    $register->vars = $vars;
-    $register->finished = $finished;
-    $register->datestudent = time();
-
-    return (insert_record('geogebra_attempts', $register) !== false);
-}
-
-/**
- * Updates an existing intance of a geogebra attempt
- * with the new data.
- *
- * @param int $attemptid ID of the attempt to be updated
- * @param string $vars Attempt vars to be updated
- * @param string $gradecomment Comment to the grade
- * @param boolean $finished Attempt finished/unfinished
- * @return boolean Success/Fail
- */
-function geogebra_update_attempt($attemptid, $vars, $actionby, $gradecomment = null, $finished = 1) {
-
-    $register->id = $attemptid;
-    $register->vars = $vars;
-    $register->gradecomment = $gradecomment;
-    $register->finished = $finished;
-    //Modified by student or teacher
-    if ($actionby == GEOGEBRA_UPDATE_STUDENT) {
-        $register->datestudent = time();
-    } else if ($actionby == GEOGEBRA_UPDATE_TEACHER) {
-        $register->dateteacher = time();
+function geogebra_supports($feature) {
+    switch($feature) {
+        case FEATURE_GROUPS:                  return true;
+//        case FEATURE_GROUPINGS:               return true;
+//        case FEATURE_GROUPMEMBERSONLY:        return true;
+        case FEATURE_MOD_INTRO:               return true;
+        case FEATURE_COMPLETION_TRACKS_VIEWS: return true;
+//        case FEATURE_COMPLETION_HAS_RULES:    return true;
+        case FEATURE_GRADE_HAS_GRADE:         return true;
+//        case FEATURE_GRADE_OUTCOMES:          return true;
+//        case FEATURE_RATE:                    return true;
+        case FEATURE_BACKUP_MOODLE2:          return true;
+//        case FEATURE_SHOW_DESCRIPTION:        return true;
+//        case FEATURE_ADVANCED_GRADING:        return true;
+        default:                        
+          if (defined('FEATURE_SHOW_DESCRIPTION') && $feature==FEATURE_SHOW_DESCRIPTION) return true;
+          else return null;
     }
-
-    return (update_record('geogebra_attempts', $register) !== false);
 }
 
 /**
- * Updates an existing intance of a geogebra attempt
- * with new grading information.
+ * Saves a new instance of the geogebra into the database
  *
- * @param int $attemptid ID of the attempt to be updated
- * @param string $vars Attempt vars to be updated
- * @param string $gradecomment Comment to the grade
- * @return boolean Success/Fail
- */
-/*function geogebra_update_attempt_grade($attemptid, $vars, $gradecomment = null) {
-    $register->id = $attemptid;
-    $register->vars = $vars;
-    $register->gradecomment = $gradecomment;
-
-    return (update_record('geogebra_attempts', $register) !== false);
-}*/
-
-function geogebra_setValues(&$geogebra) {
-
-    $enableRightClick = isset($geogebra->enableRightClick) && $geogebra->enableRightClick;
-    $enableLabelDrags = isset($geogebra->enableLabelDrags) && $geogebra->enableLabelDrags;
-    $showResetIcon = isset($geogebra->showResetIcon) && $geogebra->showResetIcon;
-    $showMenuBar = isset($geogebra->showMenuBar) && $geogebra->showMenuBar;
-    $showToolBar = isset($geogebra->showToolBar) && $geogebra->showToolBar;
-    $showToolBarHelp = isset($geogebra->showToolBarHelp) && $geogebra->showToolBarHelp;
-    $language = $geogebra->language;
-    //$showAlgebraInput = isset($geogebra->showAlgebraInput) && $geogebra->showAlgebraInput;
-    $geogebra->url = http_build_query(array(
-        'filename' => $geogebra->filename,
-        'enableRightClick' => $enableRightClick,
-        'enableLabelDrags' => $enableLabelDrags,
-        'showResetIcon' => $showResetIcon,
-        'showMenuBar' => $showMenuBar,
-        'showToolBar' => $showToolBar,
-        'showToolBarHelp' => $showToolBarHelp,
-        'language' => $language
-            ), '', '&');
-
-    $geogebra->showsubmit = isset($geogebra->showsubmit);
-}
-
-function geogebra_file_exists($data) {
-    global $CFG;
-
-    $filename = $CFG->dataroot . "/" . $data['course'] . "/" . $data['filename'];
-    $file_exists = file_exists($filename);
-    return $file_exists;
-}
-
-function geogebra_validate($data) {
-    $validation = new stdClass();
-    $validation->errors = array();
-
-    // Check if specified file is valid
-    if (!empty($data['filename'])) {
-        if (substr($data['filename'], 0, 4) == 'http') {
-            // At the moment is not possible to use external files
-            $validation->errors['filename'] = get_string('httpnotallowed', 'geogebra');
-            $validation->result = false;
-        } else if (!geogebra_file_exists($data)) {
-            $validation->errors['filename'] = get_string('filenotfound', 'geogebra');
-            $validation->result = false;
-        } else {
-            $validation->result = true;
-        }
-    }
-
-    return $validation;
-}
-
-/**
  * Given an object containing all the necessary data,
  * (defined by the form in mod_form.php) this function
  * will create a new instance and return the id number
  * of the new instance.
+ * 
+ * @todo: create event (when timedue added)
  *
  * @param object $geogebra An object from the form in mod_form.php
+ * @param mod_geogebra_mod_form $mform
  * @return int The id of the newly inserted geogebra record
  */
-function geogebra_add_instance($geogebra) {
-    geogebra_setValues($geogebra);
+function geogebra_add_instance(stdClass $geogebra, mod_geogebra_mod_form $mform = null) {
+    global $DB;
+        
+    $cmid = $geogebra->coursemodule;
     $geogebra->timecreated = time();
 
-    //return insert_record('geogebra', $geogebra);
-
-    if ($returnid = insert_record('geogebra', $geogebra)) {
-        $geogebra->id = $returnid;
-
-        if ($geogebra->timedue) {
-            $event = new object();
-            $event->name = $geogebra->name;
-            $event->description = $geogebra->intro;
-            $event->courseid = $geogebra->course;
-            $event->groupid = 0;
-            $event->userid = 0;
-            $event->modulename = 'geogebra';
-            $event->instance = $returnid;
-            $event->eventtype = 'due';
-            $event->timestart = $geogebra->timedue;
-            $event->timeduration = 0;
-
-            add_event($event);
-        }
-
-        geogebra_grade_item_update($geogebra);
+    if ($mform->get_data()->filetype === GEOGEBRA_FILE_TYPE_LOCAL) {
+        $geogebra->url = $mform->get_data()->geogebrafile;
+    } else{
+        $geogebra->url = $geogebra->geogebraurl;
     }
+    
+    $geogebra->id = $DB->insert_record('geogebra', $geogebra);
+    // we need to use context now, so we need to make sure all needed info is already in db
+    $DB->set_field('course_modules', 'instance', $geogebra->id, array('id'=>$cmid));
+    
+    // Store the geogebra and verify
+    if ($mform->get_data()->filetype === GEOGEBRA_FILE_TYPE_LOCAL) {
+        $filename = geogebra_set_mainfile($geogebra);
+        $geogebra->url = $filename;
+        $DB->update_record('geogebra', $geogebra);
+    }
+    
+    if ($geogebra->timedue) {
+        $event = new stdClass();
+        $event->name        = $geogebra->name;
+        $event->description = format_module_intro('geogebra', $geogebra, $geogebra->coursemodule);
+        $event->courseid    = $geogebra->course;
+        $event->groupid     = 0;
+        $event->userid      = 0;
+        $event->modulename  = 'geogebra';
+        $event->instance    = $geogebra->id;
+        $event->eventtype   = 'due';
+        $event->timestart   = $geogebra->timedue;
+        $event->timeduration = 0;
 
-    return $returnid;
+        calendar_event::create($event);
+    }
+    geogebra_grade_item_update($geogebra);
+    
+    return $geogebra->id;    
 }
 
 /**
+ * Updates an instance of the geogebra in the database
+ *
  * Given an object containing all the necessary data,
  * (defined by the form in mod_form.php) this function
  * will update an existing instance with new data.
  *
  * @param object $geogebra An object from the form in mod_form.php
+ * @param mod_geogebra_mod_form $mform
  * @return boolean Success/Fail
  */
-function geogebra_update_instance($geogebra) {
-    geogebra_setValues($geogebra);
+function geogebra_update_instance(stdClass $geogebra, mod_geogebra_mod_form $mform = null) {
+    global $DB;
+
     $geogebra->timemodified = time();
     $geogebra->id = $geogebra->instance;
-
-    if (!update_record('geogebra', $geogebra)) {
-        return false;
+    if ($mform->get_data()->filetype === GEOGEBRA_FILE_TYPE_LOCAL) {
+        $geogebra->url = $mform->get_data()->geogebrafile;
+    } else{
+        $geogebra->url = $geogebra->geogebraurl;
     }
+    
+    $result = $DB->update_record('geogebra', $geogebra);
+    if ($result && $mform->get_data()->filetype === GEOGEBRA_FILE_TYPE_LOCAL) {
+        $filename = geogebra_set_mainfile($geogebra);
+        $geogebra->url = $filename;
+        $result = $DB->update_record('geogebra', $geogebra);
+    }
+    
+    if ($result && $geogebra->timedue) {
+        $event = new stdClass();
+        if ($event->id = $DB->get_field('event', 'id', array('modulename'=>'geogebra', 'instance'=>$geogebra->id))) {
+            $event->name        = $geogebra->name;
+            $event->description = format_module_intro('geogebra', $geogebra, $geogebra->coursemodule);
+            $event->timestart   = $geogebra->timedue;
 
-    if ($geogebra->timedue) {
-        $event = new object();
-
-        if ($event->id = get_field('event', 'id', 'modulename', 'geogebra', 'instance', $geogebra->id)) {
-
-            $event->name = $geogebra->name;
-            $event->description = $geogebra->intro;
-            $event->timestart = $geogebra->timedue;
-
-            update_event($event);
+            $calendarevent = calendar_event::load($event->id);
+            $calendarevent->update($event);
         } else {
-            $event = new object();
-            $event->name = $geogebra->name;
-            $event->description = $geogebra->intro;
-            $event->courseid = $geogebra->course;
-            $event->groupid = 0;
-            $event->userid = 0;
-            $event->modulename = 'geogebra';
-            $event->instance = $geogebra->id;
-            $event->eventtype = 'due';
-            $event->timestart = $geogebra->timedue;
+            $event = new stdClass();
+            $event->name        = $geogebra->name;
+            $event->description = format_module_intro('geogebra', $geogebra, $geogebra->coursemodule);
+            $event->courseid    = $geogebra->course;
+            $event->groupid     = 0;
+            $event->userid      = 0;
+            $event->modulename  = 'geogebra';
+            $event->instance    = $geogebra->id;
+            $event->eventtype   = 'due';
+            $event->timestart   = $geogebra->timedue;
             $event->timeduration = 0;
 
-            add_event($event);
+            calendar_event::create($event);
         }
     } else {
-        delete_records('event', 'modulename', 'geogebra', 'instance', $geogebra->id);
+        $DB->delete_records('event', array('modulename'=>'geogebra', 'instance'=>$geogebra->id));
+    }  
+    
+    if ($result){
+        // get existing grade item
+        $result = geogebra_grade_item_update($geogebra);
     }
-
-    geogebra_grade_item_update($geogebra);
-    geogebra_update_grades($geogebra);
-    return true;
+    
+    return $result;
 }
 
 /**
+ * Removes an instance of the geogebra from the database
+ *
  * Given an ID of an instance of this module,
  * this function will permanently delete the instance
  * and any data that depends on it.
+ * 
+ * @todo: delete event records (after adding this feature to the module)
  *
  * @param int $id Id of the module instance
  * @return boolean Success/Failure
  */
 function geogebra_delete_instance($id) {
-    $result = true;
-
-    if (!$geogebra = get_record('geogebra', 'id', $id)) {
+    global $DB;
+    
+    if (!$geogebra = $DB->get_record('geogebra', array('id'=>$id))) {
         return false;
     }
+    
+    $result = true;
+    
+    $DB->delete_records('geogebra_attempts', array('geogebra' => $id));
 
-    if (!delete_records('geogebra_attempts', 'geogebra', $id)) {
+    // delete items from the gradebook
+    if(!geogebra_grade_item_delete($geogebra)){
         $result = false;
     }
 
-    if (!delete_records('geogebra', 'id', $id)) {
-        $result = false;
-    }
+    /** TODO: // delete files associated with this geogebra
+        $fs = get_file_storage();
+        if (! $fs->delete_area_files($context->id) ) {
+            $result = false;
+        }
+    **/
 
-    if (!delete_records('event', 'modulename', 'geogebra', 'instance', $id)) {
-        $result = false;
-    }
+    // delete events related with this instance
+    $DB->delete_records('event', array('modulename'=>'geogebra', 'instance'=>$id));
 
-    geogebra_grade_item_delete($geogebra);
-
+    // delete the instance
+    $DB->delete_records('geogebra', array('id' => $id));
+        
     return $result;
 }
 
 /**
- * Return a small object with summary information about what a
+ * Returns a small object with summary information about what a
  * user has done with a given particular instance of this module
  * Used for user activity reports.
  * $return->time = the time they did it
  * $return->info = a short text description
  *
- * @return null
- * @todo Finish documenting this function
+ * @param object $course
+ * @param object $user
+ * @param object $mod
+ * @param object $geogebra
+ * @return stdClass|null
  */
-function geogebra_user_outline($course, $user, $mod, $geogebra) {
-    $return = new stdClass;
-    $return->time = 0;
-    $return->info = '';
+function geogebra_user_outline($course, $user, $mod, $geogebra) {    
+    global $CFG;
+    
+    require_once("$CFG->libdir/gradelib.php");
+    $result = null;
+    
+    $grades = grade_get_grades($course->id, 'mod', 'geogebra', $geogebra->id, $user->id);
+    if (!empty($grades->items[0]->grades)) {
+        $grade = reset($grades->items[0]->grades);
+        $result = new stdClass();
+        $result->info = get_string('grade') . ': ' . $grade->str_long_grade;
 
-    return $return;
+        //if grade was last modified by the user themselves use date graded. Otherwise use date submitted
+        if ($grade->usermodified == $user->id || empty($grade->datesubmitted)) {
+            $result->time = $grade->dategraded;
+        } else {
+            $result->time = $grade->datesubmitted;
+        }
+    }
+    return $result;    
 }
 
 /**
- * Print a detailed representation of what a user has done with
+ * Prints a detailed representation of what a user has done with
  * a given particular instance of this module, for user activity reports.
+ * 
+ * @todo: implement
  *
- * @return boolean
- * @todo Finish documenting this function
+ * @return string HTML
  */
 function geogebra_user_complete($course, $user, $mod, $geogebra) {
+    $outline = geogebra_user_outline($course, $user, $mod, $geogebra);
+    
+    print_r($outline->info);
     return true;
 }
+
 
 /**
  * Given a course and a time, this module should find recent activity
  * that has occurred in geogebra activities and print it out.
  * Return true if there was output, or false is there was none.
+ * 
+ * @todo: implement
  *
  * @return boolean
- * @todo Finish documenting this function
  */
-function geogebra_print_recent_activity($course, $isteacher, $timestart) {
+function geogebra_print_recent_activity($course, $viewfullnames, $timestart) {
     return false;  //  True if anything was printed, otherwise false
+}
+
+/**
+ * Returns all activity in geogebras since a given time
+ * 
+ * @todo: implement
+ *
+ * @param array $activities sequentially indexed array of objects
+ * @param int $index
+ * @param int $timestart
+ * @param int $courseid
+ * @param int $cmid
+ * @param int $userid defaults to 0
+ * @param int $groupid defaults to 0
+ * @return void adds items into $activities and increases $index
+ */
+function geogebra_get_recent_mod_activity(&$activities, &$index, $timestart, $courseid, $cmid, $userid=0, $groupid=0) {
+}
+
+/**
+ * Prints single activity item prepared by {@see geogebra_get_recent_mod_activity()}
+ * 
+ * @todo: implement
+ * 
+ * @return void
+ */
+function geogebra_print_recent_mod_activity($activity, $courseid, $detail, $modnames, $viewfullnames) {
 }
 
 /**
@@ -310,894 +356,458 @@ function geogebra_print_recent_activity($course, $isteacher, $timestart) {
  *
  * @return boolean
  * @todo Finish documenting this function
- * */
-function geogebra_cron() {
+ **/
+function geogebra_cron () {
     return true;
 }
 
 /**
- * Must return an array of user records (all data) who are participants
- * for a given instance of geogebra. Must include every user involved
- * in the instance, independient of his role (student, teacher, admin...)
- * See other modules as example.
+ * Returns an array of users who are participanting in this geogebra
  *
+ * Must return an array of users who are participants for a given instance
+ * of geogebra. Must include every user involved in the instance,
+ * independient of his role (student, teacher, admin...). The returned
+ * objects must contain at least id property.
+ * See other modules as example.
+ * 
  * @param int $geogebraid ID of an instance of this module
- * @return mixed boolean/array of students
+ * @return boolean|array false if no participants, array of objects otherwise
  */
 function geogebra_get_participants($geogebraid) {
-    global $CFG;
+    global $CFG, $DB;
 
     //Get students
-    $students = get_records_sql("SELECT DISTINCT u.id, u.id as userid
-                                 FROM {$CFG->prefix}user u,
-                                      {$CFG->prefix}geogebra_attempts ga
-                                 WHERE ga.geogebra = '$geogebraid' and
-                                       u.id = ga.userid");
+    $students = $DB->get_records_sql("SELECT DISTINCT u.id, u.id as userid
+                                 FROM {user} u,
+                                      {geogebra_sessions} js
+                                 WHERE js.geogebraid = ? and
+                                       u.id = js.user_id", array($geogebraid));
+    //Get teachers
+    $teachers = $DB->get_records_sql("SELECT DISTINCT u.id, u.id as userid
+                                 FROM {user} u,
+                                      {geogebra_sessions} js
+                                 WHERE js.geogebraid = ? and
+                                       u.id = js.user_id", array($geogebraid));
+
+    //Add teachers to students
+    if ($teachers) {
+        foreach ($teachers as $teacher) {
+            $students[$teacher->id] = $teacher;
+        }
+    }
     //Return students array (it contains an array of unique users)
     return ($students);
 }
 
 /**
+ * Returns all other caps used in the module
+ *
+ * @example return array('moodle/site:accessallgroups');
+ * @return array
+ */
+function geogebra_get_extra_capabilities() {
+    return array('moodle/site:accessallgroups', 'moodle/site:viewfullnames', 'moodle/grade:managegradingforms');
+}
+
+////////////////////////////////////////////////////////////////////////////////
+// Gradebook API                                                              //
+////////////////////////////////////////////////////////////////////////////////
+
+/**
+ * Is a given scale used by the instance of geogebra?
+ *
  * This function returns if a scale is being used by one geogebra
  * if it has support for grading and scales. Commented code should be
  * modified if necessary. See forum, glossary or journal modules
  * as reference.
  *
  * @param int $geogebraid ID of an instance of this module
- * @return mixed
- * @todo Finish documenting this function
+ * @return bool true if the scale is used by the given geogebra instance
  */
 function geogebra_scale_used($geogebraid, $scaleid) {
-//This function returns if a scale is being used by one geogebra
-
+    global $DB;
+    
     $return = false;
-
-    $rec = get_record("geogebra", "id", "$geogebraid", "grade", "-$scaleid");
-
+    $rec = $DB->get_record('geogebra', array('id'=>$geogebraid,'grade'=>-$scaleid));
     if (!empty($rec) && !empty($scaleid)) {
         $return = true;
     }
-
     return $return;
 }
 
 /**
  * Checks if scale is being used by any instance of geogebra.
- * This function was added in 1.9
  *
- * This is used to find out if scale used anywhere
+ * This is used to find out if scale used anywhere.
+ *
  * @param $scaleid int
- * @return boolean True if the scale is used by any geogebra
+ * @return boolean true if the scale is used by any geogebra instance
  */
 function geogebra_scale_used_anywhere($scaleid) {
-    return ($scaleid && record_exists('geogebra', 'grade', -$scaleid));
-}
+    global $DB;
 
-/**
- * Execute post-install custom actions for the module
- * This function was added in 1.9
- *
- * @return boolean true if success, false on error
- */
-function geogebra_install() {
-    return true;
-}
-
-/**
- * Execute post-uninstall custom actions for the module
- * This function was added in 1.9
- *
- * @return boolean true if success, false on error
- */
-function geogebra_uninstall() {
-    return true;
-}
-
-/**
- * Update grades by firing grade_updated event
- *
- * @param object $geogebra null means all geogebras
- * @param int $userid specific user only, 0 mean all
- * @param boolean $nullifnone return null if grade does not exist
- * @return void
- */
-function geogebra_update_grades($geogebra = null, $userid = 0, $nullifnone = true) {
-    global $CFG;
-
-    if ($geogebra != null) {
-        require_once($CFG->libdir . '/gradelib.php');
-        if ($userid == 0) {
-            $students = geogebra_get_participants($geogebra->id);
-            if (!empty($students)) {
-                foreach ($students as $student) {
-                    if ($grades = geogebra_get_user_grades($geogebra, $student->id)) {
-                        if ($grades->grade != '') {
-                            geogebra_grade_item_update($geogebra, $grades);
-                        }
-                    }
-                }
-            }
-        } else {
-            if ($grades = geogebra_get_user_grades($geogebra, $userid)) {
-                if ($grades->grade != '') {
-                    geogebra_grade_item_update($geogebra, $grades);
-                }
-            } else if ($userid and $nullifnone) {
-                $grade = new object();
-                $grade->userid = $userid;
-                $grade->rawgrade = NULL;
-                geogebra_grade_item_update($geogebra, $grade);
-            } else {
-                geogebra_grade_item_update($geogebra);
-            }
-        }
+    if ($scaleid and $DB->record_exists('geogebra', array('grade'=>-$scaleid))) {
+        return true;
     } else {
-        $sql = "SELECT g.*, cm.idnumber as cmidnumber
-                  FROM {$CFG->prefix}geogebra g, {$CFG->prefix}course_modules cm, {$CFG->prefix}modules m
-                 WHERE m.name='geogebra' AND m.id=cm.module AND cm.instance=g.id";
-        if ($rs = get_recordset_sql($sql)) {
-            while ($geogebra = rs_fetch_next_record($rs)) {
-                geogebra_update_grades($geogebra, 0, false);
-            }
-            rs_close($rs);
-        }
+        return false;
     }
-    return true;
 }
 
 /**
- * Create/update grade item for given geogebra
+ * Creates or updates grade item for the give geogebra instance
  *
- * @param object $geogebra object with extra cmidnumber
- * @param mixed optional array/object of grade(s); 'reset' means reset grades in gradebook
+ * Needed by grade_update_mod_grades() in lib/gradelib.php
+ *
+ * @uses GRADE_TYPE_NONE
+ * @uses GRADE_TYPE_VALUE
+ * @uses GRADE_TYPE_SCALE
+ * @param stdClass $geogebra instance object with extra cmidnumber and modname property
+ * @param mixed $grades optional array/object of grade(s); 'reset' means reset grades in gradebook
  * @return int 0 if ok
  */
-function geogebra_grade_item_update($geogebra, $grades = NULL) {
+function geogebra_grade_item_update(stdClass $geogebra, $grades=NULL) {
     global $CFG;
-    if (!function_exists('grade_update')) { //workaround for buggy PHP versions
-        require_once($CFG->libdir . '/gradelib.php');
+    require_once($CFG->libdir.'/gradelib.php');
+
+    if (!isset($geogebra->courseid)) {
+        $geogebra->courseid = $geogebra->course;
     }
 
-    $params = array('itemname' => $geogebra->name, 'idnumber' => $geogebra->cmidnumber);
+    $params = array();
+    $params['itemname'] = clean_param($geogebra->name, PARAM_NOTAGS);
+    $params['idnumber'] = $geogebra->cmidnumber;
+    if ($geogebra->grade > 0) {
+        $params['gradetype'] = GRADE_TYPE_VALUE;
+        $params['grademax']  = $geogebra->grade;
+        $params['grademin']  = 0;
 
-    if ($geogebra->grade == GEOGEBRA_NO_GRADING) {
-        $params['gradetype'] = GRADE_TYPE_NONE;
     } else if ($geogebra->grade < 0) {
         $params['gradetype'] = GRADE_TYPE_SCALE;
-        $params['scaleid'] = -$geogebra->grade;
+        $params['scaleid']   = -$geogebra->grade;
+
     } else {
-        $params['gradetype'] = GRADE_TYPE_VALUE;
-        $params['grademax'] = $geogebra->grade;
-        $params['grademin'] = 0;
+        $params['gradetype'] = GRADE_TYPE_NONE; // allow text comments only
     }
 
-    if ($grades === 'reset') {
+    if ($grades  === 'reset') {
         $params['reset'] = true;
         $grades = NULL;
     }
+    
+    grade_update('mod/geogebra', $geogebra->courseid, 'mod', 'geogebra', $geogebra->id, 0, $grades, $params);
 
-    return grade_update('mod/geogebra', $geogebra->course, 'mod', 'geogebra', $geogebra->id, 0, $grades, $params);
+    return true;
 }
 
 /**
  * Delete grade item for given geogebra
  *
- * @param object $forum object
+ * @global object
+ * @param object $geogebra object
  * @return object grade_item
  */
 function geogebra_grade_item_delete($geogebra) {
-    global $CFG;
-    require_once($CFG->libdir . '/gradelib.php');
+    global $CFG;    
+    require_once($CFG->libdir.'/gradelib.php');
 
-    return grade_update('mod/geogebra', $geogebra->course, 'mod', 'geogebra', $geogebra->id, 0, NULL, array('deleted' => 1));
+    return grade_update('mod/geogebra', $geogebra->course, 'mod', 'geogebra', $geogebra->id, 0, NULL, array('deleted'=>1)) == GRADE_UPDATE_OK;
 }
 
 /**
- * Returns if a geogegra activity is configured to allow attempts.
+ * Return grade for given user or all users.
  *
- * @param object $geogebra object
- * @return boolean
- */
-function geogebra_attempts_allowed($geogebra) {
-    
-}
-
-/**
- * Returns the grade informacion for a user and geogebra activity
- * acording to the chosen grademethod.
- *
- * @param object $geogebra
- * @param int $userid
- * @return mixed
- */
-function geogebra_get_user_grades($geogebra, $userid) {
-    if ($geogebra->maxattempts == 0) {
-        $attempt = geogebra_get_unique_attempt_grade($geogebra->id, $userid);
-    } else {
-        switch ($geogebra->grademethod) {
-            case GEOGEBRA_NO_GRADING:
-                $attempt = geogebra_get_nograding_grade($geogebra->id, $userid);
-                break;
-            case GEOGEBRA_AVERAGE_GRADE:
-                $attempt = (geogebra_get_average_grade($geogebra->id, $userid));
-                break;
-            case GEOGEBRA_HIGHEST_GRADE:
-                $attempt = (geogebra_get_highest_attempt_grade($geogebra->id, $userid));
-                break;
-            case GEOGEBRA_LOWEST_GRADE:
-                $attempt = (geogebra_get_lowest_attempt_grade($geogebra->id, $userid));
-                break;
-            case GEOGEBRA_FIRST_GRADE:
-                $attempt = (geogebra_get_first_attempt_grade($geogebra->id, $userid));
-                break;
-            case GEOGEBRA_LAST_GRADE:
-                $attempt = (geogebra_get_last_attempt_grade($geogebra->id, $userid));
-                break;
-        }
-    }
-    return $attempt;
-}
-
-/**
- * Finds the unique attempt for a given user and geogebra.
- *
- * @param int $geogebraid ID of an instance of this module
- * @param int $userid ID of a user
- * @return mixed boolean/object with userid, grade, rawgrade, grademax, attempts, duration and date
- */
-function geogebra_get_unique_attempt_grade($geogebraid, $userid) {
-    global $CFG;
-    $select = 'SELECT *';
-    $from = ' FROM ' . $CFG->prefix . 'geogebra_attempts';
-    $where = ' WHERE userid = ' . $userid . ' AND geogebra = ' . $geogebraid . ' AND finished = 1';
-
-    if ($attempt = get_record_sql($select . $from . $where)) {
-        if (empty($attempt)) {
-            return false;
-        } else {
-            parse_str($attempt->vars, $parsedVars);
-
-            $result->userid = $userid;
-            $result->grade = $parsedVars['grade'];
-            $result->rawgrade = $result->grade;
-            //     $result->grademax = $parsedVars['maxGrade'];
-            $result->attempts = geogebra_count_finished_attempts($geogebraid, $userid);
-            $result->duration = $parsedVars['duration'];
-            $result->dateteacher = $attempt->dateteacher;
-            $result->datestudent = $attempt->datestudent;
-
-            return $result;
-        }
-    } else
-        return false;
-}
-
-/**
- * Calculates number of attempts, the average grade and average duration 
- * of all attemps for a given user and geogebra
- *
- * @param int $geogebraid ID of an instance of this module
- * @param int $userid ID of a user
- * @return mixed boolean/object with userid, grade, rawgrade, grademax, attempts, duration and date
- */
-function geogebra_get_nograding_grade($geogebraid, $userid) {
-    global $CFG;
-
-    $select = 'SELECT *';
-    $from = ' FROM ' . $CFG->prefix . 'geogebra_attempts';
-    $where = ' WHERE userid = ' . $userid . ' AND geogebra = ' . $geogebraid . ' AND finished = 1';
-
-    if ($attempts = get_records_sql($select . $from . $where)) {
-        $count = 0;
-        $durationsum = 0;
-        foreach ($attempts as $attempt) {
-            $count++;
-            parse_str($attempt->vars, $parsedVars);
-            $durationsum += $parsedVars['duration'];
-        }
-
-        $result->userid = $userid;
-        $result->grade = 0;
-        $result->rawgrade = 0;
-        $result->attempts = $count; //A revisar quan ATTEMPS estigui llest
-        $result->duration = round($durationsum, 2);
-        $result->dateteacher = '';
-        $result->datestudent = '';
-
-        return $result;
-    } else
-        return false;
-}
-
-/**
- * Calculates number of attempts, the average grade and average duration 
- * of all attemps for a given user and geogebra
- *
- * @param int $geogebraid ID of an instance of this module
- * @param int $userid ID of a user
- * @return mixed boolean/object with userid, grade, rawgrade, grademax, attempts, duration and date
- */
-function geogebra_get_average_grade($geogebraid, $userid) {
-    global $CFG;
-
-    $select = 'SELECT *';
-    $from = ' FROM ' . $CFG->prefix . 'geogebra_attempts';
-    $where = ' WHERE userid = ' . $userid . ' AND geogebra = ' . $geogebraid . ' AND finished = 1';
-
-    if ($attempts = get_records_sql($select . $from . $where)) {
-
-        $durationsum = 0;
-        $gradessum = 0;
-        $count = 0;
-        foreach ($attempts as $attempt) {
-            parse_str($attempt->vars, $parsedVars);
-            if ($parsedVars['grade'] >= 0) { //only attempt with valid grade
-                $count++;
-                $gradessum += $parsedVars['grade'];
-                $durationsum += $parsedVars['duration'];
-            }
-        }
-        if ($count > 0) {
-            $result->userid = $userid;
-            $result->grade = round($gradessum / $count, 2);
-            $result->rawgrade = $result->grade;
-            $result->attempts = count($attempts); //A revisar quan ATTEMPS estigui llest
-            $result->duration = round($durationsum / $count, 2);
-            $result->dateteacher = '';
-            $result->datestudent = '';
-
-            return $result;
-        } else {
-            $result->userid = $userid;
-            $result->grade = '';
-            $result->rawgrade = '';
-            $result->attempts = count($attempts);
-            $result->duration = '';
-            $result->dateteacher = '';
-            $result->datestudent = '';
-
-            return $result;
-        }
-    } else
-        return false;
-}
-
-/**
- * Finds the last attempt for a given user and geogebra.
- *
- * @param int $geogebraid ID of an instance of this module
- * @param int $userid ID of a user
- * @return mixed boolean/object with userid, grade, rawgrade, grademax, attempts, duration and date
- */
-function geogebra_get_last_attempt_grade($geogebraid, $userid) {
-    global $CFG;
-
-    $select = 'SELECT *';
-    $from = ' FROM ' . $CFG->prefix . 'geogebra_attempts';
-    $where = ' WHERE datestudent = (SELECT MAX(datestudent) FROM ' . $CFG->prefix . 'geogebra_attempts WHERE 
-        userid = ' . $userid . ' AND geogebra = ' . $geogebraid . ' AND finished = 1)';
-
-
-    if ($attempt = get_record_sql($select . $from . $where)) {
-        if (empty($attempt)) {
-            return false;
-        }
-        parse_str($attempt->vars, $parsedVars);
-        if ($parsedVars['grade'] < 0) { //last attempt not graded
-            $result->userid = $userid;
-            $result->grade = '';
-            $result->gradecomment = '';
-            $result->rawgrade = '';
-            $result->attempts = geogebra_count_finished_attempts($geogebraid, $userid);
-            $result->duration = '';
-            $result->dateteacher = '';
-            $result->datestudent = '';
-
-            return $result;
-        } else {
-            $result->userid = $userid;
-            $result->grade = $parsedVars['grade'];
-            $result->gradecomment = $attempt->gradecomment;
-            $result->rawgrade = $result->grade;
-            $result->attempts = geogebra_count_finished_attempts($geogebraid, $userid);
-            $result->duration = $parsedVars['duration'];
-            $result->dateteacher = $attempt->dateteacher;
-            $result->datestudent = $attempt->datestudent;
-
-            return $result;
-        }
-    } else
-        return false;
-}
-
-/**
- * Finds the firt attempt for a given user and geogebra.
- *
- * @param int $geogebraid ID of an instance of this module
- * @param int $userid ID of a user
- * @return mixed boolean/object with userid, grade, rawgrade, grademax, attempts, duration and date
- */
-function geogebra_get_first_attempt_grade($geogebraid, $userid) {
-    global $CFG;
-
-    $select = 'SELECT *';
-    $from = ' FROM ' . $CFG->prefix . 'geogebra_attempts';
-    $where = ' WHERE datestudent = (SELECT MIN(datestudent) FROM ' . $CFG->prefix . 'geogebra_attempts WHERE 
-        userid = ' . $userid . ' AND geogebra = ' . $geogebraid . ' AND finished = 1)';
-
-    if ($attempt = get_record_sql($select . $from . $where)) {
-        if (empty($attempt)) {
-            return false;
-        }
-        parse_str($attempt->vars, $parsedVars);
-        if ($parsedVars['grade'] < 0) { //first attempt not graded
-            $result->userid = $userid;
-            $result->grade = '';
-            $result->gradecomment = '';
-            $result->rawgrade = '';
-            $result->attempts = geogebra_count_finished_attempts($geogebraid, $userid);
-            $result->duration = '';
-            $result->dateteacher = '';
-            $result->datestudent = '';
-
-            return $result;
-        } else {
-
-            $result->userid = $userid;
-            $result->grade = $parsedVars['grade'];
-            $result->gradecomment = $attempt->gradecomment;
-            $result->rawgrade = $result->grade;
-            $result->attempts = geogebra_count_finished_attempts($geogebraid, $userid);
-            $result->duration = $parsedVars['duration'];
-            $result->dateteacher = $attempt->dateteacher;
-            $result->datestudent = $attempt->datestudent;
-
-            return $result;
-        }
-    }else
-        return false;
-}
-
-/**
- * Finds the attempt with the highest grade for a given user and geogebra.
- * If more than one attempt has the same grade, gets one with less duration.
- *
- * @param int $geogebraid ID of an instance of this module
- * @param int $userid ID of a user
- * @return mixed boolean/object with userid, grade, rawgrade, grademax, attempts, duration and date
- */
-function geogebra_get_highest_attempt_grade($geogebraid, $userid) {
-    global $CFG;
-
-    // 1 - All attemps
-    $select = 'SELECT *';
-    $from = ' FROM ' . $CFG->prefix . 'geogebra_attempts';
-    $where = ' WHERE userid = ' . $userid . ' AND geogebra = ' . $geogebraid . ' AND finished = 1';
-
-    if ($attempts = get_records_sql($select . $from . $where)) {
-
-        // 2 - Get highest graded attempt
-        $maxgrade = 0;
-        $maxattempt = null;
-        $mintime = PHP_INT_MAX;
-
-        foreach ($attempts as $attempt) {
-
-            parse_str($attempt->vars, $parsedVars);
-
-            if ($parsedVars['grade'] >= 0) {//only attempt with valid grade
-                if ($parsedVars['grade'] > $maxgrade) { // Highter grade
-                    $maxattempt = $attempt;
-                    $maxgrade = $parsedVars['grade'];
-                    $mintime = $parsedVars['duration'];
-                } else if ($parsedVars['grade'] == $maxgrade) { // If same grade,
-                    if ($parsedVars['duration'] < $mintime) { // get the faster attempt
-                        $maxattempt = $attempt;
-                        $maxgrade = $parsedVars['grade'];
-                        $mintime = $parsedVars['duration'];
-                    }
-                }
-            }
-        }
-        // 3 - Prepare return values
-        if (isset($maxattempt)) {
-            parse_str($maxattempt->vars, $parsedVars);
-            $result->userid = $userid;
-            $result->grade = $parsedVars['grade'];
-            $result->rawgrade = $result->grade;
-            $result->gradecomment = $maxattempt->gradecomment;
-            $result->attempts = sizeof($attempts);
-            $result->duration = $parsedVars['duration'];
-            $result->dateteacher = $maxattempt->dateteacher;
-            $result->datestudent = $maxattempt->datestudent;
-
-            return $result;
-        } else {
-            $result->userid = $userid;
-            $result->grade = '';
-            $result->rawgrade = '';
-            $result->gradecomment = '';
-            $result->attempts = count($attempts);
-            $result->duration = '';
-            $result->dateteacher = '';
-            $result->datestudent = '';
-
-            return $result;
-        }
-    } else
-        return false;
-}
-
-/**
- * Finds the attempt with the lowest grade for a given user and geogebra.
- * If more than one attempt has the same grade, gets the one with more duration.
- *
- * @param int $geogebraid ID of an instance of this module
- * @param int $userid ID of a user
- * @return mixed boolean/object with userid, grade, rawgrade, grademax, attempts, duration and date
- */
-function geogebra_get_lowest_attempt_grade($geogebraid, $userid) {
-    global $CFG;
-
-    // 1 - All attemps
-    $select = 'SELECT *';
-    $from = ' FROM ' . $CFG->prefix . 'geogebra_attempts';
-    $where = ' WHERE userid = ' . $userid . ' AND geogebra = ' . $geogebraid . ' AND finished = 1';
-
-    if ($attempts = get_records_sql($select . $from . $where)) {
-
-        // 2 - Get highest graded attempt
-
-        $mingrade = PHP_INT_MAX;
-        $minattempt = null;
-        $maxtime = 0;
-
-        foreach ($attempts as $attempt) {
-
-            parse_str($attempt->vars, $parsedVars);
-            if ($parsedVars['grade'] >= 0) {//only attempt with valid grade
-                if ($parsedVars['grade'] < $mingrade) { // Lowest grade
-                    $minattempt = $attempt;
-                    $mingrade = $parsedVars['grade'];
-                    $maxtime = $parsedVars['duration'];
-                } else if ($parsedVars['grade'] == $mingrade) { // If same grade,
-                    if ($parsedVars['duration'] > $maxtime) { // get the faster attempt
-                        $minattempt = $attempt;
-                        $mingrade = $parsedVars['grade'];
-                        $maxtime = $parsedVars['duration'];
-                    }
-                }
-            }
-        }
-
-        // 3 - Prepare return values
-        if (isset($minattempt)) {
-            parse_str($minattempt->vars, $parsedVars);
-
-            $result->userid = $userid;
-            $result->grade = $parsedVars['grade'];
-            $result->rawgrade = $result->grade;
-            $result->gradecomment = $minattempt->gradecomment;
-            $result->attempts = sizeof($attempts);
-            $result->duration = $parsedVars['duration'];
-            $result->dateteacher = $minattempt->dateteacher;
-            $result->datestudent = $minattempt->datestudent;
-
-            return $result;
-        } else {
-            $result->userid = $userid;
-            $result->grade = '';
-            $result->rawgrade = '';
-            $result->gradecomment = '';
-            $result->attempts = count($attempts);
-            $result->duration = '';
-            $result->dateteacher = '';
-            $result->datestudent = '';
-
-            return $result;
-        }
-    } else
-        return false;
-}
-
-function geogebra_count_finished_attempts($geogebraid, $userid) {
-    global $CFG;
-
-    //Count the attempts done by the user
-    $select = 'SELECT COUNT(*)';
-    $from = ' FROM ' . $CFG->prefix . 'geogebra_attempts';
-    $where = ' WHERE userid = ' . $userid . ' AND geogebra = ' . $geogebraid . ' AND finished = 1';
-
-    return count_records_sql($select . $from . $where);
-}
-
-/*
- * Not sure if needed
- */
-
-function geogebra_count_attempts($geogebraid, $userid) {
-    global $CFG;
-
-    //Count the attempts done by the user
-    $select = 'SELECT COUNT(*)';
-    $from = ' FROM ' . $CFG->prefix . 'geogebra_attempts';
-    $where = ' WHERE userid = ' . $userid . ' AND geogebra = ' . $geogebraid;
-
-    return count_records_sql($select . $from . $where);
-}
-
-/**
- * Format time from milliseconds to string 
- *
- * @return string Formated string [x' y''], where x are the minutes and y are the seconds.	
- * @param int $time	The time (in ms)
- */
-function geogebra_time2str($time) {
-    $minutes = floor($time / 60);
-    $seconds = sprintf("%02s", round(fmod($time, 60), 0));
-    return ($minutes > 0 ? $minutes . "' " : " ") . $seconds . "''";
-}
-
-/**
- * Prints the geogebra start and end dates in a box.
+ * @todo: implement userid=0 (all users)
+ * @todo: optimize this function (to avoid call geogebra_get_sessions_summary or update only mandatory info)
  * 
- * @param object $geogebra
+ * @param object $geogebra object
+ * @param int $userid optional user id, 0 means all users
+ * @return array array of grades, false if none
  */
-function geogebra_view_dates($geogebra) {
-    if (!$geogebra->timeavailable && !$geogebra->timedue) {
+function geogebra_get_user_grades($geogebra, $userid=0) {
+    global $CFG, $DB;
+    require_once($CFG->dirroot.'/mod/geogebra/locallib.php');
+
+    // sanity check on $geogebra->id
+    if (! isset($geogebra->id)) {
         return;
     }
-
-    print_simple_box_start('center', '', '', 0, 'generalbox', 'dates');
-    echo '<table>';
-    if ($geogebra->timeavailable) {
-        echo '<tr><td class="c0">' . get_string('availabledate', 'geogebra') . ':</td>';
-        echo '    <td class="c1">' . userdate($geogebra->timeavailable) . '</td></tr>';
+    $sessions_summary = geogebra_get_sessions_summary($geogebra->id, $userid);
+    $grades[$userid]->userid = $userid;
+    $grades[$userid]->attempts = $sessions_summary->attempts;
+    $grades[$userid]->totaltime = $sessions_summary->totaltime;
+    $grades[$userid]->starttime = $sessions_summary->starttime;
+    $grades[$userid]->done = $sessions_summary->done;
+    $grades[$userid]->rawgrade = 0;
+    if ($geogebra->avaluation=='score'){
+        $grades[$userid]->rawgrade = $sessions_summary->score;				
+    }else{
+        $grades[$userid]->rawgrade = $sessions_summary->solved;
     }
-    if ($geogebra->timedue) {
-        echo '<tr><td class="c0">' . get_string('duedate', 'geogebra') . ':</td>';
-        echo '    <td class="c1">' . userdate($geogebra->timedue) . '</td></tr>';
-    }
-    echo '</table>';
-    print_simple_box_end();
+    return $grades;
 }
 
 /**
- * Return the unfinished attempt of a user. Only 1 attempt for each (user, geogebra) can be unfinished
+ * Update geogebra grades in the gradebook
  *
- * @param type $geogebra_id ID of an instance of this module
- * @param type $user_id ID of a user
- * @return mixed null/geogebra attempt object
- */
-function geogebra_get_unfinished_attempt($geogebraid, $userid) {
-    global $CFG;
-
-    $select = 'SELECT *';
-    $from = ' FROM ' . $CFG->prefix . 'geogebra_attempts';
-    $where = ' WHERE userid = ' . $userid . ' AND geogebra = ' . $geogebraid . ' AND finished = 0';
-    return ($attempt = get_record_sql($select . $from . $where));
-}
-
-/**
- * Return the content of specified URL. 
+ * Needed by grade_update_mod_grades() in lib/gradelib.php
  * 
- * @param string $url
- * @return string content of specified URL 
+ * @todo: Fix some problems (this function is not working when is called from beans.php)
+ *
+ * @param stdClass $geogebra instance object with extra cmidnumber and modname property
+ * @param int $userid update grade of specific user only, 0 means all participants
+ * @param boolean $nullifnone return null if grade does not exist
+ * @return void
  */
-function geogebra_getfilecontent($url) {
-    $curl = curl_init();
-    curl_setopt($curl, CURLOPT_URL, $url);
-    curl_setopt($curl, CURLOPT_RETURNTRANSFER, true);
-    curl_setopt($curl, CURLOPT_HEADER, false);
-    curl_setopt($curl, CURLOPT_FOLLOWLOCATION, true);
-    $contents = curl_exec($curl);
-    curl_close($curl);
+function geogebra_update_grades(stdClass $geogebra, $userid = 0, $nullifnone=true) {
+    global $CFG, $DB;
+    require_once($CFG->libdir.'/gradelib.php');
 
-    return $contents;
-}
+    if ($geogebra->grade == 0) {
+        geogebra_grade_item_update($geogebra);
 
-function geogebra_get_js_from_geogebra($filename) {
-    global $CFG;
-    $entry_content = '';
-    if (isset($filename)) {
-        $temppath = $CFG->dataroot . "/temp/geogebra/" . basename($filename) . "_" . time();
-        require_once("$CFG->libdir/filelib.php");
-        include_once("$CFG->libdir/pclzip/pclzip.lib.php");
-        $archive = new PclZip(cleardoubleslashes("$filename"));
-        if ($list = $archive->extract(PCLZIP_OPT_PATH, $temppath, PCLZIP_CB_PRE_EXTRACT, 'unzip_cleanfilename', PCLZIP_OPT_BY_NAME, 'geogebra_javascript.js', PCLZIP_OPT_EXTRACT_DIR_RESTRICTION, $temppath)) {
-            if (!empty($list)) {
-                $entry_content = file_get_contents(cleardoubleslashes($temppath . '/geogebra_javascript.js'));
-                $entry_content = '<script type="text/javascript">var ggbApplet = document.ggbApplet; ' . $entry_content . '</script>';
+    } else if ($grades = geogebra_get_user_grades($geogebra, $userid)) {
+        foreach($grades as $k=>$v) {
+            if ($v->rawgrade == -1) {
+                $grades[$k]->rawgrade = null;
             }
-            fulldelete($temppath);
         }
-    }
-    return $entry_content;
-}
+        geogebra_grade_item_update($geogebra, $grades);
 
-function geogebra_get_applet_param($paramName, $attributes) {
-    $paramValue = (isset($attributes[$paramName]) && $attributes[$paramName]) ? 'true' : 'false';
-    return '<param name="' . $paramName . '" value="' . $paramValue . '" />';
-}
-
-function geogebra_show_applet($geogebra, $attributes, $parsedVars = null) {
-    global $CFG, $USER;
-
-    echo '<script type="text/javascript" src="' . $CFG->wwwroot . '/mod/geogebra/geogebra_view.js"></script>';
-    echo '<applet id="geogebra_object" name="ggbApplet" codebase="', geogebra_get_javacodebase(), '" archive="', GEOGEBRA_ARCHIVE, '" code="', GEOGEBRA_CODE, '" width="' . $geogebra->width . 'px" height="' . $geogebra->height . 'px" align="bottom">';
-    if (isset($attributes['filename'])) {
-        //$filename = (substr($attributes['filename'], 0, 4)=='http')?$attributes['filename']:$CFG->wwwroot.'/file.php/'.$geogebra->course.'/'.$attributes['filename'];
-        //echo '<param name="filename" value="'.$filename.'"/>';
-
-        $filename = $CFG->dataroot . "/" . $geogebra->course . "/" . $attributes['filename'];
-        $ggbbase64 = base64_encode(file_get_contents($filename));
-        echo '<param name="ggbBase64" value="' . $ggbbase64 . '" />';
-        echo geogebra_get_applet_param('enableLabelDrags', $attributes);
-        echo geogebra_get_applet_param('showResetIcon', $attributes);
-        echo geogebra_get_applet_param('showMenuBar', $attributes);
-        echo geogebra_get_applet_param('showToolBar', $attributes);
-        echo geogebra_get_applet_param('showToolBarHelp', $attributes);
-        echo '<param name="language" value="' . $attributes['language'] . '" />';
-        //echo geogebra_get_applet_param('showAlgebraInput', $attributes);
-        echo geogebra_get_applet_param('enableRightClick', $attributes);
-    }
-
-    if (isset($parsedVars['state'])) {
-        // Continue previuos attempt or preview final result
-        $edu_xtec_adapter_parameters = http_build_query(array(
-            'state' => $parsedVars['state'],
-            'grade' => $parsedVars['grade'],
-            'duration' => $parsedVars['duration'],
-            'attempts' => $parsedVars['attempts']
-                ), '', '&');
+    } else if ($userid and $nullifnone) {
+        $grade = new stdClass();
+        $grade->userid   = $userid;
+        $grade->rawgrade = NULL;
+        geogebra_grade_item_update($geogebra, $grade);
+        
     } else {
-        // New attempt
-        $attempts = geogebra_count_finished_attempts($geogebra->id, $USER->id) + 1;
-        $edu_xtec_adapter_parameters = http_build_query(array(
-            //      'grade' => '0',
-            'attempts' => $attempts
-                ), '', '&');
+        geogebra_grade_item_update($geogebra);
     }
+}
 
-    $context = get_context_instance(CONTEXT_MODULE, $geogebra->cmidnumber);
-    $attributes['framePossible'] = has_capability('mod/geogebra:gradeactivity', $context);
-    echo geogebra_get_applet_param('framePossible', $attributes);
-    echo '<param name="useBrowserForJS" value="true" />';
-    echo get_string('warningnojava', 'geogebra');
+////////////////////////////////////////////////////////////////////////////////
+// File API                                                                   //
+////////////////////////////////////////////////////////////////////////////////
 
-    echo '</applet>';
-    echo '<input type="hidden" name="prevAppletInformation" value="' . $edu_xtec_adapter_parameters . '" />';
-    echo '<br/>';
-
-    print_r(geogebra_get_js_from_geogebra($filename));
+/**
+ * Returns the lists of all browsable file areas within the given module context
+ *
+ * The file area 'intro' for the activity introduction field is added automatically
+ * by {@link file_browser::get_file_info_context_module()}
+ *
+ * @param stdClass $course
+ * @param stdClass $cm
+ * @param stdClass $context
+ * @return array of [(string)filearea] => (string)description
+ */
+function geogebra_get_file_areas($course, $cm, $context) {
+    return array(
+        'content'      => get_string('urledit',  'geogebra')
+    );
 }
 
 /**
- * Get an array with the languages
- *
- * @return array   The array with each language.
+ * File browsing support for geogebra module content area.
+ * @param object $browser
+ * @param object $areas
+ * @param object $course
+ * @param object $cm
+ * @param object $context
+ * @param string $filearea
+ * @param int $itemid
+ * @param string $filepath
+ * @param string $filename
+ * @return object file_info instance or null if not found
  */
-function geogebra_get_languages() {
+function geogebra_get_file_info($browser, $areas, $course, $cm, $context, $filearea, $itemid, $filepath, $filename) {
     global $CFG;
-    $tmplanglist = get_list_of_languages();
-    $langlist = array();
-    foreach ($tmplanglist as $lang => $langname) {
-        if (substr($lang, -5) == '_utf8') {   //Remove the _utf8 suffix from the lang to show
-            $lang = substr($lang, 0, -5);
-        }
-        $langlist[$lang] = $langname;
+
+    if (!has_capability('moodle/course:managefiles', $context)) {
+        // students can not peak here!
+        return null;
     }
-    return $langlist;
+
+    $fs = get_file_storage();
+
+    if ($filearea === 'content') {
+        $filepath = is_null($filepath) ? '/' : $filepath;
+        $filename = is_null($filename) ? '.' : $filename;
+
+        $urlbase = $CFG->wwwroot.'/pluginfile.php';
+        if (!$storedfile = $fs->get_file($context->id, 'mod_geogebra', 'content', 0, $filepath, $filename)) {
+            if ($filepath === '/' and $filename === '.') {
+                $storedfile = new virtual_root_file($context->id, 'mod_geogebra', 'content', 0);
+            } else {
+                // not found
+                return null;
+            }
+        }
+        return new file_info_stored($browser, $context, $storedfile, $urlbase, $areas[$filearea], false, true, false, false);
+    }
+    // note: geogebra_intro handled in file_browser automatically
+
+    return null;
 }
+
+
+/**
+ * Serves the files from the geogebra file areas
+ *
+ * @param stdClass $course
+ * @param stdClass $cm
+ * @param stdClass $context
+ * @param string $filearea
+ * @param array $args
+ * @param bool $forcedownload
+ * @return void this should never return to the caller
+ */
+function geogebra_pluginfile($course, $cm, $context, $filearea, array $args, $forcedownload) {
+    global $DB, $CFG;
+
+    if ($context->contextlevel != CONTEXT_MODULE) {
+        send_file_not_found();
+    }
+
+    require_login($course, true, $cm);
+    
+    if (!has_capability('mod/geogebra:view', $context)) {
+        return false;
+    }
+
+    if ($filearea !== 'content') {
+        // intro is handled automatically in pluginfile.php
+        return false;
+    }
+
+    array_shift($args); // ignore revision - designed to prevent caching problems only
+
+    $fs = get_file_storage();
+    $relativepath = implode('/', $args);
+    $fullpath = rtrim("/$context->id/mod_geogebra/$filearea/0/$relativepath", '/');
+    do {
+        if ($file = $fs->get_file_by_hash(sha1($fullpath))) {
+            break;
+        }
+/*            
+            $geogebra = $DB->get_record('geogebra', array('id'=>$cm->instance), 'id, legacyfiles', MUST_EXIST);
+            if (!$file = geogebralib_try_file_migration('/'.$relativepath, $cm->id, $cm->course, 'mod_geogebra', 'content', 0)) {
+                return false;
+            }
+            // file migrate - update flag
+            $resource->legacyfileslast = time();
+            $DB->update_record('resource', $resource); 
+ */
+    } while (false);
+
+    // finally send the file
+    send_stored_file($file, 86400, 0, $forcedownload);    
+}
+
+////////////////////////////////////////////////////////////////////////////////
+// Navigation API                                                             //
+////////////////////////////////////////////////////////////////////////////////
+
+/**
+ * Extends the global navigation tree by adding geogebra nodes if there is a relevant content
+ *
+ * This can be called by an AJAX request so do not rely on $PAGE as it might not be set up properly.
+ *
+ * @param navigation_node $navref An object representing the navigation tree node of the geogebra module instance
+ * @param stdClass $course
+ * @param stdClass $module
+ * @param cm_info $cm
+ */
+function geogebra_extend_navigation(navigation_node $navref, stdclass $course, stdclass $module, cm_info $cm) {
+}
+
+/**
+ * Extends the settings navigation with the geogebra settings
+ *
+ * This function is called when the context for the page is a geogebra module. This is not called by AJAX
+ * so it is safe to rely on the $PAGE.
+ *
+ * @param settings_navigation $settingsnav {@link settings_navigation}
+ * @param navigation_node $geogebranode {@link navigation_node}
+ */
+function geogebra_extend_settings_navigation(settings_navigation $settingsnav, navigation_node $geogebranode=null) {
+}
+
+////////////////////////////////////////////////////////////////////////////////
+// Reset                                                                      //
+////////////////////////////////////////////////////////////////////////////////
+
 
 /**
  * Removes all grades from gradebook
  * @param int $courseid
  * @param string optional type
  */
-function geogebra_reset_gradebook($courseid, $type = '') {
-    global $CFG;
-    $sql = "SELECT g.*, cm.idnumber as cmidnumber, g.course as courseid
-              FROM {$CFG->prefix}geogebra g, {$CFG->prefix}course_modules cm, {$CFG->prefix}modules m
-             WHERE m.name='geogebra' AND m.id=cm.module AND cm.instance=g.id AND g.course=$courseid";
-    if ($datas = get_records_sql($sql)) {
-        foreach ($datas as $data) {
-            geogebra_grade_item_update($data, 'reset');
+function geogebra_reset_gradebook($courseid) {
+    global $CFG, $DB;
+
+    $params = array('courseid'=>$courseid);
+
+    $sql = "SELECT j.*, cm.idnumber as cmidnumber, j.course as courseid
+              FROM {geogebra} j, {course_modules} cm, {modules} m
+             WHERE m.name='geogebra' AND m.id=cm.module AND cm.instance=j.id AND j.course=:courseid ";
+
+    if ($geogebras = $DB->get_records_sql($sql, $params)) {
+        foreach ($geogebras as $geogebra) {
+            geogebra_grade_item_update($geogebra, 'reset');
         }
     }
 }
 
 /**
  * This function is used by the reset_course_userdata function in moodlelib.
- * This function will remove all geogebra sessions in the specified course.
+ * This function will remove all posts from the specified geogebra
+ * and clean up any related data.
  * @param $data the data submitted from the reset course.
  * @return array status array
  */
 function geogebra_reset_userdata($data) {
-    global $CFG;
+    global $CFG, $DB;
 
+    $componentstr = get_string('modulenameplural', 'choice');
     $status = array();
-    if (!empty($data->reset_geogebra_deleteallattempts)) {
-        $select = 'geogebra IN'
-                . " (SELECT g.id FROM {$CFG->prefix}geogebra g"
-                . " WHERE g.course = {$data->courseid})";
-        delete_records_select('geogebra_attempts', $select);
+ 
+    if (!empty($data->reset_geogebra_deleteallsessions)) {
+        $params = array('courseid' => $data->courseid);
+        $select = 'session_id IN'
+            . " (SELECT s.session_id FROM {geogebra_sessions} s"
+            . " INNER JOIN {geogebra} j ON s.geogebraid = j.id"
+            . " WHERE j.course = :courseid)";
+        $DB->delete_records_select('geogebra_activities', $select, $params);
 
+        $select = 'geogebraid IN'
+            . " (SELECT j.id FROM {geogebra} j"
+            . " WHERE j.course = :courseid)";
+        $DB->delete_records_select('geogebra_sessions', $select, $params);
+        
+        // remove all grades from gradebook
         if (empty($data->reset_gradebook_grades)) {
-            // remove all grades from gradebook
             geogebra_reset_gradebook($data->courseid);
         }
-
-        $status[] = array('component' => get_string('modulenameplural', 'geogebra'),
-            'item' => get_string('deleteallattempts', 'geogebra'),
-            'error' => false);
+        
+        $status[] = array('component'=>$componentstr, 'item'=>get_string('deleteallsessions', 'geogebra'), 'error'=>false);
     }
-    return $status;
+ 
+   return $status;
 }
 
 /**
- * Called by course/reset.php
+ * Implementation of the function for printing the form elements that control
+ * whether the course reset functionality affects the geogebra.
  * @param $mform form passed by reference
  */
 function geogebra_reset_course_form_definition(&$mform) {
     $mform->addElement('header', 'geogebraheader', get_string('modulenameplural', 'geogebra'));
-    $mform->addElement('checkbox', 'reset_geogebra_deleteallattempts', get_string('deleteallattempts', 'geogebra'));
+    $mform->addElement('checkbox', 'reset_geogebra_deleteallsessions', get_string('deleteallsessions', 'geogebra'));
+    
 }
 
 /**
  * Course reset form defaults.
  */
 function geogebra_reset_course_form_defaults($course) {
-    return array('reset_geogebra_deleteallattempts' => 1);
+    return array('reset_geogebra_deleteallsessions' => 1);
 }
-
-function geogebra_define_table($table, $geogebra, $course) {
-
-    if ($geogebra->grade != GEOGEBRA_NO_GRADING) {
-        $tablecolumns = array('picture', 'fullname', 'attempts', 'duration', 'grade', 'comment', 'datestudent', 'dateteacher', 'status');
-        $tableheaders = array('',
-            get_string('fullname'),
-            get_string('attempts', 'geogebra') . ($geogebra->maxattempts > 0 ? ' / ' . $geogebra->maxattempts : ''),
-            get_string('duration', 'geogebra'),
-            ($geogebra->grade < 0) ? get_string('grade', 'geogebra') : get_string('grade', 'geogebra') . ' / ' . $geogebra->grade,
-            get_string('comment', 'geogebra'),
-            get_string('lastmodified').' ('.$course->student.')',
-            get_string('lastmodified').' ('.$course->teacher.')',
-            get_string('status'));
-    } else {
-        $tablecolumns = array('picture', 'fullname', 'attempts', 'duration', 'datestudent', 'status');
-        $tableheaders = array('',
-            get_string('fullname'),
-            get_string('attempts', 'geogebra') . ($geogebra->maxattempts > 0 ? ' / ' . $geogebra->maxattempts : ''),
-            get_string('duration', 'geogebra'),
-            get_string('lastmodified').' ('.$course->student.')',
-            get_string('status'));
-    }
-    $table->define_columns($tablecolumns);
-    $table->define_headers($tableheaders);
-
-    $table->column_class('picture', 'picture');
-    
-    $table->column_style['status']['text-align'] =  'center';
-
-    $table->sortable(false);
-    $table->collapsible(true);
-//    $table->initialbars(true);
-
-    $table->set_attribute('cellspacing', '0');
-    $table->set_attribute('id', 'attempts');
-    $table->set_attribute('class', 'grade-table');
-    $table->set_attribute('width', '100%');
-    $table->set_attribute('align', 'center');
-    $table->column_style_all('vertical-align', 'middle');
-//    $table->column_style_all('text-align', 'center');
-    $table->column_style_all('border-width', '1px');
-    $table->column_style_all('border-style', 'solid');
-    $table->column_style_all('border-color', '#DDDDDD');
-
-    $table->setup();
-
-    return $table;
-}
-
-?>

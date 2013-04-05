@@ -1,141 +1,90 @@
 <?php
 
-require_once('../../config.php');
-require_once('lib.php');
+// This file is part of Moodle - http://moodle.org/
+//
+// Moodle is free software: you can redistribute it and/or modify
+// it under the terms of the GNU General Public License as published by
+// the Free Software Foundation, either version 3 of the License, or
+// (at your option) any later version.
+//
+// Moodle is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// GNU General Public License for more details.
+//
+// You should have received a copy of the GNU General Public License
+// along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
-$id = optional_param('id', 0, PARAM_INT);  // course_module ID, or
-$a = optional_param('a', 0, PARAM_INT);   // geogebra instance ID
+/**
+ * Prints a particular instance of geogebra
+ *
+ * You can have a rather longer description of the file as well,
+ * if you like, and it can span multiple lines.
+ *
+ * @package    mod
+ * @subpackage geogebra
+ * @copyright  2011 Departament d'Ensenyament de la Generalitat de Catalunya
+ * @author     Sara Arjona Téllez <sarjona@xtec.cat>
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ */
 
-if ($id !== false) {
-    if (($cm = get_coursemodule_from_id('geogebra', $id)) === false) {
-        error('Course Module ID was incorrect');
-    }
+require_once(dirname(dirname(dirname(__FILE__))).'/config.php');
+require_once(dirname(__FILE__).'/locallib.php');
+require_once($CFG->libdir.'/completionlib.php');
 
-    if (($course = get_record('course', 'id', $cm->course)) === false) {
-        error('Course is misconfigured');
-    }
 
-    if (($geogebra = get_record('geogebra', 'id', $cm->instance)) === false) {
-        error('Course module is incorrect');
-    } else {
-        $geogebra->cmidnumber = $cm->id;
-    }
-} else if ($a !== false) {
-    if (($geogebra = get_record('geogebra', 'id', $a)) === false) {
-        error('Course module is incorrect');
-    }
+$id = optional_param('id', 0, PARAM_INT); // course_module ID, or
+$n  = optional_param('n', 0, PARAM_INT);  // geogebra instance ID - it should be named as the first character of the module
 
-    if (($course = get_record('course', 'id', $geogebra->course)) === false) {
-        error('Course is misconfigured');
-    }
-
-    if (($cm = get_coursemodule_from_instance('geogebra', $geogebra->id, $course->id)) === false) {
-        error('Course Module ID was incorrect');
-    } else {
-        $geogebra->cmidnumber = $cm->id;
-    }
+if ($id) {
+    $cm         = get_coursemodule_from_id('geogebra', $id, 0, false, MUST_EXIST);
+    $course     = $DB->get_record('course', array('id' => $cm->course), '*', MUST_EXIST);
+    $geogebra  = $DB->get_record('geogebra', array('id' => $cm->instance), '*', MUST_EXIST);
+} elseif ($n) {
+    $geogebra  = $DB->get_record('geogebra', array('id' => $n), '*', MUST_EXIST);
+    $course     = $DB->get_record('course', array('id' => $geogebra->course), '*', MUST_EXIST);
+    $cm         = get_coursemodule_from_instance('geogebra', $geogebra->id, $course->id, false, MUST_EXIST);
 } else {
     error('You must specify a course_module ID or an instance ID');
 }
 
 require_login($course, true, $cm);
-add_to_log($course->id, 'geogebra', 'view', 'view.php?id=' . $cm->id, $geogebra->id);
 $context = get_context_instance(CONTEXT_MODULE, $cm->id);
+require_capability('mod/geogebra:view', $context);
 
-// Print the page header
-$navlinks = array(
-    array(
-        'name' => get_string('modulenameplural', 'geogebra'),
-        'link' => $CFG->wwwroot . '/mod/geogebra/index.php?id=' . $course->id,
-        'type' => 'activity'
-    ),
-    array(
-        'name' => format_string($geogebra->name),
-        'link' => '',
-        'type' => 'activityinstance'
-    )
-);
+add_to_log($course->id, 'geogebra', 'view', "view.php?id={$cm->id}", $geogebra->name, $cm->id);
 
-$navigation = build_navigation($navlinks);
+/// Print the page header
 
-print_header_simple(
-        format_string($geogebra->name), '', $navigation, '', '', true, update_module_button($cm->id, $course->id, get_string('modulename', 'geogebra')), navmenu($course, $cm)
-);
+$PAGE->set_url('/mod/geogebra/view.php', array('id' => $cm->id));
+$PAGE->set_title(format_string($geogebra->name));
+$PAGE->set_heading(format_string($course->fullname));
+$PAGE->set_context($context);
 
-print_tabs(array(
-    array(
-        new tabobject('view', $CFG->wwwroot . '/mod/geogebra/view.php?id=' . $cm->id, get_string('viewtab', 'geogebra')),
-        new tabobject('grade', $CFG->wwwroot . '/mod/geogebra/grade.php?id=' . $cm->id, get_string('resultstab', 'geogebra'))
-    )
-        ), 'view');
 
-print_heading($geogebra->name);
+// Mark viewed if required
+$completion = new completion_info($course);
+$completion->set_module_viewed($cm);
 
-//Any unfinished attempt?
-$unfinishedattempt = geogebra_get_unfinished_attempt($geogebra->id, $USER->id);
-if ($unfinishedattempt) {
-    parse_str($unfinishedattempt->vars, $parsedVars);
-    $parsedVars['finished'] = 0;
-} else {
-    $parsedVars = null;
-}
+// other things you may want to set - remove if not needed
+//$PAGE->set_cacheable(false);
+//$PAGE->set_focuscontrol('some-html-id');
+//$PAGE->add_body_class('geogebra-'.$somevar);
 
-// Max number of attemps reached?
-$numattempts = geogebra_count_finished_attempts($geogebra->id, $USER->id);
+geogebra_view_header($geogebra, $cm, $course);
+geogebra_view_intro($geogebra, $cm);
 
-$error = '';
-if ($geogebra->maxattempts <= 0) {
-    echo '<div class="mod-geogebra-attempts">' . get_string("unlimitedattempts", "geogebra");
-} else {
-    if ($geogebra->maxattempts <= $numattempts) {
-        $error = get_string("nomoreattempts", "geogebra");
-    } else if ($geogebra->maxattempts - $numattempts == 1) {
-        echo '<div class="mod-geogebra-attempts">' . get_string("lastattemptremaining", "geogebra");
-    } else {
-        echo '<div class="mod-geogebra-attempts">' . get_string("attemptsremaining", "geogebra") . ($geogebra->maxattempts - $numattempts);
+$action = optional_param('action', '', PARAM_TEXT);
+if (has_capability('mod/geogebra:grade', $context, $USER->id, false)){    
+    if ($action == 'preview'){
+        geogebra_view_applet($geogebra, $context, true);
+    } else{
+        geogebra_view_dates($geogebra, $cm);
+        geogebra_print_results_table($geogebra, $context, $cm, $course, $action);
     }
-}
-if ($unfinishedattempt) {
-    echo '<br>(' . get_string("resumeattempt", "geogebra") . ')';
-}
-echo '</div>';
-if ($error) {
-    notice($error, $CFG->wwwroot . '/course/view.php?id=' . $COURSE->id);
+    
+} else{
+    geogebra_view_applet($geogebra, $context);    
 }
 
-echo '<div class="mod-geogebra-intro">' . format_text($geogebra->intro, FORMAT_HTML) . '</div>';
-
-// Is activity opened?
-if ($geogebra->timeavailable && $geogebra->timeavailable > time()) {
-    $error = get_string("activitynotopened", "geogebra");
-} else if ($geogebra->timedue && $geogebra->timedue < time()) {
-    $error = get_string("activityclosed", "geogebra");
-}
-
-if ($error) {
-    geogebra_view_dates($geogebra);
-    notice($error);
-}
-
-// Print the main part of the page
-parse_str($geogebra->url, $attributes);
-echo '<form id="geogebra_form" method="POST" >';
-echo '<div style="text-align: center">';
-geogebra_show_applet($geogebra, $attributes, $parsedVars);
-echo '<input type="hidden" name="appletInformation" />';
-
-if ($geogebra->showsubmit) {
-    $pag1 = "'attempt.php?id=" . $id . "&a=" . $a . "&f=0" . "'";
-    $pag2 = "'attempt.php?id=" . $id . "&a=" . $a . "&f=1" . "'";
-
-    echo '<input type="submit" onclick = "this.form.action = ' . $pag1 . '" value="' . get_string('savewithoutsubmitting', 'geogebra') . '" />';
-    echo '<input type="submit" onclick = "this.form.action = ' . "'attempt.php?id=" . $id . "&a=" . $a . "&f=1" . "'" . '" value="' . get_string('submitandfinish', 'geogebra') . '" />';
-}
-echo ' </form>';
-echo '</div>';
-
-geogebra_view_dates($geogebra);
-
-// Finish the page
-print_footer($course);
-?>
+geogebra_view_footer();

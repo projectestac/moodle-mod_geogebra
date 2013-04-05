@@ -16,6 +16,12 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
+ * Definition of log events
+ *
+ * NOTE: this is an example how to insert log event during installation/update.
+ * It is not really essential to know about it, but these logs were created as example
+ * in the previous 1.9 geogebra.
+ *
  * @package    mod
  * @subpackage geogebra
  * @copyright  2011 Departament d'Ensenyament de la Generalitat de Catalunya
@@ -23,16 +29,12 @@
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-defined('MOODLE_INTERNAL') || die;
+defined('MOODLE_INTERNAL') || die();
 
-if ($ADMIN->fulltree) {
-    require_once($CFG->dirroot.'/mod/geogebra/lib.php');
+global $DB;
 
-/*    $settings->add(new admin_setting_configtext('geogebra_jarbase', get_string('geogebrajarbase', 'geogebra'),
-                       get_string('geogebrajarbase_help', 'geogebra'), JCLIC_DEFAULT_JARBASE, PARAM_URL, 60));
-
-    $settings->add(new admin_setting_configtext('geogebra_lap', get_string('lap', 'geogebra'),
-                       get_string('lap_help', 'geogebra'), JCLIC_DEFAULT_LAP, PARAM_INT));
-*/    
-}
-
+$logs = array(
+    array('module'=>'geogebra', 'action'=>'add', 'mtable'=>'geogebra', 'field'=>'name'),
+    array('module'=>'geogebra', 'action'=>'view', 'mtable'=>'geogebra', 'field'=>'name'),
+    array('module'=>'geogebra', 'action'=>'update', 'mtable'=>'geogebra', 'field'=>'name'),
+);

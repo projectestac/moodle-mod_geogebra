@@ -16,6 +16,8 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
+ * @see uninstall_plugin()
+ *
  * @package    mod
  * @subpackage geogebra
  * @copyright  2011 Departament d'Ensenyament de la Generalitat de Catalunya
@@ -23,16 +25,9 @@
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-defined('MOODLE_INTERNAL') || die;
-
-if ($ADMIN->fulltree) {
-    require_once($CFG->dirroot.'/mod/geogebra/lib.php');
-
-/*    $settings->add(new admin_setting_configtext('geogebra_jarbase', get_string('geogebrajarbase', 'geogebra'),
-                       get_string('geogebrajarbase_help', 'geogebra'), JCLIC_DEFAULT_JARBASE, PARAM_URL, 60));
-
-    $settings->add(new admin_setting_configtext('geogebra_lap', get_string('lap', 'geogebra'),
-                       get_string('lap_help', 'geogebra'), JCLIC_DEFAULT_LAP, PARAM_INT));
-*/    
+/**
+ * Custom uninstallation procedure
+ */
+function xmldb_geogebra_uninstall() {
+    return true;
 }
-
