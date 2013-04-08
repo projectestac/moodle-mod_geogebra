@@ -50,7 +50,7 @@ $string['highestattempt'] = 'Highest attempt';
 $string['lowestattempt'] = 'Lowest attempt';
 $string['firstattempt'] = 'First attempt';
 $string['lastattempt'] = 'Last attempt';
-$string['viewattempts'] = 'View ttemtps';
+$string['viewattempts'] = 'View attemtps';
 $string['comment'] = 'Comment';
 
 $string['unlimitedattempts'] = 'Unlimited attempts for this activity';
@@ -140,3 +140,10 @@ $string['geogebrafile'] = 'GeoGebra file';
 $string['geogebrafile_help'] = 'The .ggb file.';
 $string['urledit'] = 'GeoGebra file';
 $string['urledit_help'] = 'The ".ggb" file where you will find the GeoGebra activity.';
+
+$string['lastaccess']='Last visited';
+$string['datestudent'] = 'Last modified (submission)';
+$string['dateteacher']= 'Last modified (grade)';
+$string['status'] = 'Estat';
+$string['viewattempt'] = 'View';
+$string['previewtab'] = 'Preview';

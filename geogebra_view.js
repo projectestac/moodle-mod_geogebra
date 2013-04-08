@@ -50,6 +50,21 @@ function geogebra_addEvent(object, eventName, callback) {
 	}
 }
 
+function geogebra_submit_attempt(){
+	var form = document.getElementById('geogebra_form');
+        var movie = document.getElementById('geogebra_object');
+
+        if (movie.nodeName.toLowerCase() == 'applet') { // is java
+                adapter.doExit();
+                form.appletInformation.value = adapter.propertyString;
+                return true;
+        }
+
+        alert('The geogebra_object applet is missing');
+        return false;    
+}
+
+
 geogebra_addEvent(window, 'load', function() {
 	var form = document.getElementById('geogebra_form');
 	adapter.propertyString = form.prevAppletInformation.value;
@@ -57,15 +72,7 @@ geogebra_addEvent(window, 'load', function() {
 	adapter.init();
 
 	geogebra_addEvent(form, 'submit', function(e) {
-		var movie = document.getElementById('geogebra_object');
-
-		if (movie.nodeName.toLowerCase() == 'applet') { // is java
-			adapter.doExit();
-			form.appletInformation.value = adapter.propertyString;
- 			return true;
- 		}
-				
-		alert('The geogebra_object applet is missing');
-		return false;
+		return geogebra_submit_attempt();
 	});
 });
+

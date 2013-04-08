@@ -50,6 +50,10 @@ define('GEOGEBRA_DEFAULT_CODEBASE', 'http://www.geogebra.org/webstart/4.0/unsign
 define('GEOGEBRA_ARCHIVE', 'geogebra.jar');
 define('GEOGEBRA_CODE', 'geogebra.GeoGebraApplet');
 
+// GeoGebra who's updating activity
+define('GEOGEBRA_UPDATE_STUDENT', 0);
+define('GEOGEBRA_UPDATE_TEACHER', 1);
+
 
 /** Include eventslib.php */
 require_once($CFG->libdir.'/eventslib.php');
