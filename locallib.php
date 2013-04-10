@@ -579,16 +579,17 @@ require_once("$CFG->libdir/filelib.php");
     }    
 
     /**
-    * Format time from milliseconds to string 
-    *
-    * @return string Formated string [x' y''], where x are the minutes and y are the seconds.	
-    * @param int $time	The time (in ms)
-    */
-    function geogebra_time2str($time){
-        return round($time/60000,0)."' ".round(fmod($time,60000)/1000,0)."''";
-    } 
+     * Format time from milliseconds to string 
+     *
+     * @return string Formated string [x' y''], where x are the minutes and y are the seconds.	
+     * @param int $time	The time (in ms)
+     */
+    function geogebra_time2str($time) {
+        $minutes = floor($time / 60);
+        $seconds = sprintf("%02s", round(fmod($time, 60), 0));
+        return ($minutes > 0 ? $minutes . "' " : " ") . $seconds . "''";
+    }
     
-
     function geogebra_view_results($geogebra, $context, $cm, $course, $action){
         global $CFG, $DB, $OUTPUT, $PAGE, $USER;
         
@@ -814,8 +815,8 @@ require_once("$CFG->libdir/filelib.php");
             $duration = geogebra_time2str($parsedVars['duration']);
             $grade = $parsedVars['grade'];
             $gradecomment = !empty($attempt->gradecomment) ? shorten_text(trim(strip_tags(format_text($attempt->gradecomment))), 25) : '';
-            $datestudent = !empty($attemptsgrade->datestudent) ? userdate($attemptsgrade->datestudent) : '';
-            $dateteacher = !empty($attemptsgrade->dateteacher) ? userdate($attemptsgrade->dateteacher) : '';
+            $datestudent = !empty($attempt->datestudent) ? userdate($attempt->datestudent) : '';
+            $dateteacher = !empty($attempt->dateteacher) ? userdate($attempt->dateteacher) : '';
             $status = '<a href="' . $CFG->wwwroot . '/mod/geogebra/view.php?id=' . $cm->id . '&student=' . $user->id .'&attemptid='.$attempt->id.'"> ' . get_string('viewattempt', 'geogebra') . '</a>';
             $row = array($numattempt, $duration, $grade, $gradecomment, $datestudent, $dateteacher, $status);
             $rowclass = '';

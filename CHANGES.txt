@@ -9,7 +9,7 @@ Changes in progress (Moodle 2 version)
   * Create GGB activities
   * View GGB activities with students mode recovering status
   * Save/Update attempts (from students view)
-  * View current student attempts (pending addapt function to show all students when current user can grade)
+  * View current student attempts (pending adapt function to show all students when current user can grade)
 
 
 
