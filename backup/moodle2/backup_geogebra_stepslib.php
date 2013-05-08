@@ -38,40 +38,31 @@ class backup_geogebra_activity_structure_step extends backup_activity_structure_
  
         // Define each element separated
         $geogebra = new backup_nested_element('geogebra', array('id'), array(
-            'name', 'intro', 'introformat', 'url', 'skin', 'maxattempts', 
-            'width', 'height', 'avaluation', 'maxgrade', 'grade', 'lang', 
-            'exiturl', 'timeavailable', 'timedue'));
+            'name', 'intro', 'introformat', 'url', 'width', 'height', 
+            'showsubmit', 'grade', 'autograde', 'maxattempts', 'grademethod',
+            'timeavailable', 'timedue', 'timecreated', 'timemodified'));
  
-        $sessions = new backup_nested_element('sessions');
+        $attempts = new backup_nested_element('attempts');
  
-        $session = new backup_nested_element('session', array('id'), array(
-            'session_id', 'user_id', 'session_datetime', 'project_name',
-            'session_key', 'session_code', 'session_context'));
- 
-        $activities = new backup_nested_element('sessionactivities');
- 
-        $activity = new backup_nested_element('sessionactivity', array('id'), array(
-            'session_id', 'activity_id', 'activity_name', 'num_actions', 'score',
-            'activity_solved', 'qualification', 'total_time', 'activity_code'));
-        
+        $attempt = new backup_nested_element('attempt', array('id'), array(
+            'geogebra', 'userid', 'vars', 'gradecomment', 'finished',
+            'dateteacher', 'datestudent'));
+         
         // Build the tree
-        $geogebra->add_child($sessions);
-        $sessions->add_child($session);
-        $session->add_child($activities);
-        $activities->add_child($activity);
+        $geogebra->add_child($attempts);
+        $attempts->add_child($attempt);
  
         // Define sources
         $geogebra->set_source_table('geogebra', array('id' => backup::VAR_ACTIVITYID));
   
         // All the rest of elements only happen if we are including user info
         if ($userinfo) {
-            $session->set_source_table('geogebra_sessions', array('geogebraid' => backup::VAR_PARENTID));
-            $activity->set_source_table('geogebra_activities', array('session_id' => '../../session_id'));
+            $attempt->set_source_table('geogebra_attempts', array('geogebra' => backup::VAR_PARENTID));
         }
         
         // Define id annotations
         $geogebra->annotate_ids('scale', 'grade');
-        $session->annotate_ids('user', 'user_id');
+        $attempt->annotate_ids('user', 'userid');
 
         // Define file annotations
         $geogebra->annotate_files('mod_geogebra', 'intro', null);     // This file area hasn't itemid

@@ -38,8 +38,7 @@ class restore_geogebra_activity_structure_step extends restore_activity_structur
 
         $paths[] = new restore_path_element('geogebra', '/activity/geogebra');
         if ($userinfo) {
-            $paths[] = new restore_path_element('geogebra_session', '/activity/geogebra/sessions/session');
-            $paths[] = new restore_path_element('geogebra_session_activity', '/activity/geogebra/sessions/session/sessionactivities/sessionactivity');
+            $paths[] = new restore_path_element('geogebra_attempt', '/activity/geogebra/attempts/attempt');
         }
 
         // Return the paths wrapped into standard activity structure
@@ -62,36 +61,18 @@ class restore_geogebra_activity_structure_step extends restore_activity_structur
         $this->apply_activity_instance($newitemid);
     }
 
-    protected function process_geogebra_session($data) {
+    protected function process_geogebra_attempt($data) {
         global $DB;
 
         $data = (object)$data;
         $oldid = $data->id;
 
-        $data->geogebraid = $this->get_new_parentid('geogebra');
-        $data->user_id = $this->get_mappingid('user', $data->user_id);
+        $data->geogebra = $this->get_new_parentid('geogebra');
+        $data->userid = $this->get_mappingid('user', $data->userid);
 
-        $data->session_datetime = date('Y-m-d h:i:s', $this->apply_date_offset(strtotime($data->session_datetime)));
-        $data->session_id = time();
-        $newitemid = $DB->insert_record('geogebra_sessions', $data);
-        $data->id = $newitemid;
-        $data->session_id = $newitemid;
-        $DB->update_record('geogebra_sessions', $data);
-        $this->set_mapping('geogebra_session', $oldid, $newitemid);
+        $newitemid = $DB->insert_record('geogebra_attempts', $data);
     }
 
-    protected function process_geogebra_session_activity($data) {
-        global $DB;
-
-        $data = (object)$data;
-        $oldid = $data->id;
-
-        $oldsessionid = $data->session_id;
-        $data->session_id = $this->get_mappingid('geogebra_session', $oldsessionid);
-        $newitemid = $DB->insert_record('geogebra_activities', $data);
-        // No need to save this mapping as far as nothing depend on it
-        // (child paths, file areas nor links decoder)
-    }
 
     protected function after_execute() {
         // Add geogebra related files, no need to match by itemname (just internally handled context)

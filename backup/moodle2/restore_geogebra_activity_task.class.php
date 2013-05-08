@@ -47,7 +47,7 @@ class restore_geogebra_activity_task extends restore_activity_task {
      */
     protected function define_my_steps() {
         geogebra_normalize_date();
-        // JClic only has one structure step
+        // GeoGebra only has one structure step
         $this->add_step(new restore_geogebra_activity_structure_step('geogebra_structure', 'geogebra.xml'));
     }
 
@@ -70,8 +70,8 @@ class restore_geogebra_activity_task extends restore_activity_task {
     static public function define_decode_rules() {
         $rules = array();
 
-        $rules[] = new restore_decode_rule('JCLICVIEWBYID', '/mod/geogebra/view.php?id=$1', 'course_module');
-        $rules[] = new restore_decode_rule('JCLICINDEX', '/mod/geogebra/index.php?id=$1', 'course');
+        $rules[] = new restore_decode_rule('GEOGEBRAVIEWBYID', '/mod/geogebra/view.php?id=$1', 'course_module');
+        $rules[] = new restore_decode_rule('GEOGEBRAINDEX', '/mod/geogebra/index.php?id=$1', 'course');
 
         return $rules;
 
