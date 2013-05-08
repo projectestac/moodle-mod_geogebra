@@ -30,7 +30,7 @@ defined('MOODLE_INTERNAL') || die();
 require_once($CFG->dirroot . '/mod/geogebra/locallib.php');
  
 /**
- * JClic conversion handler
+ * GeoGebra conversion handler
  */
 class moodle1_mod_geogebra_handler extends moodle1_mod_handler {
  
@@ -42,7 +42,7 @@ class moodle1_mod_geogebra_handler extends moodle1_mod_handler {
      * defined. The method process_xxx() is not executed if the associated path element is
      * empty (i.e. it contains none elements or sub-paths only).
      *
-     * Note that the path /MOODLE_BACKUP/COURSE/MODULES/MOD/JCLIC does not
+     * Note that the path /MOODLE_BACKUP/COURSE/MODULES/MOD/GEOGEBRA does not
      * actually exist in the file. The last element with the module name was
      * appended by the moodle1_converter class.
      *
@@ -51,17 +51,10 @@ class moodle1_mod_geogebra_handler extends moodle1_mod_handler {
     public function get_paths() {
         return array(
             new convert_path(
-                'geogebra', '/MOODLE_BACKUP/COURSE/MODULES/MOD/JCLIC',
+                'geogebra', '/MOODLE_BACKUP/COURSE/MODULES/MOD/GEOGEBRA',
                 array(
-                    'renamefields' => array(
-                        'description' => 'intro',
-                        'format' => 'introformat',
-                    ),
                     'newfields' => array(
                         'introformat' => 0,
-                        'grade' => 0,
-                        'timeavailable' => 0,
-                        'timedue' => 0,
                     ),
                 )
             ),
@@ -69,7 +62,7 @@ class moodle1_mod_geogebra_handler extends moodle1_mod_handler {
     }
  
     /**
-     * This is executed every time we have one /MOODLE_BACKUP/COURSE/MODULES/MOD/JCLIC
+     * This is executed every time we have one /MOODLE_BACKUP/COURSE/MODULES/MOD/GEOGEBRA
      * data available
      */
     public function process_geogebra($data) {
@@ -90,19 +83,21 @@ class moodle1_mod_geogebra_handler extends moodle1_mod_handler {
         // migrate geogebra package file
         $this->fileman->filearea = 'content';
         $this->fileman->itemid   = 0;
-        if (!geogebra_is_valid_external_url($data['url']) ) {
-            // Migrate file
-            try{
-                $this->fileman->migrate_file('course_files/'.$data['url']);            
-            } catch (Exception $e){
-                echo 'Caught exception: ',  $e->getMessage(), ' File: \'',$data['url'], '\' on JClic activity \''.$data['name'].'\' <br>';
-            }
-        }
         
-        // To avoid problems if maxgrade is null
-        if ($data['maxgrade'] === NULL) $data['maxgrade'] = 100;
-        // get grade value from maxgrade
-        $data['grade'] = $data['maxgrade'];
+        // Migrate file
+        parse_str($data['url'], $parsedVarsURL);
+        try{
+            $this->fileman->migrate_file('course_files/'.$parsedVarsURL['filename']);            
+        } catch (Exception $e){
+            echo 'Caught exception: ',  $e->getMessage(), ' File: \''.$parsedVarsURL['filename'].'\' (from URL \'',$data['url'], '\') on GeoGebra activity \''.$data['name'].'\' <br>';
+        }
+        // From Moodle 2, URL field only contains information about the GGB file location
+        $data['url'] = $parsedVarsURL['filename'];
+        // Remove filename from parsedVarsURL array (to avoid save twice)
+        unset($parsedVarsURL['filename']);
+        // Store other attributes in the new param
+        $data['attributes'] = http_build_query($parsedVarsURL);
+        
         
         // start writing geogebra.xml
         $this->open_xml_writer("activities/geogebra_{$this->moduleid}/geogebra.xml");

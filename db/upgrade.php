@@ -45,7 +45,7 @@ function xmldb_geogebra_upgrade($oldversion) {
 
     $dbman = $DB->get_manager(); // loads ddl manager and xmldb classes
 
-    if ($result && $oldversion < 2012030100) {
+    if ($oldversion < 2012030100) {
         //Add grade field
         $table = new XMLDBTable('geogebra');
         $field = new XMLDBField('grade');
@@ -73,14 +73,14 @@ function xmldb_geogebra_upgrade($oldversion) {
         $result = $result && add_field($table, $field);
     }
 
-    if ($result && $oldversion < 2012030101) {
+    if ($oldversion < 2012030101) {
         $table = new XMLDBTable('geogebra_attempts');
         $field = new XMLDBField('dateteacher');
         $field->setAttributes(XMLDB_TYPE_INTEGER, '10', XMLDB_UNSIGNED, XMLDB_NOTNULL, null, null, null, '0', 'finished');
         $result = $result && add_field($table, $field);
     }
     
-    if ($result && $oldversion < 2012082100) {
+    if ($oldversion < 2012082100) {
         $table = new XMLDBTable('geogebra');
         $field = new XMLDBField('url');
         $field->setAttributes(XMLDB_TYPE_CHAR, '255', null, XMLDB_NOTNULL, null, null, null, null, 'intro');
@@ -97,7 +97,7 @@ function xmldb_geogebra_upgrade($oldversion) {
         
     }
     
-    if ($oldversion < 2013030500) {
+    if ($oldversion < 2011122902) {
 
         /// Define field introformat to be added to geogebra
         $table = new xmldb_table('geogebra');
@@ -133,9 +133,39 @@ function xmldb_geogebra_upgrade($oldversion) {
         // Add upgrading code from 1.9 (+ new file storage system)
         // @TODO: test it!!!!
         geogebra_migrate_files();
-     
+             
         // geogebra savepoint reached
         upgrade_mod_savepoint(true, 2012042700, 'geogebra');
+    }
+    
+    
+    if ($oldversion < 2013050600) {
+
+        // @TODO: test it!!!!
+        //Add atrributes field
+        $table = new xmldb_table('geogebra');
+        $field = new xmldb_field('attributes');
+        $field->set_attributes(XMLDB_TYPE_TEXT, 'small', null, null, null, null, null, null, 'url');
+        $dbman->add_field($table, $field);
+        
+        $rs = $DB->get_recordset('geogebra');
+        foreach ($rs as $f) {
+            parse_str($f->url, $parsedVarsURL);
+            if (array_key_exists('filename', $parsedVarsURL)) {
+                // From Moodle 2, URL field only contains information about the GGB file location
+                $f->url = $parsedVarsURL['filename'];
+                // Remove filename from parsedVarsURL array (to avoid save twice)
+                unset($parsedVarsURL['filename']);
+                // Store other attributes in the new param
+                $f->attributes = http_build_query($parsedVarsURL);
+                $DB->update_record('geogebra', $f);
+                upgrade_set_timeout();
+            }
+        }
+        $rs->close();
+     
+        // geogebra savepoint reached
+        upgrade_mod_savepoint(true, 2013050600, 'geogebra');
     }
     
     // Final return of upgrade result (true, all went good) to Moodle.
