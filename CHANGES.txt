@@ -6,11 +6,11 @@ development home at https://github.com/projectestac/moodle-mod_geogebra
 Changes in progress (Moodle 2 version)
 ---------------------------------------------------------------------------------------
 - At the moment, only works:
-  * Create GGB activities
+  * Create GGB activities (pending save settings like showMenuBar or enableRightClick)
   * View GGB activities with students mode recovering status
   * Save/Update attempts (from students view)
+  * Backup/Restory activities (even from Moodle 1.9)
   * View current student attempts (pending adapt function to show all students when current user can grade)
-
 
 
 Changes in progress (Moodle 1.9 version)
