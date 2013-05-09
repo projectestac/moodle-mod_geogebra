@@ -187,11 +187,11 @@ class mod_geogebra_mod_form extends moodleform_mod {
         return $errors;
     }    
     
-    // Need to translate the "url" field
     function set_data($default_values) {
         $default_values = (array)$default_values;
 
         if (isset($default_values['url'])) {
+            // Need to translate the "url" field
             if (geogebra_is_valid_external_url($default_values['url'])) {
                 $default_values['filetype'] = GEOGEBRA_FILE_TYPE_EXTERNAL;
                 $default_values['geogebraurl'] = $default_values['url'];
@@ -199,8 +199,19 @@ class mod_geogebra_mod_form extends moodleform_mod {
                 $default_values['filetype'] = GEOGEBRA_FILE_TYPE_LOCAL;
                 $default_values['geogebrafile'] = $default_values['url'];            
             }
+            
+            // Load attributes
+            parse_str($default_values['attributes'], $attributes);
+            $default_values['enableRightClick'] = isset($attributes['enableRightClick']) ? $attributes['enableRightClick'] : 0;
+            $default_values['enableLabelDrags'] = isset($attributes['enableLabelDrags']) ? $attributes['enableLabelDrags'] : 0;
+            $default_values['showResetIcon'] = isset($attributes['showResetIcon']) ? $attributes['showResetIcon'] : 0;
+            $default_values['showMenuBar'] = isset($attributes['showMenuBar']) ? $attributes['showMenuBar'] : 0;
+            $default_values['showToolBar'] = isset($attributes['showToolBar']) ? $attributes['showToolBar'] : 0;
+            $default_values['showToolBarHelp'] = isset($attributes['showToolBarHelp']) ? $attributes['showToolBarHelp'] : 0;
         }
         unset($default_values['url']);
+        
+        
         
         $this->data_preprocessing($default_values);
         parent::set_data($default_values);

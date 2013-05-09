@@ -152,9 +152,9 @@ require_once("$CFG->libdir/filelib.php");
             echo $OUTPUT->box(get_string('expired', 'geogebra', userdate($geogebra->timedue)), 'generalbox boxaligncenter geogebradates'); 
         } else {
             if ($geogebra->maxattempts<0 || $attempts < $geogebra->maxattempts){
-                // TODO: Get correct attributes. Some of them are not still saved in mod_form (like language)
-                $attributes = array('language'=>'ca', 'filename'=>$geogebra->url);
-    
+                parse_str($geogebra->attributes, $attributes);
+                $attributes['filename'] = $geogebra->url;
+   
                 $PAGE->requires->js('/mod/geogebra/geogebra_view.js');
                 echo '<applet id="geogebra_object" name="ggbApplet" codebase="', geogebra_get_javacodebase(), '" archive="', GEOGEBRA_ARCHIVE, '" code="', GEOGEBRA_CODE, '" width="' . $geogebra->width . 'px" height="' . $geogebra->height . 'px" align="bottom">';
                 $ggbbase64 = geogebra_get_ggbbase64_content($geogebra, $context);
@@ -231,8 +231,7 @@ require_once("$CFG->libdir/filelib.php");
     }
 
     function geogebra_get_applet_param($paramName, $attributes) {
-        //$paramValue = (isset($attributes[$paramName]) && $attributes[$paramName]) ? 'true' : 'false';
-        $paramValue = 'true';
+        $paramValue = (isset($attributes[$paramName]) && $attributes[$paramName]) ? 'true' : 'false';
         return '<param name="' . $paramName . '" value="' . $paramValue . '" />';
     }
     
@@ -946,3 +945,32 @@ require_once("$CFG->libdir/filelib.php");
         $tabs[] = new tabobject('result', $CFG->wwwroot . '/mod/geogebra/view.php?id=' . $cm->id.'&action=result', get_string('resultstab', 'geogebra'));
         return array($tabs);
     }
+    
+    /**
+     * Update geogebra object specified to include in the attributes field all the information
+     * 
+     * @param type $geogebra 
+     */
+    function geogebra_updateAttributes(&$geogebra) {
+        $enableRightClick = isset($geogebra->enableRightClick) && $geogebra->enableRightClick;
+        $enableLabelDrags = isset($geogebra->enableLabelDrags) && $geogebra->enableLabelDrags;
+        $showResetIcon = isset($geogebra->showResetIcon) && $geogebra->showResetIcon;
+        $showMenuBar = isset($geogebra->showMenuBar) && $geogebra->showMenuBar;
+        $showToolBar = isset($geogebra->showToolBar) && $geogebra->showToolBar;
+        $showToolBarHelp = isset($geogebra->showToolBarHelp) && $geogebra->showToolBarHelp;
+        $language = $geogebra->language;
+        $geogebra->attributes = http_build_query(array(
+            'enableRightClick' => $enableRightClick,
+            'enableLabelDrags' => $enableLabelDrags,
+            'showResetIcon' => $showResetIcon,
+            'showMenuBar' => $showMenuBar,
+            'showToolBar' => $showToolBar,
+            'showToolBarHelp' => $showToolBarHelp,
+            'language' => $language
+                ), '', '&');
+
+        $geogebra->showsubmit = isset($geogebra->showsubmit);
+    }
+
+    
+    

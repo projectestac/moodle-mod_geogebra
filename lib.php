@@ -113,6 +113,7 @@ function geogebra_supports($feature) {
 function geogebra_add_instance(stdClass $geogebra, mod_geogebra_mod_form $mform = null) {
     global $DB;
         
+    geogebra_updateAttributes($geogebra);
     $cmid = $geogebra->coursemodule;
     $geogebra->timecreated = time();
 
@@ -167,6 +168,7 @@ function geogebra_add_instance(stdClass $geogebra, mod_geogebra_mod_form $mform 
 function geogebra_update_instance(stdClass $geogebra, mod_geogebra_mod_form $mform = null) {
     global $DB;
 
+    geogebra_updateAttributes($geogebra);
     $geogebra->timemodified = time();
     $geogebra->id = $geogebra->instance;
     if ($mform->get_data()->filetype === GEOGEBRA_FILE_TYPE_LOCAL) {
