@@ -116,6 +116,7 @@ $string['discardchanges'] = 'Discard changes and return';
 
 
 /* Revision Moodle 2 */
+$string['modulename_help'] = '<b>ATTENTION!!</b> <br>Alpha version of the GeoGebra module for Moodle 2. It\'s incomplete and there are some functionalities which are not working properly ';
 $string['pluginname'] = 'GeoGebra';
 $string['pluginadministration'] = 'GeoGebra administration';
 $string['geogebra:view'] = 'View GeoGebra';
