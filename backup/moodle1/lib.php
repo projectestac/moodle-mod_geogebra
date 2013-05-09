@@ -96,7 +96,7 @@ class moodle1_mod_geogebra_handler extends moodle1_mod_handler {
         // Remove filename from parsedVarsURL array (to avoid save twice)
         unset($parsedVarsURL['filename']);
         // Store other attributes in the new param
-        $data['attributes'] = http_build_query($parsedVarsURL);
+        $data['attributes'] = http_build_query($parsedVarsURL, '', '&');
         
         
         // start writing geogebra.xml
