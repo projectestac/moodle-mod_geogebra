@@ -839,6 +839,7 @@ require_once("$CFG->libdir/filelib.php");
 */            
             
             $table = new html_table();
+            $table->size = array('10%', '90%');
 
             parse_str($attempt->vars, $parsedVars);
             $numattempt = $parsedVars['attempts'];
@@ -889,7 +890,7 @@ require_once("$CFG->libdir/filelib.php");
     
     function geogebra_add_table_row_tuple(html_table $table, $first, $second){
         $row = new html_table_row();
-        $cell1 = new html_table_cell($first);
+        $cell1 = new html_table_cell('<b>'.$first.'</b>');
         $cell2 = new html_table_cell($second);
         $row->cells = array($cell1, $cell2);
         $table->data[] = $row;
