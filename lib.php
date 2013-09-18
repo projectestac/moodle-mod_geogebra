@@ -147,13 +147,11 @@ function geogebra_update_instance(stdClass $geogebra, mod_geogebra_mod_form $mfo
     
     geogebra_before_add_or_update($geogebra, $mform);
     
-    $result = $DB->update_record('geogebra', $geogebra);
+    $DB->update_record('geogebra', $geogebra);
     
-    if ($result){
-        $result = geogebra_after_add_or_update($geogebra, $mform);
-    }
+    geogebra_after_add_or_update($geogebra, $mform);
     
-    return $result;
+    return true;
 }
 
 /**

@@ -39,20 +39,21 @@ function geogebra_before_add_or_update(&$geogebra, $mform){
         $geogebra->url = $mform->get_data()->geogebrafile;
     } else{
         $geogebra->url = $geogebra->geogebraurl;
-    }    
+    }
+    
+    return true;
 }
 
 function geogebra_after_add_or_update($geogebra, $mform){
     global $DB;
 
-    $result = true;
     if ($mform->get_data()->filetype === GEOGEBRA_FILE_TYPE_LOCAL) {
         $filename = geogebra_set_mainfile($geogebra);
         $geogebra->url = $filename;
         $result = $DB->update_record('geogebra', $geogebra);
     }
     
-    if ($result && $geogebra->timedue) {
+    if ($geogebra->timedue) {
         $event = new stdClass();
         if ($event->id = $DB->get_field('event', 'id', array('modulename'=>'geogebra', 'instance'=>$geogebra->id))) {
             $event->name        = $geogebra->name;
@@ -80,12 +81,10 @@ function geogebra_after_add_or_update($geogebra, $mform){
         $DB->delete_records('event', array('modulename'=>'geogebra', 'instance'=>$geogebra->id));
     }  
     
-    if ($result){
-        // get existing grade item
-        $result = geogebra_grade_item_update($geogebra);
-    }
+    // get existing grade item
+    geogebra_grade_item_update($geogebra);
 
-    return $result;
+    return true;
 }
 
 
