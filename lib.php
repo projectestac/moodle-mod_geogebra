@@ -46,7 +46,7 @@ define('GEOGEBRA_FIRST_GRADE', 4);
 define('GEOGEBRA_LAST_GRADE', 5);
 
 // GeoGebra applet vars
-define('GEOGEBRA_DEFAULT_CODEBASE', 'http://www.geogebra.org/webstart/4.0/unsigned/');
+define('GEOGEBRA_DEFAULT_CODEBASE', 'http://www.geogebra.org/webstart/4.2/unsigned/');
 define('GEOGEBRA_ARCHIVE', 'geogebra.jar');
 define('GEOGEBRA_CODE', 'geogebra.GeoGebraApplet');
 
@@ -713,19 +713,6 @@ function geogebra_pluginfile($course, $cm, $context, $filearea, array $args, $fo
 ////////////////////////////////////////////////////////////////////////////////
 
 /**
- * Extends the global navigation tree by adding geogebra nodes if there is a relevant content
- *
- * This can be called by an AJAX request so do not rely on $PAGE as it might not be set up properly.
- *
- * @param navigation_node $navref An object representing the navigation tree node of the geogebra module instance
- * @param stdClass $course
- * @param stdClass $module
- * @param cm_info $cm
- */
-function geogebra_extend_navigation(navigation_node $navref, stdclass $course, stdclass $module, cm_info $cm) {
-}
-
-/**
  * Extends the settings navigation with the geogebra settings
  *
  * This function is called when the context for the page is a geogebra module. This is not called by AJAX
@@ -740,7 +727,6 @@ function geogebra_extend_settings_navigation(settings_navigation $settingsnav, n
 ////////////////////////////////////////////////////////////////////////////////
 // Reset                                                                      //
 ////////////////////////////////////////////////////////////////////////////////
-
 
 /**
  * Removes all grades from gradebook

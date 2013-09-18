@@ -253,7 +253,7 @@ require_once("$CFG->libdir/filelib.php");
     
     function geogebra_get_javacodebase() {
         global $CFG;
-        if (isset($CFG->geogebra_javacodebase))
+        if (isset($CFG->geogebra_javacodebase) && !empty($CFG->geogebra_javacodebase))
             return $CFG->geogebra_javacodebase;
         return GEOGEBRA_DEFAULT_CODEBASE;
     }
@@ -686,7 +686,7 @@ require_once("$CFG->libdir/filelib.php");
         $table->define_columns($tablecolumns['tablecolumns']);
         $table->define_headers($tablecolumns['tableheaders']);
         $table->define_baseurl($CFG->wwwroot.'/mod/geogebra/view.php?id='.$cm->id.'&amp;action='.$action);
-
+        
         $table->set_attribute('cellspacing', '0');
         $table->set_attribute('id', 'attempts');
         $table->set_attribute('class', 'results generaltable generalbox');
@@ -701,9 +701,7 @@ require_once("$CFG->libdir/filelib.php");
             $where .= ' AND ';
         }
 
-        if ($sort = $table->get_sql_sort()) {
-            $sort = ' ORDER BY '.$sort;
-        }
+//        $sort = ' ORDER BY attemptid';
 
         // Show results only for specified user
         if (!empty($attempt)){
@@ -886,7 +884,7 @@ require_once("$CFG->libdir/filelib.php");
     function geogebra_get_user_attempts($geogebraid, $userid) {
         global $DB;
         
-        return ($DB->get_records('geogebra_attempts', array('geogebra'=>$geogebraid, 'userid'=>$userid)));
+        return $DB->get_records('geogebra_attempts', array('geogebra'=>$geogebraid, 'userid'=>$userid), 'datestudent ASC');
     }
 
     /**
