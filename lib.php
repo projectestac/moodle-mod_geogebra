@@ -120,32 +120,10 @@ function geogebra_add_instance(stdClass $geogebra, mod_geogebra_mod_form $mform 
     
     $geogebra->id = $DB->insert_record('geogebra', $geogebra);
         
-    // we need to use context now, so we need to make sure all needed info is already in db
+    // We need to use context now, so we need to make sure all needed info is already in db
     $DB->set_field('course_modules', 'instance', $geogebra->id, array('id'=>$cmid));
     
-    // Store the geogebra and verify
-    if ($mform->get_data()->filetype === GEOGEBRA_FILE_TYPE_LOCAL) {
-        $filename = geogebra_set_mainfile($geogebra);
-        $geogebra->url = $filename;
-        $DB->update_record('geogebra', $geogebra);
-    }
-    
-    if ($geogebra->timedue) {
-        $event = new stdClass();
-        $event->name        = $geogebra->name;
-        $event->description = format_module_intro('geogebra', $geogebra, $geogebra->coursemodule);
-        $event->courseid    = $geogebra->course;
-        $event->groupid     = 0;
-        $event->userid      = 0;
-        $event->modulename  = 'geogebra';
-        $event->instance    = $geogebra->id;
-        $event->eventtype   = 'due';
-        $event->timestart   = $geogebra->timedue;
-        $event->timeduration = 0;
-
-        calendar_event::create($event);
-    }
-    geogebra_grade_item_update($geogebra);
+    geogebra_after_add_or_update($geogebra, $mform);
     
     return $geogebra->id;    
 }
@@ -477,46 +455,51 @@ function geogebra_grade_item_delete($geogebra) {
     return grade_update('mod/geogebra', $geogebra->course, 'mod', 'geogebra', $geogebra->id, 0, NULL, array('deleted'=>1)) == GRADE_UPDATE_OK;
 }
 
-/**
- * Return grade for given user or all users.
- *
- * @todo: implement userid=0 (all users)
- * @todo: optimize this function (to avoid call geogebra_get_sessions_summary or update only mandatory info)
- * 
- * @param object $geogebra object
- * @param int $userid optional user id, 0 means all users
- * @return array array of grades, false if none
- */
-function geogebra_get_user_grades($geogebra, $userid=0) {
-    global $CFG, $DB;
-    require_once($CFG->dirroot.'/mod/geogebra/locallib.php');
 
-    // sanity check on $geogebra->id
-    if (! isset($geogebra->id)) {
-        return;
-    }
-    $sessions_summary = geogebra_get_sessions_summary($geogebra->id, $userid);
-    $grades[$userid]->userid = $userid;
-    $grades[$userid]->attempts = $sessions_summary->attempts;
-    $grades[$userid]->totaltime = $sessions_summary->totaltime;
-    $grades[$userid]->starttime = $sessions_summary->starttime;
-    $grades[$userid]->done = $sessions_summary->done;
-    $grades[$userid]->rawgrade = 0;
-    if ($geogebra->avaluation=='score'){
-        $grades[$userid]->rawgrade = $sessions_summary->score;				
-    }else{
-        $grades[$userid]->rawgrade = $sessions_summary->solved;
-    }
-    return $grades;
+/**
+ * Returns the grade informacion for a user and geogebra activity
+ * acording to the chosen grademethod.
+ *
+ * @param object $geogebra
+ * @param int $userid
+ * @return mixed
+ */
+function geogebra_get_user_grades($geogebra, $userid) {
+    /*TODO: Review if this case it's necessary for Moodle 2
+    if ($geogebra->maxattempts == 0) {
+        $attempt = geogebra_get_unique_attempt_grade($geogebra->id, $userid);
+    } else {
+     */
+        switch ($geogebra->grademethod) {
+            case GEOGEBRA_NO_GRADING:
+                $attempt = geogebra_get_nograding_grade($geogebra->id, $userid);
+                break;
+            case GEOGEBRA_AVERAGE_GRADE:
+                $attempt = (geogebra_get_average_grade($geogebra->id, $userid));
+                break;
+            case GEOGEBRA_HIGHEST_GRADE:
+                $attempt = (geogebra_get_highest_attempt_grade($geogebra->id, $userid));
+                break;
+            case GEOGEBRA_LOWEST_GRADE:
+                $attempt = (geogebra_get_lowest_attempt_grade($geogebra->id, $userid));
+                break;
+            case GEOGEBRA_FIRST_GRADE:
+                $attempt = (geogebra_get_first_attempt_grade($geogebra->id, $userid));
+                break;
+            case GEOGEBRA_LAST_GRADE:
+                $attempt = (geogebra_get_last_attempt_grade($geogebra->id, $userid));
+                break;
+        }
+//    }
+    return $attempt;
 }
+
 
 /**
  * Update geogebra grades in the gradebook
  *
  * Needed by grade_update_mod_grades() in lib/gradelib.php
  * 
- * @todo: Fix some problems (this function is not working when is called from beans.php)
- *
  * @param stdClass $geogebra instance object with extra cmidnumber and modname property
  * @param int $userid update grade of specific user only, 0 means all participants
  * @param boolean $nullifnone return null if grade does not exist
@@ -536,7 +519,6 @@ function geogebra_update_grades(stdClass $geogebra, $userid = 0, $nullifnone=tru
             }
         }
         geogebra_grade_item_update($geogebra, $grades);
-
     } else if ($userid and $nullifnone) {
         $grade = new stdClass();
         $grade->userid   = $userid;
