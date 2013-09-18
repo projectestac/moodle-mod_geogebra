@@ -739,10 +739,10 @@ function geogebra_after_add_or_update($geogebra, $mform){
 
                     // Attempts summary
                     $attempts = geogebra_get_user_attempts($geogebra->id, $auser->id);
-                    // TODO: Get duration and grade depending on the grading method
+                    $attempts_summary = geogebra_get_user_grades($geogebra, $auser->id);
                     $row = array_merge(array($picture, $userlink), $extradata,
-                            array(sizeof($attempts), '', '', '','','',''));
-                    $rowclass = (sizeof($attempts)>0)?'summary-row':'';
+                            array($attempts_summary->attempts, geogebra_time2str($attempts_summary->duration), $attempts_summary->grade, '','','',''));
+                    $rowclass = ($attempts_summary->attempts>0)?'summary-row':'';
                     $table->add_data($row, $rowclass);
                     
                     // Show attempts information
