@@ -112,18 +112,14 @@ function geogebra_supports($feature) {
  */
 function geogebra_add_instance(stdClass $geogebra, mod_geogebra_mod_form $mform = null) {
     global $DB;
-        
-    geogebra_updateAttributes($geogebra);
-    $cmid = $geogebra->coursemodule;
-    $geogebra->timecreated = time();
 
-    if ($mform->get_data()->filetype === GEOGEBRA_FILE_TYPE_LOCAL) {
-        $geogebra->url = $mform->get_data()->geogebrafile;
-    } else{
-        $geogebra->url = $geogebra->geogebraurl;
-    }
+    $geogebra->timecreated = time();
+    $cmid = $geogebra->coursemodule;
+    
+    geogebra_before_add_or_update($geogebra, $mform);
     
     $geogebra->id = $DB->insert_record('geogebra', $geogebra);
+        
     // we need to use context now, so we need to make sure all needed info is already in db
     $DB->set_field('course_modules', 'instance', $geogebra->id, array('id'=>$cmid));
     
@@ -168,53 +164,15 @@ function geogebra_add_instance(stdClass $geogebra, mod_geogebra_mod_form $mform 
 function geogebra_update_instance(stdClass $geogebra, mod_geogebra_mod_form $mform = null) {
     global $DB;
 
-    geogebra_updateAttributes($geogebra);
     $geogebra->timemodified = time();
     $geogebra->id = $geogebra->instance;
-    if ($mform->get_data()->filetype === GEOGEBRA_FILE_TYPE_LOCAL) {
-        $geogebra->url = $mform->get_data()->geogebrafile;
-    } else{
-        $geogebra->url = $geogebra->geogebraurl;
-    }
+    
+    geogebra_before_add_or_update($geogebra, $mform);
     
     $result = $DB->update_record('geogebra', $geogebra);
-    if ($result && $mform->get_data()->filetype === GEOGEBRA_FILE_TYPE_LOCAL) {
-        $filename = geogebra_set_mainfile($geogebra);
-        $geogebra->url = $filename;
-        $result = $DB->update_record('geogebra', $geogebra);
-    }
-    
-    if ($result && $geogebra->timedue) {
-        $event = new stdClass();
-        if ($event->id = $DB->get_field('event', 'id', array('modulename'=>'geogebra', 'instance'=>$geogebra->id))) {
-            $event->name        = $geogebra->name;
-            $event->description = format_module_intro('geogebra', $geogebra, $geogebra->coursemodule);
-            $event->timestart   = $geogebra->timedue;
-
-            $calendarevent = calendar_event::load($event->id);
-            $calendarevent->update($event);
-        } else {
-            $event = new stdClass();
-            $event->name        = $geogebra->name;
-            $event->description = format_module_intro('geogebra', $geogebra, $geogebra->coursemodule);
-            $event->courseid    = $geogebra->course;
-            $event->groupid     = 0;
-            $event->userid      = 0;
-            $event->modulename  = 'geogebra';
-            $event->instance    = $geogebra->id;
-            $event->eventtype   = 'due';
-            $event->timestart   = $geogebra->timedue;
-            $event->timeduration = 0;
-
-            calendar_event::create($event);
-        }
-    } else {
-        $DB->delete_records('event', array('modulename'=>'geogebra', 'instance'=>$geogebra->id));
-    }  
     
     if ($result){
-        // get existing grade item
-        $result = geogebra_grade_item_update($geogebra);
+        $result = geogebra_after_add_or_update($geogebra, $mform);
     }
     
     return $result;
@@ -607,12 +565,14 @@ function geogebra_update_grades(stdClass $geogebra, $userid = 0, $nullifnone=tru
  */
 function geogebra_get_file_areas($course, $cm, $context) {
     return array(
-        'content'      => get_string('urledit',  'geogebra')
+        'content'           => get_string('urledit',  'geogebra'),
+        'extracted_files'   => get_string('extracted files from ggb',  'geogebra')
     );
 }
 
 /**
  * File browsing support for geogebra module content area.
+ * 
  * @param object $browser
  * @param object $areas
  * @param object $course
@@ -633,15 +593,29 @@ function geogebra_get_file_info($browser, $areas, $course, $cm, $context, $filea
     }
 
     $fs = get_file_storage();
-
-    if ($filearea === 'content') {
+    if ($filearea === 'extracted_files') {
         $filepath = is_null($filepath) ? '/' : $filepath;
         $filename = is_null($filename) ? '.' : $filename;
 
         $urlbase = $CFG->wwwroot.'/pluginfile.php';
-        if (!$storedfile = $fs->get_file($context->id, 'mod_geogebra', 'content', 0, $filepath, $filename)) {
+        if (!$storedfile = $fs->get_file($context->id, 'mod_geogebra', $filearea, $itemid, $filepath, $filename)) {
             if ($filepath === '/' and $filename === '.') {
-                $storedfile = new virtual_root_file($context->id, 'mod_geogebra', 'content', 0);
+                $storedfile = new virtual_root_file($context->id, 'mod_geogebra', $filearea, $itemid);
+            } else {
+                // not found
+                return null;
+            }
+        }
+        return new file_info_stored($browser, $context, $storedfile, $urlbase, $areas[$filearea], false, true, false, false);
+
+    } else if ($filearea === 'content') {
+        $filepath = is_null($filepath) ? '/' : $filepath;
+        $filename = is_null($filename) ? '.' : $filename;
+
+        $urlbase = $CFG->wwwroot.'/pluginfile.php';
+        if (!$storedfile = $fs->get_file($context->id, 'mod_geogebra', $filearea, $itemid, $filepath, $filename)) {
+            if ($filepath === '/' and $filename === '.') {
+                $storedfile = new virtual_root_file($context->id, 'mod_geogebra', $filearea, $itemid);
             } else {
                 // not found
                 return null;
@@ -649,6 +623,8 @@ function geogebra_get_file_info($browser, $areas, $course, $cm, $context, $filea
         }
         return new file_info_stored($browser, $context, $storedfile, $urlbase, $areas[$filearea], false, true, false, false);
     }
+    
+
     // note: geogebra_intro handled in file_browser automatically
 
     return null;
@@ -679,7 +655,7 @@ function geogebra_pluginfile($course, $cm, $context, $filearea, array $args, $fo
         return false;
     }
 
-    if ($filearea !== 'content') {
+    if ($filearea !== 'extracted_files') {
         // intro is handled automatically in pluginfile.php
         return false;
     }

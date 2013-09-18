@@ -1,3 +1,4 @@
+
 <?php
 
 // This file is part of Moodle - http://moodle.org/
@@ -31,6 +32,63 @@
 defined('MOODLE_INTERNAL') || die();
 
 require_once("$CFG->libdir/filelib.php");
+
+function geogebra_before_add_or_update(&$geogebra, $mform){
+    geogebra_updateAttributes($geogebra);
+    if ($mform->get_data()->filetype === GEOGEBRA_FILE_TYPE_LOCAL) {
+        $geogebra->url = $mform->get_data()->geogebrafile;
+    } else{
+        $geogebra->url = $geogebra->geogebraurl;
+    }    
+}
+
+function geogebra_after_add_or_update($geogebra, $mform){
+    global $DB;
+
+    $result = true;
+    if ($mform->get_data()->filetype === GEOGEBRA_FILE_TYPE_LOCAL) {
+        $filename = geogebra_set_mainfile($geogebra);
+        $geogebra->url = $filename;
+        $result = $DB->update_record('geogebra', $geogebra);
+    }
+    
+    if ($result && $geogebra->timedue) {
+        $event = new stdClass();
+        if ($event->id = $DB->get_field('event', 'id', array('modulename'=>'geogebra', 'instance'=>$geogebra->id))) {
+            $event->name        = $geogebra->name;
+            $event->description = format_module_intro('geogebra', $geogebra, $geogebra->coursemodule);
+            $event->timestart   = $geogebra->timedue;
+
+            $calendarevent = calendar_event::load($event->id);
+            $calendarevent->update($event);
+        } else {
+            $event = new stdClass();
+            $event->name        = $geogebra->name;
+            $event->description = format_module_intro('geogebra', $geogebra, $geogebra->coursemodule);
+            $event->courseid    = $geogebra->course;
+            $event->groupid     = 0;
+            $event->userid      = 0;
+            $event->modulename  = 'geogebra';
+            $event->instance    = $geogebra->id;
+            $event->eventtype   = 'due';
+            $event->timestart   = $geogebra->timedue;
+            $event->timeduration = 0;
+
+            calendar_event::create($event);
+        }
+    } else {
+        $DB->delete_records('event', array('modulename'=>'geogebra', 'instance'=>$geogebra->id));
+    }  
+    
+    if ($result){
+        // get existing grade item
+        $result = geogebra_grade_item_update($geogebra);
+    }
+
+    return $result;
+}
+
+
 
     /**
     * Get an array with the languages
@@ -205,8 +263,8 @@ require_once("$CFG->libdir/filelib.php");
                 echo get_string('warningnojava', 'geogebra');
                 echo '</applet>';
 
-                // TODO: Review to include also javascript code from GGB file
-                //  print_r(geogebra_get_js_from_geogebra($filename));                
+                // Include also javascript code from GGB file
+                print_r(geogebra_get_js_from_geogebra($context, $geogebra));                
                 
                 // If not preview mode, load state
                 if (!$viewmode!='preview') {                    
@@ -268,20 +326,64 @@ require_once("$CFG->libdir/filelib.php");
         
         $url = '';
         if (geogebra_is_valid_external_url($geogebra->url)) {
-            // TODO: Get contents if specified GGB is external
+            // Get contents if specified GGB is external
             $content = file_get_contents($geogebra->url);
         } else {
             $fs = get_file_storage();
             $file = $fs->get_file($context->id, 'mod_geogebra', 'content', 0, '/', $geogebra->url);
             if ($file) {
                 $content = $file->get_content();
-            }    
+            }
         }
         
         return base64_encode($content);
     }
 
+    function geogebra_get_js_from_geogebra($context, $geogebra) {
+        global $CFG;
+                
+        if (geogebra_is_valid_external_url($geogebra->url)) {
+            // Prepare tmp dir (create if not exists, download ggb file...)
+            $tmpdir = $CFG->tempdir.'/mod_geogebra/'.time();
+            if (!file_exists($tmpdir)){
+                mkdir($tmpdir, 0777, true);
+            }
+            $ggbfile = $geogebra->url;
+            $ext = pathinfo($ggbfile, PATHINFO_EXTENSION);
+            $tmpggbfile = tempnam($tmpdir, $ext);
+            
+            // Download external GGB and extract javascript file
+            copy($ggbfile, $tmpggbfile);
+            
+            // Extract geogebra js from GGB file
+            $zip = new ZipArchive;
+            if ($zip->open($tmpggbfile) === TRUE) {
+                $zip->extractTo($tmpdir, array('geogebra_javascript.js'));
+                $zip->close();
+            }
 
+            $content = file_get_contents($tmpdir.'/geogebra_javascript.js');
+            
+            // Delete temporary files
+            unlink($tmpggbfile);
+            unlink($tmpdir.'/geogebra_javascript.js');
+            rmdir($tmpdir);
+        } else{
+            $fs = get_file_storage();
+            $file = $fs->get_file($context->id, 'mod_geogebra', 'extracted_files', 0, '/', 'geogebra_javascript.js');
+            if ($file) {
+                $content = $file->get_content();    
+            }
+        }
+
+        if ($content) {
+            $content = '<script type="text/javascript">var ggbApplet = document.ggbApplet; ' .$content . '</script>';    
+        }
+
+        return $content;
+    }
+    
+    
     /**
      * Display the bottom and footer of a page
      *
@@ -399,8 +501,6 @@ require_once("$CFG->libdir/filelib.php");
     }
 
     function geogebra_set_mainfile($data) {
-        $filename = null;
-        $fs = get_file_storage();
         $cmid = $data->coursemodule;
         $draftitemid = $data->url;
 
@@ -409,6 +509,11 @@ require_once("$CFG->libdir/filelib.php");
             file_save_draft_area_files($draftitemid, $context->id, 'mod_geogebra', 'content', 0, geogebra_get_filemanager_options());
         }
         
+        $filename = geogebra_extract_package($cmid);
+
+/* Codi antic        
+        
+        $fs = get_file_storage();
         $files = $fs->get_area_files($context->id, 'mod_geogebra', 'content', 0, 'sortorder', false);
         if (count($files) == 1) {
             // only one file attached, set it as main file automatically
@@ -416,8 +521,36 @@ require_once("$CFG->libdir/filelib.php");
             file_set_sortorder($context->id, 'mod_geogebra', 'content', 0, $file->get_filepath(), $file->get_filename(), 1);
             $filename = $file->get_filename();
         }
+ */
         return $filename;
     }
+    
+    /**
+     * Extracts GGB package, sets up all variables.
+     * @param int $cmid 
+     * @return filename
+     */
+    function geogebra_extract_package($cmid){
+        global $DB;
+
+        $fs = get_file_storage();
+        $context = context_module::instance($cmid);
+        $files = $fs->get_area_files($context->id, 'mod_geogebra', 'content', 0, 'sortorder', false);
+        if (count($files) == 1) {
+            // only one file attached, set it as main file automatically
+            $package = reset($files);
+            file_set_sortorder($context->id, 'mod_geogebra', 'content', 0, $package->get_filepath(), $package->get_filename(), 1);
+            $filename = $package->get_filename();
+
+            // Extract files
+            $fs->delete_area_files($context->id, 'mod_geogebra', 'extracted_files');
+
+            $packer = get_file_packer('application/zip');
+            $package->extract_to_storage($packer, $context->id, 'mod_geogebra', 'extracted_files', 0, '/');
+        }
+        
+        return $filename;
+    }    
         
     function geogebra_is_valid_external_url($url){
         return preg_match('/(http:\/\/|https:\/\/|www).*\/*(\?[a-z+&\$_.-][a-z0-9;:@&%=+\/\$_.-]*)?$/i', $url);
