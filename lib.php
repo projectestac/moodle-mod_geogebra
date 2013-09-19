@@ -463,31 +463,39 @@ function geogebra_grade_item_delete($geogebra) {
  * @return mixed
  */
 function geogebra_get_user_grades($geogebra, $userid) {
+    global $CFG;
+    require_once($CFG->dirroot.'/mod/geogebra/locallib.php');
+    
+    // sanity check 
+    if (! isset($geogebra->id)) {
+        return;
+    }
+    
     /*TODO: Review if this case it's necessary for Moodle 2
     if ($geogebra->maxattempts == 0) {
         $attempt = geogebra_get_unique_attempt_grade($geogebra->id, $userid);
     } else {
      */
-        switch ($geogebra->grademethod) {
-            case GEOGEBRA_NO_GRADING:
-                $attempt = geogebra_get_nograding_grade($geogebra->id, $userid);
-                break;
-            case GEOGEBRA_AVERAGE_GRADE:
-                $attempt = (geogebra_get_average_grade($geogebra->id, $userid));
-                break;
-            case GEOGEBRA_HIGHEST_GRADE:
-                $attempt = (geogebra_get_highest_attempt_grade($geogebra->id, $userid));
-                break;
-            case GEOGEBRA_LOWEST_GRADE:
-                $attempt = (geogebra_get_lowest_attempt_grade($geogebra->id, $userid));
-                break;
-            case GEOGEBRA_FIRST_GRADE:
-                $attempt = (geogebra_get_first_attempt_grade($geogebra->id, $userid));
-                break;
-            case GEOGEBRA_LAST_GRADE:
-                $attempt = (geogebra_get_last_attempt_grade($geogebra->id, $userid));
-                break;
-        }
+    switch ($geogebra->grademethod) {
+        case GEOGEBRA_NO_GRADING:
+            $attempt = geogebra_get_nograding_grade($geogebra->id, $userid);
+            break;
+        case GEOGEBRA_AVERAGE_GRADE:
+            $attempt = (geogebra_get_average_grade($geogebra->id, $userid));
+            break;
+        case GEOGEBRA_HIGHEST_GRADE:
+            $attempt = (geogebra_get_highest_attempt_grade($geogebra->id, $userid));
+            break;
+        case GEOGEBRA_LOWEST_GRADE:
+            $attempt = (geogebra_get_lowest_attempt_grade($geogebra->id, $userid));
+            break;
+        case GEOGEBRA_FIRST_GRADE:
+            $attempt = (geogebra_get_first_attempt_grade($geogebra->id, $userid));
+            break;
+        case GEOGEBRA_LAST_GRADE:
+            $attempt = (geogebra_get_last_attempt_grade($geogebra->id, $userid));
+            break;
+    }
 //    }
     return $attempt;
 }
@@ -506,7 +514,7 @@ function geogebra_get_user_grades($geogebra, $userid) {
 function geogebra_update_grades(stdClass $geogebra, $userid = 0, $nullifnone=true) {
     global $CFG, $DB;
     require_once($CFG->libdir.'/gradelib.php');
-
+    
     if ($geogebra->grade == 0) {
         geogebra_grade_item_update($geogebra);
 
