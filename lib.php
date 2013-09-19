@@ -415,6 +415,10 @@ function geogebra_grade_item_update(stdClass $geogebra, $grades=NULL) {
 
     $params = array();
     $params['itemname'] = clean_param($geogebra->name, PARAM_NOTAGS);
+    if (empty($jclic->cmidnumber)) {
+        $cm = get_coursemodule_from_instance('geogebra', $geogebra->id, $geogebra->course, false, MUST_EXIST);
+        $geogebra->cmidnumber = $cm->idnumber;
+    }
     $params['idnumber'] = $geogebra->cmidnumber;
     if ($geogebra->grade > 0) {
         $params['gradetype'] = GRADE_TYPE_VALUE;
@@ -520,8 +524,8 @@ function geogebra_update_grades(stdClass $geogebra, $userid = 0, $nullifnone=tru
 
     } else if ($grades = geogebra_get_user_grades($geogebra, $userid)) {
         foreach($grades as $k=>$v) {
-            if ($v->rawgrade == -1) {
-                $grades[$k]->rawgrade = null;
+            if ($k == 'rawgrade' AND $v == -1) {
+                $grades[$k] = null;
             }
         }
         geogebra_grade_item_update($geogebra, $grades);

@@ -1,4 +1,3 @@
-
 <?php
 
 // This file is part of Moodle - http://moodle.org/
@@ -582,7 +581,7 @@ function geogebra_after_add_or_update($geogebra, $mform){
      */
     function geogebra_time2str($time) {
         $minutes = floor($time / 60);
-        $seconds = sprintf("%02s", round(fmod($time, 60), 0));
+        $seconds = sprintf("%02s", round(fmod((double)$time, 60), 0));
         return ($minutes > 0 ? $minutes . "' " : " ") . $seconds . "''";
     }
     
@@ -1173,6 +1172,7 @@ function geogebra_after_add_or_update($geogebra, $mform){
         global $DB;
 
         if ($attempts = $DB->get_records('geogebra_attempts', array('userid'=>$userid, 'geogebra'=> $geogebraid, 'finished' =>1))) {
+            $result = new stdClass();
             $durationsum = 0;
             $gradessum = 0;
             $count = 0;
