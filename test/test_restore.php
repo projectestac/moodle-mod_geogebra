@@ -19,7 +19,7 @@ $transaction = $DB->start_delegated_transaction();
 $courseid = restore_dbops::create_new_course($fullname, $shortname, $categoryid);
 
 // Restore backup into course
-$controller = new restore_controller($folder, $courseid, 
+$controller = new restore_controller($folder, $courseid,
         backup::INTERACTIVE_NO, backup::MODE_SAMESITE, $userid,
         backup::TARGET_NEW_COURSE);
 $controller->execute_precheck();
