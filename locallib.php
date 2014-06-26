@@ -351,19 +351,28 @@ function geogebra_after_add_or_update($geogebra, $mform){
             $tmpggbfile = tempnam($tmpdir, $ext);
 
             // Download external GGB and extract javascript file
-            copy($ggbfile, $tmpggbfile);
+            if(!copy($ggbfile, $tmpggbfile)){
+                return "<br>Error copying from $ggbfile";
+            }
 
             // Extract geogebra js from GGB file
             $zip = new ZipArchive;
             if ($zip->open($tmpggbfile) === TRUE) {
                 $zip->extractTo($tmpdir, array('geogebra_javascript.js'));
                 $zip->close();
+                unlink($tmpggbfile);
+            } else {
+                @unlink($tmpggbfile);
+                @rmdir($tmpdir);
+                return "<br>Cannot open zipfile $tmpggbfile";
             }
 
             $content = file_get_contents($tmpdir.'/geogebra_javascript.js');
+            if(empty($content)){
+                return "Empty content";
+            }
 
             // Delete temporary files
-            unlink($tmpggbfile);
             unlink($tmpdir.'/geogebra_javascript.js');
             rmdir($tmpdir);
         } else{
