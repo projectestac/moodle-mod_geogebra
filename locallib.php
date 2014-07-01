@@ -262,7 +262,7 @@ function geogebra_after_add_or_update($geogebra, $mform){
                 echo '</applet>';
 
                 // Include also javascript code from GGB file
-                print_r(geogebra_get_js_from_geogebra($context, $geogebra));
+                geogebra_get_js_from_geogebra($context, $geogebra);
 
                 // If not preview mode, load state
                 if (!$viewmode!='preview') {
