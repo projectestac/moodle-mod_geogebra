@@ -3,9 +3,11 @@ Release notes for GeoGebra Module for Moodle (http://moodle.org/plugins/pluginve
 More information on each of the fixes can be found in the project 
 development home at https://github.com/projectestac/moodle-mod_geogebra
 
-Changes in progress
+Changes in 0.2.6 (2014/11/07)
 ---------------------------------------------------------------------------------------
-- fix get_string() error
+- Adapted module to Moodle 2.6
+- Fixed get_string() error (thanks to papillon326)
+
 
 Changes in 0.2.5 RC (2014/01/14)
 ---------------------------------------------------------------------------------------
