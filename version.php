@@ -24,17 +24,16 @@
  *
  * @package    mod
  * @subpackage geogebra
- * @copyright  2011 Departament d'Ensenyament de la Generalitat de Catalunya
+ * @copyright  2011 onwards Departament d'Ensenyament de la Generalitat de Catalunya
  * @author     Sara Arjona Téllez <sarjona@xtec.cat>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
 defined('MOODLE_INTERNAL') || die();
 
-//$module->version   = 0;             // If version == 0 then module will not be installed
-$module->version   = 2014052900;      // The current module version (Date: YYYYMMDDXX)
-$module->requires  = 2011033009;      // Requires this Moodle version (2.0)
-$module->cron      = 0;               // Period for cron to check this module (secs)
-$module->component = 'mod_geogebra';  // To check on upgrade, that module sits in correct place
-$module->release   = 'v0.2.6';        // Human-readable version name
-$module->maturity = MATURITY_STABLE;      // How stable the plugin is
+$plugin->version   = 2014052900;      // The current module version (Date: YYYYMMDDXX)
+$plugin->requires  = 2013111806;      // Requires this Moodle version (2.6)
+$plugin->cron      = 0;               // Period for cron to check this module (secs)
+$plugin->component = 'mod_geogebra';  // To check on upgrade, that module sits in correct place
+$plugin->release   = 'v0.2.6';        // Human-readable version name
+$plugin->maturity = MATURITY_STABLE;      // How stable the plugin is
