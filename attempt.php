@@ -18,14 +18,14 @@ if ($id) {
     $course    = $DB->get_record('course', array('id' => $geogebra->course), '*', MUST_EXIST);
     $cm        = get_coursemodule_from_instance('geogebra', $geogebra->id, $course->id, false, MUST_EXIST);
 } else {
-    error('You must specify a course_module ID or an instance ID');
+    print_error('You must specify a course_module ID or an instance ID');
 }
 $context = context_module::instance($cm->id);
 
 //Activity was sended before the applet was fully loaded
 parse_str($vars, $parsedVars);
 if (empty($vars)) {
-    error('The applet has not sent correct data');
+    print_error('The applet has not sent correct data');
 }
 
 require_login($course, true, $cm);

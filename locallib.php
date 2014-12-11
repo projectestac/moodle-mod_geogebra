@@ -594,7 +594,7 @@ function geogebra_after_add_or_update($geogebra, $mform){
         return ($minutes > 0 ? $minutes . "' " : " ") . $seconds . "''";
     }
 
-    function geogebra_view_results($geogebra, $context, $cm, $course, $action){
+    function    geogebra_view_results($geogebra, $context, $cm, $course, $action){
         global $CFG, $DB, $OUTPUT, $PAGE, $USER;
 
         if ($action == 'submitgrade'){
@@ -642,11 +642,7 @@ function geogebra_after_add_or_update($geogebra, $mform){
         }
 
         // Create results table
-        if (function_exists('get_extra_user_fields') ) {
-            $extrafields = get_extra_user_fields($context);
-        } else{
-            $extrafields = array();
-        }
+        $extrafields = get_extra_user_fields($context);
         $tablecolumns = array_merge(array('picture', 'fullname'), $extrafields,
                 array('attempts', 'duration', 'grade', 'comment', 'datestudent', 'dateteacher', 'status'));
 
@@ -729,14 +725,7 @@ function geogebra_after_add_or_update($geogebra, $mform){
             $offset = $page * $perpage; //offset used to calculate index of student in that particular query, needed for the pop up to know who's next
             if ($ausers !== false) {
                 //$grading_info = grade_get_grades($course->id, 'mod', 'geogebra', $geogebra->id, array_keys($ausers));
-                $endposition = $offset + $perpage;
-                $currentposition = $offset;
-                $ausersObj = new ArrayObject($ausers);
-                $iterator = $ausersObj->getIterator();
-                $iterator->seek($currentposition);
-
-                  while ($iterator->valid() && $currentposition < $endposition ) {
-                    $auser = $iterator->current();
+                foreach($ausers as $auser) {
                     $picture = $OUTPUT->user_picture($auser);
                     $userlink = '<a href="' . $CFG->wwwroot . '/user/view.php?id=' . $auser->id . '&amp;course=' . $course->id . '">' . fullname($auser, has_capability('moodle/site:viewfullnames', $context)) . '</a>';
 
@@ -767,12 +756,11 @@ function geogebra_after_add_or_update($geogebra, $mform){
                     $row[] = "";
                     $row[] = "";
                     $row[] = "";
-                    $row[] = "";
 
                     $table->add_data($row, $rowclass);
 
                     // Show attempts information
-                    foreach ($attempts as $attempt){
+                    foreach ($attempts as $attempt) {
                         $row = array();
                         // In the attempts row, show only the summary of the attempt (it's not necessary to repeat user information)
                         for ($i=0;$i<sizeof($extradata)+2;$i++){
@@ -785,10 +773,6 @@ function geogebra_after_add_or_update($geogebra, $mform){
                         array_push($row, $attempt->comment);*/
                         $table->add_data($row);
                     }
-
-                    // Forward iterator
-                    $currentposition++;
-                    $iterator->next();
                 }
             }
         } else{

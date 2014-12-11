@@ -678,21 +678,6 @@ function geogebra_pluginfile($course, $cm, $context, $filearea, array $args, $fo
     send_stored_file($file, 86400, 0, $forcedownload);
 }
 
-////////////////////////////////////////////////////////////////////////////////
-// Navigation API                                                             //
-////////////////////////////////////////////////////////////////////////////////
-
-/**
- * Extends the settings navigation with the geogebra settings
- *
- * This function is called when the context for the page is a geogebra module. This is not called by AJAX
- * so it is safe to rely on the $PAGE.
- *
- * @param settings_navigation $settingsnav {@link settings_navigation}
- * @param navigation_node $geogebranode {@link navigation_node}
- */
-function geogebra_extend_settings_navigation(settings_navigation $settingsnav, navigation_node $geogebranode=null) {
-}
 
 ////////////////////////////////////////////////////////////////////////////////
 // Reset                                                                      //

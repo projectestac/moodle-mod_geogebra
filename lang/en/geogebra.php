@@ -163,3 +163,7 @@ $string['lastmodifiedsubmission'] = 'Last modified (submission)';
 $string['lastmodifiedgrade'] = 'Last modified (grade)';
 $string['viewattempttab'] = 'View attempt';
 $string['extractedfromggb'] = 'extracted files from ggb';
+
+/* Revision Moodle 2.6 */
+$string['event_course_module_viewed'] = 'Course module viewed';
+$string['event_instances_list_viewed'] = 'Instances list viewed';
