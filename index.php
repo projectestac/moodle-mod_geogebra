@@ -40,11 +40,7 @@ if (! $course = $DB->get_record('course', array('id' => $id))) {
 require_course_login($course);
 $context = context_course::instance($course->id);
 
-$params = array(
-    'context' => $context,
-);
-$event = \mod_geogebra\event\instances_list_viewed::create($params);
-$event->trigger();
+\mod_geogebra\event\course_module_instance_list_viewed::create_from_course($course)->trigger();
 
 
 $PAGE->set_url('/mod/geogebra/index.php', array('id' => $id));

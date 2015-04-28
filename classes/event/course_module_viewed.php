@@ -28,8 +28,7 @@ defined('MOODLE_INTERNAL') || die();
 /**
  * The mod_geogebra course module viewed event class.
  */
-class course_module_viewed extends \core\event\content_viewed {
-    // Int 2.8 it must extend \core\event\course_module_viewed
+class course_module_viewed extends \core\event\course_module_viewed {
 
     /**
      * Init method.
@@ -39,8 +38,7 @@ class course_module_viewed extends \core\event\content_viewed {
     protected function init() {
         $this->data['objecttable'] = 'geogebra';
         $this->data['crud'] = 'r';
-        // $this->data['edulevel'] = self::LEVEL_PARTICIPATING; // For Moodle 2.8
-        $this->data['level'] = self::LEVEL_PARTICIPATING;
+        $this->data['edulevel'] = self::LEVEL_PARTICIPATING;
     }
 
     // TODO: Delete after 2.8 upgrade

@@ -1,5 +1,4 @@
 <?php
-
 // This file is part of Moodle - http://moodle.org/
 //
 // Moodle is free software: you can redistribute it and/or modify
@@ -31,8 +30,8 @@
 
 defined('MOODLE_INTERNAL') || die();
 
-$plugin->version   = 2014052900;      // The current module version (Date: YYYYMMDDXX)
-$plugin->requires  = 2013111806;      // Requires this Moodle version (2.6)
+$plugin->version   = 2015042800;      // The current module version (Date: YYYYMMDDXX)
+$plugin->requires  = 2014051207;      // Requires this Moodle version (2.6)
 $plugin->cron      = 0;               // Period for cron to check this module (secs)
 $plugin->component = 'mod_geogebra';  // To check on upgrade, that module sits in correct place
 $plugin->release   = 'v0.2.6';        // Human-readable version name
