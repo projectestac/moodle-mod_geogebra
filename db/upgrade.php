@@ -169,15 +169,10 @@ function xmldb_geogebra_upgrade($oldversion) {
         upgrade_mod_savepoint(true, 2013050600, 'geogebra');
     }
 
-    if ($oldversion < 2014011305) {
-        // Change default codebase to avoid problems sending data
-        $sql = "UPDATE {config} SET value='".GEOGEBRA_DEFAULT_CODEBASE."' WHERE name='geogebra_javacodebase'";
-        $DB->execute($sql);
-
-        // geogebra savepoint reached
-        upgrade_mod_savepoint(true, 2014011305, 'geogebra');
+    if ($oldversion < 2015050600) {
+        unset_config('geogebra_javacodebase');
+        upgrade_mod_savepoint(true, 2015050600, 'geogebra');
     }
-
 
     // Final return of upgrade result (true, all went good) to Moodle.
     return true;

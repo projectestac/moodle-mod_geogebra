@@ -22,3 +22,14 @@
 .initialbar {text-align: center;}
 
 .pendinggrade{background-color: #FFD991;}
+
+#applet_container>div{
+    margin: 0 auto;
+}
+
+#applet_container {
+    margin: 20px auto;
+    background-image:url([[pix:i/loading_small]]);
+    background-position: center center;
+    background-repeat: no-repeat;
+}

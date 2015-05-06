@@ -45,11 +45,6 @@ define('GEOGEBRA_LOWEST_GRADE', 3);
 define('GEOGEBRA_FIRST_GRADE', 4);
 define('GEOGEBRA_LAST_GRADE', 5);
 
-// GeoGebra applet vars
-define('GEOGEBRA_DEFAULT_CODEBASE', 'http://www.geogebra.org/webstart/4.2/unpacked/');
-define('GEOGEBRA_ARCHIVE', 'geogebra.jar');
-define('GEOGEBRA_CODE', 'geogebra.GeoGebraApplet');
-
 // GeoGebra who's updating activity
 define('GEOGEBRA_UPDATE_STUDENT', 0);
 define('GEOGEBRA_UPDATE_TEACHER', 1);
@@ -676,6 +671,45 @@ function geogebra_pluginfile($course, $cm, $context, $filearea, array $args, $fo
 
     // finally send the file
     send_stored_file($file, 86400, 0, $forcedownload);
+}
+
+////////////////////////////////////////////////////////////////////////////////
+// Navigation API                                                             //
+////////////////////////////////////////////////////////////////////////////////
+
+/**
+ * Extends the settings navigation with the geogebra settings
+ *
+ * This function is called when the context for the page is a geogebra module. This is not called by AJAX
+ * so it is safe to rely on the $PAGE.
+ *
+ * @param settings_navigation $settingsnav {@link settings_navigation}
+ * @param navigation_node $geogebranode {@link navigation_node}
+ */
+function geogebra_extend_settings_navigation(settings_navigation $settingsnav, navigation_node $geogebranode=null) {
+    global $PAGE;
+
+    $keys = $geogebranode->get_children_key_list();
+    $beforekey = null;
+    $i = array_search('modedit', $keys);
+    if ($i === false and array_key_exists(0, $keys)) {
+        $beforekey = $keys[0];
+    } else if (array_key_exists($i + 1, $keys)) {
+        $beforekey = $keys[$i + 1];
+    }
+    //if (has_capability('moodle/grade:viewall', $PAGE->context)) {
+        $node = navigation_node::create(get_string('preview_geogebra', 'geogebra'),
+                new moodle_url('/mod/geogebra/view.php', array('id'=>$PAGE->cm->id, 'action' => 'preview')),
+                navigation_node::TYPE_SETTING, null, 'mod_preview_geogebra_preview',
+                new pix_icon('i/preview', ''));
+        $geogebranode->add_node($node, $beforekey);
+
+        $url = new moodle_url('/mod/geogebra/report.php',
+                array('id' => $PAGE->cm->id));
+        $reportnode = $geogebranode->add_node(navigation_node::create(get_string('results', 'geogebra'), $url,
+                navigation_node::TYPE_SETTING,
+                null, null, new pix_icon('i/report', '')), $beforekey);
+    //}
 }
 
 

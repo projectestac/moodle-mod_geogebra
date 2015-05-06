@@ -17,7 +17,7 @@
 
 
 /**
- * Catalan strings for geogebra
+ * Spanish strings for geogebra
  *
  * You can have a rather longer description of the file as well,
  * if you like, and it can span multiple lines.
@@ -35,8 +35,8 @@ $string['modulenameplural'] = 'GeoGebra';
 $string['noattempts'] = '-';
 $string['name'] = 'Nombre';
 $string['choosescripttype'] = 'Escoge el tipo de actividad';
-$string['javacodebase'] = 'Codebase de GeoGebra';
 $string['manualgrade'] = 'Calificación manual?'; //Unused
+$string['contentheader'] = 'Contenido';
 $string['width'] = 'Ancho';
 $string['height'] = 'Alto';
 $string['showsubmit'] = 'Muestra el botón de entrega';
@@ -74,13 +74,12 @@ $string['duration'] = 'Tiempo';
 $string['errorattempt'] = 'Se ha producido un error. No se ha podido guardar el intento.';
 
 $string['viewtab'] = 'Muestra';
-$string['resultstab'] = 'Resultados';
+$string['results'] = 'Resultados';
 $string['reviewtab'] = 'Revisión';
 
 $string['availabledate'] = 'Disponible desde';
 $string['duedate'] = 'Hasta';
 
-$string['javacodebase_help'] = 'URL de los archivos JAR de GeoGebra';
 $string['filename'] = 'Nombre del archivo';
 $string['enableRightClick'] = 'Habilita el botón derecho';
 $string['enableLabelDrags'] = 'Permite arrastrar las etiquetas';
@@ -91,7 +90,6 @@ $string['showToolBarHelp'] = 'Muestra la ayuda de la barra de herramientas';
 $string['showAlgebraInput'] = 'Muestra la barra de inserción'; //Unused
 $string['functionalityoptionsgrp'] = 'Funcionalidades';
 $string['interfaceoptionsgrp'] = 'Interfaz';
-$string['warningnojava'] = 'Este Applet Java ha sido creado utilizando GeoGebra (www.geogebra.org) - posiblemente no tenga Java correctamente instalado, puede comprobarlo en www.java.com';
 $string['filenotfound'] = 'El archivo indicado';
 $string['httpnotallowed'] = 'No es posible utilizar archivos remotos';
 
@@ -99,12 +97,13 @@ $string['submitandfinish'] = 'Entrega y termina';
 $string['savewithoutsubmitting'] = 'Guarda sin entregar';
 $string['redirecttocourse'] = 'La actividad se ha guardado correctamente. Se está volviendo a la pantalla de inicio.';
 $string['unfinished'] = 'No finalizado';
-$string['language']='Idioma';
+$string['language'] = 'Idioma';
 $string['resumeattempt'] = 'Continuación de un intento anterior';
 $string['coursewithoutstudents'] = 'No hay estudiantes inscritos en este curso';
 $string['deleteallattempts'] = 'Eliminar todos los intentos';
 $string['view'] = 'Ver';
 $string['gradeit'] = 'Calificación';
+$string['timing'] = 'Temporización';
 $string['ungraded'] = 'Sin calificar';
 $string['save'] = 'Guardar';
 $string['autograde'] = 'Actividad autopuntuable';
@@ -154,6 +153,7 @@ $string['dateteacher']= 'Última modificación (calificación)';
 $string['status'] = 'Estado';
 $string['viewattempt'] = 'Visualizar';
 $string['previewtab'] = 'Previsualizar';
+$string['preview_geogebra'] = 'Previsualizar la actividad Geogebra';
 
 $string['notopenyet'] = 'Esta actividad no estará disponible hasta {$a}';
 $string['expired'] = 'Esta actividad se cerró el {$a} y, por lo tanto, ya no está disponible.';
@@ -162,3 +162,4 @@ $string['lastmodifiedsubmission'] = $string['datestudent'];
 $string['lastmodifiedgrade'] = $string['dateteacher'];
 $string['viewattempttab'] = 'Intento';
 $string['extractedfromggb'] = 'archivos extraidos desde el ggb';
+$string['msg_nosessions'] = 'Esta actividad Geogebra todavía no tiene ninguna sessión';

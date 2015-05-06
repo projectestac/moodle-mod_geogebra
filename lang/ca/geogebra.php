@@ -32,11 +32,12 @@ defined('MOODLE_INTERNAL') || die();
 
 $string['modulename'] = 'GeoGebra';
 $string['modulenameplural'] = 'GeoGebra';
+
 $string['noattempts'] = '-';
 $string['name'] = 'Nom';
 $string['choosescripttype'] = 'Escull el tipus d\'activitat';
-$string['javacodebase'] = 'Codebase de GeoGebra';
 $string['manualgrade'] = 'Qualificació manual?'; //Unused
+$string['contentheader'] = 'Contingut';
 $string['width'] = 'Amplada';
 $string['height'] = 'Alçada';
 $string['showsubmit'] = 'Mostra el botó d\'entrega';
@@ -74,13 +75,12 @@ $string['duration'] = 'Temps';
 $string['errorattempt'] = 'S\'ha produït un error. No s\'ha pogut desar l\'intent.';
 
 $string['viewtab'] = 'Mostra';
-$string['resultstab'] = 'Resultats';
+$string['results'] = 'Resultats';
 $string['reviewtab'] = 'Revisió';
 
 $string['availabledate'] = 'Disponible des de';
 $string['duedate'] = 'Fins a';
 
-$string['javacodebase_help'] = 'URL dels fitxers JAR de GeoGebra';
 $string['filename'] = 'Nom del fitxer';
 $string['enableRightClick'] = 'Habilita el botó dret';
 $string['enableLabelDrags'] = 'Permet arrossegar les etiquetes';
@@ -91,7 +91,6 @@ $string['showToolBarHelp'] = 'Mostra l\'ajuda de la barra d\'eines';
 $string['showAlgebraInput'] = 'Mostra la barra d\'inserció'; //Unused
 $string['functionalityoptionsgrp'] = 'Funcionalitats';
 $string['interfaceoptionsgrp'] = 'Interfície';
-$string['warningnojava'] = 'Aquest Applet Java s\'ha creat utilitzant GeoGebra (www.geogebra.org) - possiblement no tingueu el Java correctament instal·lat, comproveu-ho a www.java.com';
 $string['filenotfound'] = 'El fitxer indicat no existeix';
 $string['httpnotallowed'] = 'No és possible utilitzar fitxers remots';
 
@@ -105,6 +104,7 @@ $string['coursewithoutstudents'] = 'No hi ha estudiants inscrits en el curs actu
 $string['deleteallattempts'] = 'Suprimeix tots els intents';
 $string['view'] = 'Visualitza';
 $string['gradeit'] = 'Qualificació';
+$string['timing'] = 'Temporització';
 $string['ungraded'] = 'Sense qualificar';
 //$string['save'] = 'Desa';
 $string['autograde'] = 'Activitat autopuntuable';
@@ -129,8 +129,6 @@ $string['geogebra:submit'] = 'Envia GeoGebra';
 $string['geogebra:grade'] = 'Avalua GeoGebra';
 
 $string['geogebra:addinstance'] = 'Afegeix una activitat GeoGebra';
-$string['header_geogebra']='Paràmetres del GeoGebra';
-$string['header_score']='Paràmetres d\'avaluació del GeoGebra';
 $string['filetype'] = 'Tipus';
 $string['filetype_help'] = 'Aquest paràmetre determina com s\'incorporarà l\'activitat GeoGebra al curs. Hi ha dues opcions:
 
@@ -152,6 +150,7 @@ $string['dateteacher']= 'Darrera modificació (qualificació)';
 $string['status'] = 'Estat';
 $string['viewattempt'] = 'Visualitza';
 $string['previewtab'] = 'Previsualitza';
+$string['preview_geogebra'] = 'Previsualitza l\'activitat Geogebra';
 
 $string['notopenyet'] = 'Ho sentim, aquesta activitat no estarà disponible fins {$a}';
 $string['expired'] = 'Ho sentim, aquesta activitat es va tancar el {$a} i, per tant, ja no està disponible';
@@ -160,3 +159,4 @@ $string['lastmodifiedsubmission'] = $string['datestudent'];
 $string['lastmodifiedgrade'] = $string['dateteacher'];
 $string['viewattempttab'] = 'Intent';
 $string['extractedfromggb'] = 'arxius extrets des del ggb';
+$string['msg_nosessions'] = 'Aquesta activitat Geogebra encara no té cap sessió';

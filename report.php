@@ -30,20 +30,14 @@
 
 require_once(dirname(dirname(dirname(__FILE__))).'/config.php');
 require_once(dirname(__FILE__).'/locallib.php');
-require_once($CFG->libdir.'/completionlib.php');
 
 
 $id = optional_param('id', 0, PARAM_INT); // course_module ID, or
-$n  = optional_param('n', 0, PARAM_INT);  // geogebra instance ID - it should be named as the first character of the module
 
 if ($id) {
     $cm         = get_coursemodule_from_id('geogebra', $id, 0, false, MUST_EXIST);
     $course     = $DB->get_record('course', array('id' => $cm->course), '*', MUST_EXIST);
     $geogebra  = $DB->get_record('geogebra', array('id' => $cm->instance), '*', MUST_EXIST);
-} else if ($n) {
-    $geogebra  = $DB->get_record('geogebra', array('id' => $n), '*', MUST_EXIST);
-    $course     = $DB->get_record('course', array('id' => $geogebra->course), '*', MUST_EXIST);
-    $cm         = get_coursemodule_from_instance('geogebra', $geogebra->id, $course->id, false, MUST_EXIST);
 } else {
     print_error('You must specify a course_module ID or an instance ID');
 }
@@ -52,51 +46,28 @@ require_login($course, true, $cm);
 $context = context_module::instance($cm->id);
 require_capability('mod/geogebra:view', $context);
 
-$ispreview = false;
-$attemptid = optional_param('attemptid', null, PARAM_INT); // attempt ID
-if (has_capability('moodle/grade:viewall', $context)) {
-    $action = optional_param('action', false, PARAM_TEXT);
-    if ($action == 'preview' || $attemptid) {
-        $ispreview = true;
-    } else {
-        redirect('report.php?id='.$cm->id);
-    }
-}
-
-$params = array(
-    'context' => $context,
-    'objectid' => $geogebra->id
-);
-$event = \mod_geogebra\event\course_module_viewed::create($params);
-$event->add_record_snapshot('geogebra', $geogebra);
-$event->trigger();
-
-$PAGE->set_url('/mod/geogebra/view.php', array('id' => $cm->id));
+$PAGE->set_url('/mod/geogebra/report.php', array('id' => $cm->id));
 $PAGE->set_title(format_string($geogebra->name));
 $PAGE->set_heading(format_string($course->fullname));
 $PAGE->set_context($context);
 
-
-// Mark viewed if required
-$completion = new completion_info($course);
-$completion->set_module_viewed($cm);
-
 echo $OUTPUT->header();
+
+echo $OUTPUT->heading(get_string('results', 'geogebra'));
+
+groups_print_activity_menu($cm, $CFG->wwwroot . '/mod/geogebra/report.php?id=' . $cm->id);
 
 echo '<div class="reportlink">'.geogebra_submittedlink().'</div>';
 
-geogebra_view_intro($geogebra, $cm);
+$cangrade = is_siteadmin() || has_capability('moodle/grade:edit', $context, $USER->id, false);
 
-if ($attemptid) {
-    $attempt = geogebra_get_attempt($attemptid);
-    $cangrade = is_siteadmin() || has_capability('moodle/grade:edit', $context, $USER->id, false);
-    if ($cangrade || $attempt->userid == $USER->id) {
-        geogebra_view_applet($geogebra, $cm, $context, $attempt, true);
-    } else {
-        print_error(get_string('accessdenied', 'admin'));
-    }
+$action = optional_param('action', false, PARAM_TEXT);
+if ($cangrade) {
+    // User can grade (probably is a teacher) so, by default, show results page
+    geogebra_view_results($geogebra, $context, $cm, $course, $action);
 } else {
-    geogebra_view_applet($geogebra, $cm, $context, null, $ispreview);
+    // Show GGB applet with last attempt
+    geogebra_view_userid_results($geogebra, $USER->id, $cm, $context, $action);
 }
 
 echo $OUTPUT->footer();

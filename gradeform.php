@@ -54,9 +54,11 @@ class mod_geogebra_grade_form extends moodleform {
         $this->geogebra = $geogebra;
 
         $attemptelement = $mform->addElement('text', 'attempt', get_string('attempt', 'geogebra'), array('style' => 'border:none'));
+        $mform->setType('attempt', PARAM_TEXT);
         $attemptelement->freeze();
 
         $durationelement = $mform->addElement('text', 'duration', get_string('duration', 'geogebra'), array('style' => 'border:none'));
+        $mform->setType('duration', PARAM_TEXT);
         $durationelement->freeze();
 
 
@@ -91,16 +93,8 @@ class mod_geogebra_grade_form extends moodleform {
         $mform->setType('action', PARAM_ALPHA);
 
         // Buttons
-        $buttonarray=array();
-        $buttonarray[] = $mform->createElement('submit', 'savegrade', get_string('savechanges', 'assign'));
-        $buttonarray[] = $mform->createElement('cancel', 'cancelbutton', get_string('cancel'));
-        $mform->addGroup($buttonarray, 'buttonar', '', array(' '), false);
+        $this->add_action_buttons(true, get_string('savechanges', 'assign'));
         $mform->closeHeaderBefore('buttonar');
-        $buttonarray=array();
-
-        if (!empty($buttonarray)) {
-            $mform->addGroup($buttonarray, 'navar', '', array(' '), false);
-        }
 
         if ($data) {
             $this->set_data($data);
