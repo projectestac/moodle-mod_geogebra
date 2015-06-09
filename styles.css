@@ -1,3 +1,11 @@
+.GeoGebraFrame .AutoCompleteTextFieldW.SymbolCanBeShown .TextField,
+.GeoGebraFrame .AutoCompleteTextFieldW.SymbolCanBeShown.FromDrawTextFieldNew input[type="text"].TextField,
+.GeoGebraFrame input[type="text"].TextField {
+    padding-top: 0;
+    padding-bottom: 0;
+    height: auto;
+}
+
 .geogebra-activity-solved td {background-color:#DFFFDF!important;}
 .geogebra-activity-unsolved td {background-color:#FFDFDF!important;}
 
