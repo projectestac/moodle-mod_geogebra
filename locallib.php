@@ -317,7 +317,83 @@ function geogebra_print_content($geogebra, $context) {
     </script>
     <div id="applet_container" style="width: 100%; height: '.$geogebra->height.'px;"></div>';
 
+    // Include also javascript code from GGB file
+    geogebra_get_js_from_geogebra($context, $geogebra);
+
     return;
+}
+
+/**
+ * Execute Javascript that is embedded in the geogebra file, if it exists
+ * File must be named geogebra_javascript.js
+ * @param  object $context  Of the activity to get the files
+ * @param  object $geogebra object with the activity info
+ */
+function geogebra_get_js_from_geogebra($context, $geogebra) {
+    global $CFG;
+
+    $content = false;
+
+    if (geogebra_is_valid_external_url($geogebra->url)) {
+        require_once("$CFG->libdir/filestorage/zip_packer.php");
+        // Prepare tmp dir (create if not exists, download ggb file...)
+        $dirname = 'mod_geogebra_'.time();
+        $tmpdir = make_temp_directory($dirname);
+        if (!$tmpdir) {
+            debugging("Cannot create temp directory $dirname");
+            return;
+        }
+
+        $materialid = geogebra_get_id($geogebra->url);
+        if ($materialid) {
+            $ggbfile = "http://tube.geogebra.org/material/download/format/file/id/$materialid";
+        } else {
+            $ggbfile = $geogebra->url;
+        }
+        $filename = pathinfo($ggbfile, PATHINFO_FILENAME);
+        $tmpggbfile = tempnam($tmpdir, $filename.'_');
+
+        // Download external GGB and extract javascript file
+        if (!download_file_content($ggbfile, null, null, false, 300, 20, false, $tmpggbfile)) {
+            debugging("Error copying from $ggbfile");
+            return;
+        }
+
+        // Extract geogebra js from GGB file
+        $zip = new zip_packer();
+        $extract = $zip->extract_to_pathname($tmpggbfile, $tmpdir, array('geogebra_javascript.js'));
+        if ($extract && $extract['geogebra_javascript.js']) {
+            unlink($tmpggbfile);
+        } else {
+            @unlink($tmpggbfile);
+            @rmdir($tmpdir);
+            debugging("Cannot open zipfile $tmpggbfile");
+            return;
+        }
+
+        $content = file_get_contents($tmpdir.'/geogebra_javascript.js');
+
+        // Delete temporary files
+        unlink($tmpdir.'/geogebra_javascript.js');
+        rmdir($tmpdir);
+    } else {
+        $fs = get_file_storage();
+        $file = $fs->get_file($context->id, 'mod_geogebra', 'extracted_files', 0, '/', 'geogebra_javascript.js');
+        if ($file) {
+            $content = $file->get_content();
+        }
+    }
+
+    if (empty($content)) {
+        debugging("Empty content");
+        return;
+    }
+
+    echo '<script type="text/javascript">
+    if (typeof ggbApplet == \'undefined\') {
+        ggbApplet = document.ggbApplet;
+    }
+    ' .$content . '</script>';
 }
 
 /**

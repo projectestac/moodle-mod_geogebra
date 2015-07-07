@@ -61,16 +61,26 @@ function geogebra_submit_attempt(){
     form.submit();
 }
 
+geogebra_addEvent(window, 'load', function() {
+	init_ggb();
+});
 
-function ggbOnInit() {
+function init_ggb() {
+	if (typeof ggbApplet == 'undefined') {
+		var applet = document.ggbApplet;
+	} else {
+		var applet = ggbApplet;
+	}
+
+	if (typeof applet == 'undefined') {
+		setTimeout(init_ggb, 1000);
+		return;
+	}
+
 	var form = document.getElementById('geogebra_form');
 
 	adapter.propertyString = form.prevAppletInformation.value;
-	if (ggbApplet == undefined) {
-		adapter.applet = document.ggbApplet;
-	} else {
-		adapter.applet = ggbApplet;
-	}
+	adapter.applet = applet
 	adapter.init();
 
 	var save = document.getElementById('geogebra_form_save');
