@@ -46,6 +46,9 @@ var adapter = {
 }
 
 function geogebra_addEvent(object, eventName, callback) {
+	if (object == null) {
+		return;
+	}
 	if (object.addEventListener) {
 		object.addEventListener(eventName, callback, false);
 	} else {
@@ -80,7 +83,7 @@ function init_ggb() {
 	var form = document.getElementById('geogebra_form');
 
 	adapter.propertyString = form.prevAppletInformation.value;
-	adapter.applet = applet
+	adapter.applet = applet;
 	adapter.init();
 
 	var save = document.getElementById('geogebra_form_save');
