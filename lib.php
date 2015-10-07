@@ -748,28 +748,19 @@ function geogebra_reset_gradebook($courseid) {
 function geogebra_reset_userdata($data) {
     global $CFG, $DB;
 
-    $componentstr = get_string('modulenameplural', 'choice');
+    $componentstr = get_string('modulenameplural', 'geogebra');
     $status = array();
 
-    if (!empty($data->reset_geogebra_deleteallsessions)) {
-        $params = array('courseid' => $data->courseid);
-        $select = 'session_id IN'
-            . " (SELECT s.session_id FROM {geogebra_sessions} s"
-            . " INNER JOIN {geogebra} j ON s.geogebraid = j.id"
-            . " WHERE j.course = :courseid)";
-        $DB->delete_records_select('geogebra_activities', $select, $params);
-
-        $select = 'geogebraid IN'
-            . " (SELECT j.id FROM {geogebra} j"
-            . " WHERE j.course = :courseid)";
-        $DB->delete_records_select('geogebra_sessions', $select, $params);
+    if (!empty($data->reset_geogebra_deleteallattempts)) {
+        $select = 'geogebra IN (SELECT j.id FROM {geogebra} j WHERE j.course = :courseid)';
+        $DB->delete_records_select('geogebra_attempts', $select, array('courseid' => $data->courseid));
 
         // remove all grades from gradebook
         if (empty($data->reset_gradebook_grades)) {
             geogebra_reset_gradebook($data->courseid);
         }
 
-        $status[] = array('component'=>$componentstr, 'item'=>get_string('deleteallsessions', 'geogebra'), 'error'=>false);
+        $status[] = array('component'=>$componentstr, 'item'=>get_string('deleteallattempts', 'geogebra'), 'error'=>false);
     }
 
    return $status;
@@ -782,7 +773,7 @@ function geogebra_reset_userdata($data) {
  */
 function geogebra_reset_course_form_definition(&$mform) {
     $mform->addElement('header', 'geogebraheader', get_string('modulenameplural', 'geogebra'));
-    $mform->addElement('checkbox', 'reset_geogebra_deleteallsessions', get_string('deleteallsessions', 'geogebra'));
+    $mform->addElement('checkbox', 'reset_geogebra_deleteallattempts', get_string('deleteallattempts', 'geogebra'));
 
 }
 
@@ -790,5 +781,5 @@ function geogebra_reset_course_form_definition(&$mform) {
  * Course reset form defaults.
  */
 function geogebra_reset_course_form_defaults($course) {
-    return array('reset_geogebra_deleteallsessions' => 1);
+    return array('reset_geogebra_deleteallattempts' => 1);
 }
