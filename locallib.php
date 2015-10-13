@@ -127,11 +127,11 @@ function geogebra_view_dates($geogebra, $cm, $timenow=null) {
 
     echo $OUTPUT->box_start('generalbox boxaligncenter geogebradates', 'dates');
     if ($geogebra->timeavailable) {
-        echo '<div class="title-time">'.get_string('availabledate', 'assignment').': </div>';
+        echo '<div class="title-time">'.get_string('availabledate', 'geogebra').': </div>';
         echo '<div class="data-time">'.userdate($geogebra->timeavailable).'</div>';
     }
     if ($geogebra->timedue) {
-        echo '<div class="title-time">'.get_string('duedate', 'assignment').': </div>';
+        echo '<div class="title-time">'.get_string('duedate', 'geogebra').': </div>';
         echo '<div class="data-time">'.userdate($geogebra->timedue).'</div>';
     }
     echo $OUTPUT->box_end();
