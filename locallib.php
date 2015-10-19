@@ -268,7 +268,7 @@ function geogebra_print_content($geogebra, $context) {
     parse_str($geogebra->attributes, $attributes);
 
     $attribnames = array('enableRightClick', 'showAlgebraInput', 'showMenuBar', 'showToolBar',
-        'showToolBarHelp', 'enableLabelDrags', 'showResetIcon');
+        'showToolBarHelp', 'enableLabelDrags', 'showResetIcon', 'useBrowserForJS');
 
     $attribs = array(
         'width' => $geogebra->width,
@@ -1113,6 +1113,7 @@ function geogebra_update_attributes(&$geogebra) {
         'showToolBar' => isset($geogebra->showToolBar) && $geogebra->showToolBar,
         'showToolBarHelp' => isset($geogebra->showToolBarHelp) && $geogebra->showToolBarHelp,
         'showAlgebraInput' => isset($geogebra->showAlgebraInput) && $geogebra->showAlgebraInput,
+        'useBrowserForJS' => isset($geogebra->useBrowserForJS) && $geogebra->useBrowserForJS,
         'language' => $geogebra->language
             ), '', '&');
 

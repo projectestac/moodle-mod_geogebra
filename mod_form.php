@@ -127,6 +127,12 @@ class mod_geogebra_mod_form extends moodleform_mod {
         $mform->setDefault('showResetIcon', 0);
         $mform->setAdvanced('functionalityoptionsgrp');
 
+        $options = array(
+            0 => get_string('useBrowserForJS_geogebra', 'geogebra'),
+            1 => get_string('useBrowserForJS_html', 'geogebra'));
+        $mform->addElement('select', 'useBrowserForJS', get_string('useBrowserForJS', 'geogebra'), $options);
+        $mform->setDefault('useBrowserForJS', '1');
+
         $interfaceoptionsgrp = array();
         $interfaceoptionsgrp[] = &$mform->createElement('checkbox', 'showMenuBar', '', get_string('showMenuBar', 'geogebra'));
         $interfaceoptionsgrp[] = &$mform->createElement('checkbox', 'showToolBar', '', get_string('showToolBar', 'geogebra'));
@@ -213,6 +219,7 @@ class mod_geogebra_mod_form extends moodleform_mod {
             $values['showToolBarHelp'] = isset($attributes['showToolBarHelp']) ? $attributes['showToolBarHelp'] : 0;
             $values['showAlgebraInput'] = isset($attributes['showAlgebraInput']) ? $attributes['showAlgebraInput'] : 0;
             $values['language'] = isset($attributes['language']) ? $attributes['language'] : 0;
+            $values['useBrowserForJS'] = isset($attributes['useBrowserForJS']) ? $attributes['useBrowserForJS'] : 0;
         }
         unset($values['url']);
 
