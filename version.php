@@ -30,9 +30,9 @@
 
 defined('MOODLE_INTERNAL') || die();
 
-$plugin->version   = 2015102700;      // The current module version (Date: YYYYMMDDXX)
-$plugin->requires  = 2014051200;      // Requires this Moodle version (2.7)
+$plugin->version   = 2016052000;      // The current module version (Date: YYYYMMDDXX)
+$plugin->requires  = 2015111600;      // Requires this Moodle version (2.7)
 $plugin->cron      = 0;               // Period for cron to check this module (secs)
 $plugin->component = 'mod_geogebra';  // To check on upgrade, that module sits in correct place
-$plugin->release   = 'v0.2.7.2';        // Human-readable version name
+$plugin->release   = 'v3.0.0';        // Human-readable version name
 $plugin->maturity = MATURITY_STABLE;      // How stable the plugin is
