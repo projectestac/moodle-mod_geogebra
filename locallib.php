@@ -587,19 +587,6 @@ function geogebra_time2str($time) {
 function geogebra_view_results($geogebra, $context, $cm, $course, $action) {
     global $CFG, $DB, $OUTPUT, $PAGE, $USER;
 
-    if ($action == 'submitgrade') {
-        // Upgrade submitted grade
-        $grade = optional_param('grade', '', PARAM_INT);
-        $gradecomment = optional_param_array('comment_editor', '', PARAM_RAW);
-        $attemptid = optional_param('attemptid', '', PARAM_INT);
-        $attempt = geogebra_get_attempt($attemptid);
-        parse_str($attempt->vars, $parsedvars);
-        $parsedvars['grade'] = $grade;
-        $attempt->vars = http_build_query($parsedvars, '', '&');
-
-        geogebra_update_attempt($attemptid, $attempt->vars, GEOGEBRA_UPDATE_TEACHER, $gradecomment['text']);
-    }
-
     // Show students list with their results
     require_once($CFG->libdir.'/gradelib.php');
     $perpage = optional_param('perpage', 10, PARAM_INT);
@@ -794,7 +781,7 @@ function geogebra_get_results_table_columns($cm = null) {
     return array('tablecolumns' => $tablecolumns, 'tableheaders' => $tableheaders);
 }
 
-function geogebra_view_userid_results($geogebra, $userid, $cm, $context, $action, $attempt = null) {
+function geogebra_view_userid_results($geogebra, $userid, $cm, $context, $viewmode, $attempt = null) {
     global $CFG, $DB, $OUTPUT, $PAGE, $USER;
 
     require_once($CFG->libdir.'/tablelib.php');
@@ -802,7 +789,7 @@ function geogebra_view_userid_results($geogebra, $userid, $cm, $context, $action
 
     $user = $DB->get_record('user', array('id' => $userid));
 
-    $tablecolumns = geogebra_get_results_table_columns($action == 'view' ? null : $cm);
+    $tablecolumns = geogebra_get_results_table_columns($viewmode == 'view' ? null : $cm);
     $table->define_columns($tablecolumns['tablecolumns']);
     $table->define_headers($tablecolumns['tableheaders']);
     $table->define_baseurl($CFG->wwwroot.'/mod/geogebra/view.php?id='.$cm->id);
@@ -856,6 +843,23 @@ function geogebra_view_userid_results($geogebra, $userid, $cm, $context, $action
 
             // Create form
             $mform = new mod_geogebra_grade_form(null, array($geogebra, $data, null), 'post', '', array('class' => 'gradeform'));
+            $action = optional_param('action', false, PARAM_TEXT);
+            if ($action == 'submitgrade') {
+                // Upgrade submitted grade
+                $grade = optional_param('grade', '', PARAM_INT);
+                $gradecomment = optional_param_array('comment_editor', '', PARAM_RAW);
+                $attemptid = optional_param('attemptid', '', PARAM_INT);
+                $attempt = geogebra_get_attempt($attemptid);
+                parse_str($attempt->vars, $parsedvars);
+                $parsedvars['grade'] = $grade;
+                $attempt->vars = http_build_query($parsedvars, '', '&');
+
+                if ($formdata = $mform->get_data()) {
+                    // TODO: Use $formdata insteadof optional_param
+                    geogebra_update_attempt($attemptid, $attempt->vars, GEOGEBRA_UPDATE_TEACHER, $gradecomment['text']);
+                }
+            }
+
         } else {
             if ($geogebra->grade < 0 ) {
                 // Get scale name
