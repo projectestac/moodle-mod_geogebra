@@ -3,6 +3,18 @@ Release notes for GeoGebra Module for Moodle (http://moodle.org/plugins/pluginve
 More information on each of the fixes can be found in the project
 development home at https://github.com/projectestac/moodle-mod_geogebra
 
+Changes in 3.0.1 (2016/06/17)
+---------------------------------------------------------------------------------------
+- Fixed bug when saving manual-grade and comments for each attempt
+
+Changes in 3.0.0 (2016/05/20)
+---------------------------------------------------------------------------------------
+- Changed version numbering method, now the first two numbers are the minimum Moodle required version
+- Deleted cron function
+- Replaced deprecated add_intro_editor function
+- Added first behat tests
+- Prepared version for Moodle 3.1
+
 Changes in 0.2.7.1 (2015/10/15)
 ---------------------------------------------------------------------------------------
  - Solve two missing string identifiers
