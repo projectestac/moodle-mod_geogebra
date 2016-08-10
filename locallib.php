@@ -385,7 +385,7 @@ function geogebra_get_js_from_geogebra($context, $geogebra) {
     }
 
     if (empty($content)) {
-        debugging("Empty content");
+        //debugging("Empty content");
         return;
     }
 
