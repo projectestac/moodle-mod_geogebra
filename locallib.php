@@ -579,9 +579,7 @@ function geogebra_format_time($time) {
  * @param int $time	The time (in ms)
  */
 function geogebra_time2str($time) {
-    $minutes = floor($time / 60);
-    $seconds = sprintf("%02s", round(fmod((double)$time, 60), 0));
-    return ($minutes > 0 ? $minutes . "' " : " ") . $seconds . "''";
+    return floor($time/60)."' ".round(fmod($time,60),0)."''";
 }
 
 function geogebra_view_results($geogebra, $context, $cm, $course, $action) {
@@ -706,12 +704,9 @@ function geogebra_view_results($geogebra, $context, $cm, $course, $action) {
 
                 $row = array($picture, $userlink);
 
-                $extradata = array();
                 foreach ($extrafields as $field) {
-                    $extradata[] = $auser->{$field};
+                    $row[] = $auser->{$field};
                 }
-
-                $row += $extradata;
 
                 // Attempts summary
                 $attempts = geogebra_get_user_attempts($geogebra->id, $auser->id);
@@ -738,7 +733,7 @@ function geogebra_view_results($geogebra, $context, $cm, $course, $action) {
                 foreach ($attempts as $attempt) {
                     $row = array();
                     // In the attempts row, show only the summary of the attempt (it's not necessary to repeat user information)
-                    for ($i = 0; $i < count($extradata) + 2; $i++) {
+                    for ($i = 0; $i < count($extrafields) + 2; $i++) {
                         array_push($row, '');
                     }
                     // Attempt information
@@ -1179,10 +1174,10 @@ function geogebra_get_average_grade($geogebraid, $userid) {
         foreach ($attempts as $attempt) {
             parse_str($attempt->vars, $parsedvars);
             if ($parsedvars['grade'] >= 0) { // Only attempt with valid grade
-                $count++;
                 $gradessum += $parsedvars['grade'];
-                $durationsum += $parsedvars['duration'];
             }
+            $count++;
+            $durationsum += $parsedvars['duration'];
         }
         if ($count > 0) {
             $result->userid = $userid;
