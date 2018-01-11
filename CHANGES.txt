@@ -3,6 +3,16 @@ Release notes for GeoGebra Module for Moodle (http://moodle.org/plugins/pluginve
 More information on each of the fixes can be found in the project
 development home at https://github.com/projectestac/moodle-mod_geogebra
 
+Changes in 3.4.0 (2018/01/11)
+---------------------------------------------------------------------------------------
+- Removed Preview menu option for users who are not able to grade
+- Changed from report to preview for users who are able to view all, for compatibility
+  with menu in boost theme
+- Fixed some minor bugs
+   * Duration calculation in average was only added if there was some grade (may confuse users)
+   * Extrafields were not shown correctly
+   * Total time conversion has been changed
+
 Changes in 3.0.1 (2016/06/17)
 ---------------------------------------------------------------------------------------
 - Fixed bug when saving manual-grade and comments for each attempt
@@ -67,4 +77,3 @@ Changes in 1.0.1 (2012/08/16)
 Changes in 1.0.0 (2011/11/18)
 ---------------------------------------------------------------------------------------
 - First version of the GeoGebra module for Moodle 1.9
-
