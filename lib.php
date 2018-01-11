@@ -685,19 +685,18 @@ function geogebra_extend_settings_navigation(settings_navigation $settingsnav, n
     } else if (array_key_exists($i + 1, $keys)) {
         $beforekey = $keys[$i + 1];
     }
-    //if (has_capability('moodle/grade:viewall', $PAGE->context)) {
+    if (has_capability('moodle/grade:viewall', $PAGE->context)) {
         $node = navigation_node::create(get_string('preview_geogebra', 'geogebra'),
                 new moodle_url('/mod/geogebra/view.php', array('id'=>$PAGE->cm->id, 'action' => 'preview')),
                 navigation_node::TYPE_SETTING, null, 'mod_preview_geogebra_preview',
                 new pix_icon('i/preview', ''));
         $geogebranode->add_node($node, $beforekey);
-
-        $url = new moodle_url('/mod/geogebra/report.php',
-                array('id' => $PAGE->cm->id));
-        $reportnode = $geogebranode->add_node(navigation_node::create(get_string('results', 'geogebra'), $url,
-                navigation_node::TYPE_SETTING,
-                null, null, new pix_icon('i/report', '')), $beforekey);
-    //}
+    }
+    $url = new moodle_url('/mod/geogebra/report.php',
+            array('id' => $PAGE->cm->id));
+    $reportnode = $geogebranode->add_node(navigation_node::create(get_string('results', 'geogebra'), $url,
+            navigation_node::TYPE_SETTING,
+            null, null, new pix_icon('i/report', '')), $beforekey);
 }
 
 
