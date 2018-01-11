@@ -54,14 +54,6 @@ require_capability('mod/geogebra:view', $context);
 
 $ispreview = false;
 $attemptid = optional_param('attemptid', null, PARAM_INT); // attempt ID
-if (has_capability('moodle/grade:viewall', $context)) {
-    $action = optional_param('action', false, PARAM_TEXT);
-    if ($action == 'preview' || $attemptid) {
-        $ispreview = true;
-    } else {
-        redirect('report.php?id='.$cm->id);
-    }
-}
 
 $params = array(
     'context' => $context,
