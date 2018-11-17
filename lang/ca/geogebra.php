@@ -1,5 +1,4 @@
 <?php
-
 // This file is part of Moodle - http://moodle.org/
 //
 // Moodle is free software: you can redistribute it and/or modify
@@ -116,6 +115,15 @@ $string['autograde'] = 'Activitat autopuntuable';
 $string['savechanges'] = 'Desa els canvis';
 $string['discardchanges'] = 'Torna sense desar';
 
+$string['privacy'] = 'Privacitat dels resultats';
+$string['privacy:metadata:geogebra_attempts'] = 'Informació sobre els intent/s realitzats per a cada activitat de geogebra';
+$string['privacy:metadata:geogebra_attempts:vars'] = 'Dades relacionades amb l\'intent del usuari';
+$string['privacy:metadata:geogebra_attempts:gradecomment'] = 'El comentari de la nota del intent de l\'acrivitat  geogebra.';
+$string['privacy:metadata:geogebra_attempts:userid'] = 'L\'ID del usuari que ha realitzat l\'intentot.';
+$string['privacy:metadata:geogebra_attempts:finished'] = 'El timestamp que indica la finalització del intent del usuari.';
+$string['privacy:metadata:geogebra_attempts:geogebra'] = 'L\'ID de l\'activitat geogebra';
+$string['privacy:metadata:geogebra_attempts:dateteacher'] = 'El timestamp que indica la finalització per part del professor';
+$string['privacy:metadata:geogebra_attempts:datestudent'] = 'El timestamp que indica la finalització per part del estudiant';
 
 /* Revision Moodle 2 */
 $string['modulename_help'] = '<p><a href="http://www.geogebra.org" target="_blank">GeoGebra</a> és una aplicació de matemàtica dinàmica, gratuïta, lliure i multiplataforma, enfocada a tots els nivells educatius, que aglutina la geometria, l\'àlgebra, el full de càlcul, l\'estadística i l\'anàlisi, en un únic paquet integrat, molt fàcil d\'utilitzar.</p>

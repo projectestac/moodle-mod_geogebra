@@ -115,6 +115,15 @@ $string['autograde'] = 'Actividad autopuntuable';
 $string['savechanges'] = 'Guardar los cambios';
 $string['discardchanges'] = 'Volver sin guardar';
 
+$string['privacy'] = 'Privacidad de los resultados';
+$string['privacy:metadata:geogebra_attempts'] = 'Informació sobre los intento/s realitzados para cada actividad geogebra';
+$string['privacy:metadata:geogebra_attempts:vars'] = 'Datos relacionados con el intento del usuario';
+$string['privacy:metadata:geogebra_attempts:gradecomment'] = 'El comentario de la nota del intento de la acrividad geogebra.';
+$string['privacy:metadata:geogebra_attempts:userid'] = 'El ID del usuario que ha realitzado el intento.';
+$string['privacy:metadata:geogebra_attempts:finished'] = 'El timestamp que indica la finalitzación del intento del usuario.';
+$string['privacy:metadata:geogebra_attempts:geogebra'] = 'El ID de la activividad geogebra';
+$string['privacy:metadata:geogebra_attempts:dateteacher'] = 'El timestamp que indica la finalitzación por parte del profesor';
+$string['privacy:metadata:geogebra_attempts:datestudent'] = 'El timestamp que indica la finalitzación por parte del estudiante';
 
 /* Revision Moodle 2 */
 $string['modulename_help'] = '<p><a href="http://www.geogebra.org" target="_blank">GeoGebra</a> es una aplicación de matemática dinamica, gratuita, libre y multiplataforma, enfocada a todos los niveles educativos, que engloba la geometría, el álgebra, la hoja de cálculo, la estadística, la probabilidad y el análisis, en un único paquete integrado, muy fácil de utilizar.</p>
