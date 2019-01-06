@@ -3,7 +3,7 @@
 #
 # @package mod
 # @subpackage geogebra
-# @copyright 2011 Departament d'Ensenyament de la Generalitat de Catalunya
+# @copyright 2011-19 Departament d'Educació de la Generalitat de Catalunya
 # @source https://github.com/projectestac/moodle-mod_geogebra/
 # @license http://www.gnu.org/licenses/gpl-3.0.txt
 ##
