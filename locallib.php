@@ -33,22 +33,29 @@ require_once("$CFG->libdir/filelib.php");
 
 function geogebra_before_add_or_update(&$geogebra, $mform) {
     geogebra_update_attributes($geogebra);
-    if ($mform->get_data()->filetype === GEOGEBRA_FILE_TYPE_LOCAL) {
-        $geogebra->url = $mform->get_data()->geogebrafile;
+    if (is_null($mform)) {
+        $geogebra->url = '';
     } else {
-        $geogebra->url = $geogebra->geogebraurl;
+        if ($mform->get_data()->filetype === GEOGEBRA_FILE_TYPE_LOCAL) {
+            $geogebra->url = $mform->get_data()->geogebrafile;
+        } else {
+            $geogebra->url = $geogebra->geogebraurl;
+        }
     }
-
     return true;
 }
 
 function geogebra_after_add_or_update($geogebra, $mform) {
     global $DB;
 
-    if ($mform->get_data()->filetype === GEOGEBRA_FILE_TYPE_LOCAL) {
-        $filename = geogebra_set_mainfile($geogebra);
-        $geogebra->url = $filename;
-        $result = $DB->update_record('geogebra', $geogebra);
+    if (is_null($mform)) {
+        $geogebra->url = '';
+    } else {
+        if ($mform->get_data()->filetype === GEOGEBRA_FILE_TYPE_LOCAL) {
+            $filename = geogebra_set_mainfile($geogebra);
+            $geogebra->url = $filename;
+            $result = $DB->update_record('geogebra', $geogebra);
+        }
     }
 
     if ($geogebra->timedue) {
@@ -1113,7 +1120,7 @@ function geogebra_update_attributes(&$geogebra) {
         'showToolBarHelp' => isset($geogebra->showToolBarHelp) && $geogebra->showToolBarHelp,
         'showAlgebraInput' => isset($geogebra->showAlgebraInput) && $geogebra->showAlgebraInput,
         'useBrowserForJS' => isset($geogebra->useBrowserForJS) && $geogebra->useBrowserForJS,
-        'language' => $geogebra->language
+        'language' => isset($geogebra->language) && $geogebra->language
             ), '', '&');
 
     $geogebra->showsubmit = isset($geogebra->showsubmit);
