@@ -398,7 +398,7 @@ function geogebra_grade_item_update(stdClass $geogebra, $grades=NULL) {
 
     $params = array();
     $params['itemname'] = clean_param($geogebra->name, PARAM_NOTAGS);
-    if (empty($jclic->cmidnumber)) {
+    if (empty($geogebra->cmidnumber)) {
         $cm = get_coursemodule_from_instance('geogebra', $geogebra->id, $geogebra->course, false, MUST_EXIST);
         $geogebra->cmidnumber = $cm->idnumber;
     }
