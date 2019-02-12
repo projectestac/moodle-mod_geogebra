@@ -124,7 +124,7 @@ $string['privacy:metadata:geogebra_attempts:gradecomment'] = 'The comment of the
 $string['privacy:metadata:geogebra_attempts:userid'] = 'The ID of the user answering this geogebra activity';
 $string['privacy:metadata:geogebra_attempts:finished'] = 'The timestamp indicating when the attempt was finished by the user';
 $string['privacy:metadata:geogebra_attempts:geogebra'] = 'The ID of the choice activity';
-$string['privacy:metadata:geogebra_attempts:dateteacher'] = 'The timestamp indicating when the attempt was finished by the treacher';
+$string['privacy:metadata:geogebra_attempts:dateteacher'] = 'The timestamp indicating when the attempt was finished by the teacher';
 $string['privacy:metadata:geogebra_attempts:datestudent'] = 'The timestamp indicating when the attempt was finished by the student';
 
 /* Revision Moodle 2 */
