@@ -883,7 +883,8 @@ function geogebra_view_userid_results($geogebra, $userid, $cm, $context, $viewmo
             $picture = $OUTPUT->user_picture($user);
             $userlink = '<a href="' . $CFG->wwwroot . '/user/view.php?id=' . $user->id . '&amp;course=' . $geogebra->course . '">'
                 . fullname($user, has_capability('moodle/site:viewfullnames', $context)) . '</a>';
-            echo $picture.' '.$userlink.' ('.$user->email.')';
+            //echo $picture.' '.$userlink.' ('.$user->email.')';
+            echo $picture.' '.$userlink;
             // Print form
             $mform->display();
         } else {
