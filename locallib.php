@@ -175,7 +175,7 @@ function geogebra_view_applet($geogebra, $cm, $context, $attempt = null, $isprev
 
     $isopen = (empty($geogebra->timeavailable) || $geogebra->timeavailable < $timenow);
     if (!$isopen) {
-        $content .= $OUTPUT->notify(get_string('notopenyet', 'geogebra', userdate($geogebra->timeavailable)));
+        $content .= $OUTPUT->notification(get_string('notopenyet', 'geogebra', userdate($geogebra->timeavailable)));
         if (!$ispreview) {
             return $content;
         }
@@ -183,7 +183,7 @@ function geogebra_view_applet($geogebra, $cm, $context, $attempt = null, $isprev
 
     $isclosed = (!empty($geogebra->timedue) && $geogebra->timedue < $timenow);
     if ($isclosed) {
-        $content .= $OUTPUT->notify(get_string('expired', 'geogebra', userdate($geogebra->timedue)));
+        $content .= $OUTPUT->notification(get_string('expired', 'geogebra', userdate($geogebra->timedue)));
         if (!$ispreview) {
             return $content;
         }

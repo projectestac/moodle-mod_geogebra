@@ -83,12 +83,12 @@ if ($attemptid) {
     $attempt = geogebra_get_attempt($attemptid);
     $cangrade = is_siteadmin() || has_capability('moodle/grade:edit', $context, $USER->id, false);
     if ($cangrade || $attempt->userid == $USER->id) {
-        geogebra_view_applet($geogebra, $cm, $context, $attempt, true);
+        echo geogebra_view_applet($geogebra, $cm, $context, $attempt, true);
     } else {
         print_error(get_string('accessdenied', 'admin'));
     }
 } else {
-    geogebra_view_applet($geogebra, $cm, $context, null, $ispreview);
+    echo geogebra_view_applet($geogebra, $cm, $context, null, $ispreview);
 }
 
 echo $OUTPUT->footer();
