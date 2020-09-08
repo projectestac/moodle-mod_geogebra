@@ -3,6 +3,10 @@ Release notes for GeoGebra Module for Moodle (http://moodle.org/plugins/pluginve
 More information on each of the fixes can be found in the project
 development home at https://github.com/projectestac/moodle-mod_geogebra
 
+Changes in 3.6.1 (2020/09/08)
+---------------------------------------------------------------------------------------
+- Texts adapted to new geogebra.org format
+
 Changes in 3.6.0 (2019/01/06)
 ---------------------------------------------------------------------------------------
 - Removed unused dependence of 'eventslib.php' (deprecated in 3.6)
