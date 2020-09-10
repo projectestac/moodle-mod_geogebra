@@ -154,7 +154,7 @@ $string['filetypelocal'] = 'Fichero subido';
 $string['invalidgeogebrafile'] = 'Se ha especificado un fichero GeoGebra no válido. El fichero debe tener la extensión ".ggb".';
 $string['invalidurl'] = 'Se ha especificado un URL no válido. El URL debe empezar con http(s) y enlazar a un fichero ".ggb" válido.';
 $string['geogebraurl'] = 'URL';
-$string['geogebraurl_help'] = 'Este parámetro habilita un URL para especificar la actividad GeoGebra en lugar de seleccionarlo a través del selector de archivos.';
+$string['geogebraurl_help'] = 'Localiza la construcción en <a href="https://www.geogebra.org/" target="_blank">geogebra.org</a>, ve a <strong>Detalles</strong>, haz clic con el botón derecho del ratón en <strong>Descargar</strong> y selecciona <strong>Copiar la dirección del enlace</strong>. Finalmente, sitúate en el campo URL y pega el enlace con <strong>Ctrl+V</strong>.<br/>Para un ejemplo paso a paso de esta operación ver: <a href="https://youtu.be/qbp-RuM4NpU" target="_blank">https://youtu.be/qbp-RuM4NpU</a>.';
 $string['geogebrafile'] = 'Fichero GeoGebra';
 $string['geogebrafile_help'] = 'El fichero ".ggb" que contiene la actividad GeoGebra.';
 $string['urledit'] = 'Fichero GeoGebra';

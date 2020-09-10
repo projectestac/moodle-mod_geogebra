@@ -150,7 +150,7 @@ $string['filetypelocal'] = 'Fitxer pujat';
 $string['invalidgeogebrafile'] = 'S\'ha especificat un fitxer GeoGebra no vàlid. El fitxer ha de tenir l\'extensió ".ggb".';
 $string['invalidurl'] = 'S\'ha especificat un URL no vàlid. El URL ha de començar amb http(s) i ha d\'enllaçar a un fitxer ".ggb" vàlid.';
 $string['geogebraurl'] = 'URL';
-$string['geogebraurl_help'] = 'Aquest paràmetre permet especificar el URL de l\'activitat GeoGebra enlloc de seleccionar-la mitjançant el selector d\'arxius.';
+$string['geogebraurl_help'] = 'Localitzeu la construcció a <a href="https://www.geogebra.org/" target="_blank">geogebra.org</a>, aneu a <strong>Detalls</strong>, feu clic amb el botó dret del ratolí al botó <strong>Descarrega</strong> i seleccioneu <strong>Copia l\'adreça de l\'enllaç</strong>. Finalment, situeu-vos al camp URL i enganxeu l\'enllaç amb <strong>Ctrl+V</strong>.<br/>Per a un exemple pas a pas d\'aquesta operació vegeu: <a href="https://youtu.be/qbp-RuM4NpU" target="_blank">https://youtu.be/qbp-RuM4NpU</a>';
 $string['geogebrafile'] = 'Fitxer GeoGebra';
 $string['geogebrafile_help'] = 'El fitxer ".ggb" que conté l\'activitat GeoGebra.';
 $string['urledit'] = 'Fitxer GeoGebra';
