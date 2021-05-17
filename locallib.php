@@ -278,10 +278,15 @@ function geogebra_print_content($geogebra, $context) {
         'showToolBarHelp', 'enableLabelDrags', 'showResetIcon', 'useBrowserForJS');
 
     $attribs = array(
+        'randomSeed' => $geogebra->seed,
         'width' => $geogebra->width,
         'height' => $geogebra->height,
         'language' => $attributes['language']
         );
+    // if seed is 0 or not set (default is 0) then all random elements in the
+    // GGB activity will be randomly assigned for every access to the GGB activity
+    // set seed to have all instances with the same random values.
+    if(intval($geogebra->seed)==0)unset($attribs['randomSeed']);
     if (geogebra_is_valid_external_url($geogebra->url)) {
         // Get contents if specified GGB is external
         $materialid = geogebra_get_id($geogebra->url);
@@ -308,7 +313,7 @@ function geogebra_print_content($geogebra, $context) {
     } else {
         return false;
     }
-
+// Twingsister may be you want host Geogebra, too
     echo '<script type="text/javascript" src="//www.geogebratube.org/scripts/deployggb.js"></script>';
     echo '<script>window.onload = function() {
         var applet = new GGBApplet({';

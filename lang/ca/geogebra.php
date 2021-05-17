@@ -38,6 +38,7 @@ $string['choosescripttype'] = 'Escull el tipus d\'activitat';
 $string['manualgrade'] = 'Qualificació manual?'; //Unused
 $string['contentheader'] = 'Contingut';
 $string['width'] = 'Amplada';
+$string['seed'] = 'Seed';
 $string['height'] = 'Alçada';
 $string['showsubmit'] = 'Mostra el botó d\'entrega';
 $string['settings'] = 'Paràmetres';
@@ -151,6 +152,7 @@ $string['invalidgeogebrafile'] = 'S\'ha especificat un fitxer GeoGebra no vàlid
 $string['invalidurl'] = 'S\'ha especificat un URL no vàlid. El URL ha de començar amb http(s) i ha d\'enllaçar a un fitxer ".ggb" vàlid.';
 $string['geogebraurl'] = 'URL';
 $string['geogebraurl_help'] = 'Localitzeu la construcció a <a href="https://www.geogebra.org/" target="_blank">geogebra.org</a>, aneu a <strong>Detalls</strong>, feu clic amb el botó dret del ratolí al botó <strong>Descarrega</strong> i seleccioneu <strong>Copia l\'adreça de l\'enllaç</strong>. Finalment, situeu-vos al camp URL i enganxeu l\'enllaç amb <strong>Ctrl+V</strong>.<br/>Per a un exemple pas a pas d\'aquesta operació vegeu: <a href="https://youtu.be/qbp-RuM4NpU" target="_blank">https://youtu.be/qbp-RuM4NpU</a>';
+$string['seed_help'] = 'Seed can be a positive number between 0 and 99. If zero a Geogebra activity generated using randomness will be different upon every reload. If not zero, upon reload, the same randomized version is presented.  Using two different seeds will give two different randomized versions. Use a zero seed to give each student a different test. Use a non zero seed for guided test practicing to be sure that all the students receive the same test.';
 $string['geogebrafile'] = 'Fitxer GeoGebra';
 $string['geogebrafile_help'] = 'El fitxer ".ggb" que conté l\'activitat GeoGebra.';
 $string['urledit'] = 'Fitxer GeoGebra';

@@ -41,6 +41,8 @@ require_once($CFG->dirroot . '/mod/geogebra/lib.php');
  * @param int $oldversion
  * @return bool
  */
+
+
 function xmldb_geogebra_upgrade($oldversion) {
     global $CFG, $DB;
 
@@ -173,7 +175,20 @@ function xmldb_geogebra_upgrade($oldversion) {
         unset_config('geogebra_javacodebase');
         upgrade_mod_savepoint(true, 2015050600, 'geogebra');
     }
-
+    if ($oldversion < 2021051603) {
+        
+        // Define field seed to be added to geogebra.
+        $table = new xmldb_table('geogebra');
+        $field = new xmldb_field('seed', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, '0', 'attributes');
+        
+        // Conditionally launch add field seed.
+        if (!$dbman->field_exists($table, $field)) {
+            $dbman->add_field($table, $field);
+        }
+        
+        // Geogebra savepoint reached.
+        upgrade_mod_savepoint(true, 2021051603, 'geogebra');
+    }
     // Final return of upgrade result (true, all went good) to Moodle.
     return true;
 }
