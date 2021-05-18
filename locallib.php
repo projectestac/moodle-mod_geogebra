@@ -314,7 +314,10 @@ function geogebra_print_content($geogebra, $context) {
         return false;
     }
 // Twingsister may be you want host Geogebra, too
-    echo '<script type="text/javascript" src="//www.geogebratube.org/scripts/deployggb.js"></script>';
+// Geogebra URL is at 
+    $deployggburl=$geogebra->urlggb;
+    // old $deployggburl="//www.geogebratube.org/scripts/deployggb.js";
+    echo '<script type="text/javascript" src="'.$deployggburl.'"></script>';
     echo '<script>window.onload = function() {
         var applet = new GGBApplet({';
     foreach ($attribnames as $name) {

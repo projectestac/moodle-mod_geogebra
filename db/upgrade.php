@@ -189,6 +189,21 @@ function xmldb_geogebra_upgrade($oldversion) {
         // Geogebra savepoint reached.
         upgrade_mod_savepoint(true, 2021051603, 'geogebra');
     }
+    if ($oldversion < 2021051607) {
+        
+        // Define field urlggb to be added to geogebra.
+        $table = new xmldb_table('geogebra');
+        $field = new xmldb_field('urlggb', XMLDB_TYPE_CHAR, '255', null, XMLDB_NOTNULL, null, '//www.geogebratube.org/scripts/deployggb.js', 'timemodified');
+        
+        // Conditionally launch add field urlggb.
+        if (!$dbman->field_exists($table, $field)) {
+            $dbman->add_field($table, $field);
+        }
+        
+        // Geogebra savepoint reached.
+        upgrade_mod_savepoint(true, 2021051607, 'geogebra');
+    }
+    
     // Final return of upgrade result (true, all went good) to Moodle.
     return true;
 }
