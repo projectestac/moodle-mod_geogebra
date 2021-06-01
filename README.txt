@@ -1,3 +1,14 @@
+-----------------------------------------------------------------------------
+This fork is a permanent alpha and do not deserve a full fledged README
+Just take this
+We introduce two parameters in the Content folder 
+Seed to control randomness
+URL GGB that can control from where the Geogebra code is downloaded.
+In particular you can host your Geogebra instance by downloading the minified sources from 
+https://web.archive.org/web/20210209173709/https://download.geogebra.org/installers/5.0/geogebra-math-apps-bundle-5-0-620-0.zip
+upon unzipping in your server web space you can put in the URL GGB field a local path
+e.g. /Geogebra/GeoGebra/deployggb.js if deployggb is in htdocs/Geogebra/GeoGebra/deployggb.js YMMV
+-----------------------------------------------------------------------------
 ##
 # GeoGebra module for Moodle
 #
