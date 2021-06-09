@@ -14,7 +14,6 @@
 // You should have received a copy of the GNU General Public License
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
-
 /**
  * Defines the version of geogebra
  *
@@ -30,9 +29,9 @@
 
 defined('MOODLE_INTERNAL') || die();
 
-$plugin->version   = 2020090800;      // The current module version (Date: YYYYMMDDXX)
+$plugin->version   = 2021060900;      // The current module version (Date: YYYYMMDDXX)
 $plugin->requires  = 2015111600;      // Requires this Moodle version (2.7)
 $plugin->cron      = 0;               // Period for cron to check this module (secs)
 $plugin->component = 'mod_geogebra';  // To check on upgrade, that module sits in correct place
-$plugin->release   = 'v3.6.1';        // Human-readable version name
-$plugin->maturity = MATURITY_STABLE;      // How stable the plugin is
+$plugin->release   = 'v3.6.2';        // Human-readable version name
+$plugin->maturity  = MATURITY_STABLE; // How stable the plugin is
