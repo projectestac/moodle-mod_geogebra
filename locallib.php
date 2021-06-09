@@ -1122,7 +1122,7 @@ function geogebra_update_attributes(&$geogebra) {
         'showToolBarHelp' => isset($geogebra->showToolBarHelp) && $geogebra->showToolBarHelp,
         'showAlgebraInput' => isset($geogebra->showAlgebraInput) && $geogebra->showAlgebraInput,
         'useBrowserForJS' => isset($geogebra->useBrowserForJS) && $geogebra->useBrowserForJS,
-        'language' => isset($geogebra->language) && $geogebra->language
+        'language' => isset($geogebra->language) && $geogebra->language ? $geogebra->language : false
             ), '', '&');
 
     $geogebra->showsubmit = isset($geogebra->showsubmit);
