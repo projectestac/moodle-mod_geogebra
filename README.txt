@@ -3,7 +3,7 @@
 #
 # @package mod
 # @subpackage geogebra
-# @copyright 2011-19 Departament d'Educació de la Generalitat de Catalunya
+# @copyright 2011-2021 Departament d'Educació de la Generalitat de Catalunya
 # @source https://github.com/projectestac/moodle-mod_geogebra/
 # @license http://www.gnu.org/licenses/gpl-3.0.txt
 ##
@@ -16,7 +16,7 @@ This module allows the incorporation of GeoGebra activities in Moodle. Its main
 features are:
 - Allows embedding easily GeoGebra activities in some Moodle course.
 - Facilitates students tracing because it stores the score, date, duration and 
-construction of each of the attempts made ​​by the users.
+    construction of each of the attempts made by the users.
 - Students can save the state of the activities to continue them later.
 
 -----------------------------------------------------------------------------
@@ -40,7 +40,7 @@ to http://www.gnu.org/copyleft/gpl.html or write to
 
 -----------------------------------------------------------------------------
 REQUIREMENTS
-Compatible with Moodle 1.9.x releases
+Compatible with Moodle 2.x and 3.x releases
 
 -----------------------------------------------------------------------------
 INSTALL
@@ -54,7 +54,7 @@ The module is based on the "Flash and Java activities in Moodle" project [2].
 Developers:
    Sara Arjona Tellez (sarjona@xtec.cat)
    Jaume Fernández Valiente (jfern343@xtec.cat)
-   
+   Toni Ginard (aginard@xtec.cat)
 
 With the support of:
    Education Government of Catalonia [3]
@@ -70,7 +70,6 @@ With the support of:
       Michael Borcherds
       Markus Hohenwarter
       Christoph Reinisch
-
 
 Special Thanks:
    Germán Arbiol 
@@ -88,8 +87,7 @@ Special Thanks:
 
 
 -----------------------------------------------------------------------------
-[1] http://www.geogebra.org/
+[1] https://www.geogebra.org/
 [2] https://sourceforge.net/projects/flashjavamoodle/
-[3] http://www.gencat.cat/ensenyament
-[4] http://acgeogebra.cat/
-
+[3] http://educacio.gencat.cat/
+[4] https://acgeogebra.cat/
