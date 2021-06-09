@@ -309,7 +309,8 @@ function geogebra_print_content($geogebra, $context) {
         return false;
     }
 
-    echo '<script type="text/javascript" src="//www.geogebratube.org/scripts/deployggb.js"></script>';
+    echo '<script type="text/javascript" src="//unpkg.com/fflate"></script>';
+    echo '<script type="text/javascript" src="//www.geogebra.org/apps/deployggb.js"></script>';
     echo '<script>window.onload = function() {
         var applet = new GGBApplet({';
     foreach ($attribnames as $name) {
