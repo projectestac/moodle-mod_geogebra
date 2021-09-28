@@ -58,7 +58,7 @@ function geogebra_after_add_or_update($geogebra, $mform) {
         }
     }
 
-    if ($geogebra->timedue) {
+    if (isset($geogebra->timedue) && $geogebra->timedue) {
         $event = new stdClass();
         if ($event->id = $DB->get_field('event', 'id', array('modulename' => 'geogebra', 'instance' => $geogebra->id))) {
             $event->name        = $geogebra->name;
