@@ -3,6 +3,10 @@ Release notes for GeoGebra Module for Moodle (http://moodle.org/plugins/pluginve
 More information on each of the fixes can be found in the project
 development home at https://github.com/projectestac/moodle-mod_geogebra
 
+Changes in 3.6.3 (2021/10/10)
+---------------------------------------------------------------------------------------
+- Fixed an error in geogebra_view.js that prevented submitting or storing attempts 
+
 Changes in 3.6.2 (2021/06/09)
 ---------------------------------------------------------------------------------------
 - Fixed loading of activities due to a change in the remote javascript from geogebra.org
