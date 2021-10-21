@@ -397,11 +397,9 @@ function geogebra_get_js_from_geogebra($context, $geogebra) {
         return;
     }
 
-    echo '<script type="text/javascript">
-    if (typeof ggbApplet == \'undefined\') {
-        ggbApplet = document.ggbApplet;
-    }
-    ' .$content . '</script>';
+    // Modified: 20/10/2021
+    // Global variable `ggbApplet` not yet used
+    echo '<script type="text/javascript">' .$content . '</script>';
 }
 
 /**
