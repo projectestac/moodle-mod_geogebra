@@ -409,6 +409,9 @@ function geogebra_grade_item_update(stdClass $geogebra, $grades=NULL) {
         $geogebra->cmidnumber = $cm->idnumber;
     }
     $params['idnumber'] = $geogebra->cmidnumber;
+    if (!isset($geogebra->grade)) {
+        $geogebra->grade = 0;
+    }
     if ($geogebra->grade > 0) {
         $params['gradetype'] = GRADE_TYPE_VALUE;
         $params['grademax']  = $geogebra->grade;
