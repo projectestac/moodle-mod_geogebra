@@ -1,6 +1,7 @@
 var adapter = {
 
     startTime: Math.floor(new Date().getTime() / 1000),
+    applet: {},
     properties: [],
     propertyString: '',
     initialized: false,
@@ -15,7 +16,7 @@ var adapter = {
             if (this.properties.duration === undefined) {
                 this.properties.duration = 0;
             }
-            if (document.ggbApplet && this.properties.state !== undefined) {
+            if (this.properties.state !== undefined) {
                 console.log('Geogebra data loaded');
                 document.ggbApplet.setBase64(unescape(this.properties.state));
             }
@@ -25,14 +26,11 @@ var adapter = {
     },
 
     doExit: function () {
-        // Check if `document.ggbApplet` is already initialized
-        if (document.ggbApplet) {
-            var duration = Math.floor(new Date().getTime() / 1000) - this.startTime;
-            this.properties.state = document.ggbApplet.getBase64();
-            this.properties.grade = document.ggbApplet.getValue('grade');
-            this.properties.duration = parseInt(this.properties.duration, 10) + duration;
-            this.encodeProperties();
-        }
+        var duration = Math.floor(new Date().getTime() / 1000) - this.startTime;
+        this.properties.state = this.applet.getBase64();
+        this.properties.grade = this.applet.getValue('grade');
+        this.properties.duration = parseInt(this.properties.duration) + duration;
+        this.encodeProperties();
     },
 
     encodeProperties: function () {
@@ -42,6 +40,7 @@ var adapter = {
         }
         this.propertyString = tmp;
     }
+
 };
 
 function geogebra_addEvent(object, eventName, callback) {
@@ -63,14 +62,15 @@ function geogebra_submit_attempt() {
     form.submit();
 }
 
-geogebra_addEvent(window, 'load', function () {
-    init_ggb();
-});
-
-// Modified: 20/10/2021
-// Use `document.ggbApplet` instead of this.applet
 function init_ggb() {
+    if (typeof ggbApplet == 'undefined') {
+        var applet = document.ggbApplet;
+    } else {
+        var applet = ggbApplet;
+    }
 
+    // Modified: 20/10/2021
+    // Use `document.ggbApplet` instead of this.applet
     // Retry until `document.ggbApplet` is created 
     if (!document.ggbApplet) {
         setTimeout(init_ggb, 1000);
@@ -80,6 +80,7 @@ function init_ggb() {
     var form = document.getElementById('geogebra_form');
 
     adapter.propertyString = form.prevAppletInformation.value;
+    adapter.applet = applet;
     adapter.init();
 
     var save = document.getElementById('geogebra_form_save');
@@ -95,3 +96,7 @@ function init_ggb() {
         return geogebra_submit_attempt();
     });
 }
+
+geogebra_addEvent(window, 'load', function() {
+    init_ggb();
+});

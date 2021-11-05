@@ -278,10 +278,19 @@ function geogebra_print_content($geogebra, $context) {
         'showToolBarHelp', 'enableLabelDrags', 'showResetIcon', 'useBrowserForJS');
 
     $attribs = array(
+        'randomSeed' => $geogebra->seed,
         'width' => $geogebra->width,
         'height' => $geogebra->height,
         'language' => $attributes['language']
         );
+
+    // If seed is 0 or not set (default is 0) then all random elements in the
+    // GGB activity will be randomly assigned for every access to the GGB activity
+    // set seed to have all instances with the same random values.
+    if ((int)$geogebra->seed === 0) {
+        unset($attribs['randomSeed']);
+    }
+
     if (geogebra_is_valid_external_url($geogebra->url)) {
         // Get contents if specified GGB is external
         $materialid = geogebra_get_id($geogebra->url);
@@ -328,7 +337,6 @@ function geogebra_print_content($geogebra, $context) {
     // Include also javascript code from GGB file
     geogebra_get_js_from_geogebra($context, $geogebra);
 
-    return;
 }
 
 /**
@@ -399,7 +407,11 @@ function geogebra_get_js_from_geogebra($context, $geogebra) {
 
     // Modified: 20/10/2021
     // Global variable `ggbApplet` not yet used
-    echo '<script type="text/javascript">' .$content . '</script>';
+    echo '<script type="text/javascript">
+    if (typeof ggbApplet == \'undefined\') {
+        ggbApplet = document.ggbApplet;
+    }
+    ' . $content . '</script>';
 }
 
 /**

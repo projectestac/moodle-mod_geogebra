@@ -174,6 +174,20 @@ function xmldb_geogebra_upgrade($oldversion) {
         upgrade_mod_savepoint(true, 2015050600, 'geogebra');
     }
 
+    if ($oldversion < 2021110500) {
+        // Define field seed to be added to Geogebra.
+        $table = new xmldb_table('geogebra');
+        $field = new xmldb_field('seed', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, '0', 'attributes');
+
+        // Conditionally launch add field seed.
+        if (!$dbman->field_exists($table, $field)) {
+            $dbman->add_field($table, $field);
+        }
+
+        // Geogebra savepoint reached.
+        upgrade_mod_savepoint(true, 2021110500, 'geogebra');
+    }
+
     // Final return of upgrade result (true, all went good) to Moodle.
     return true;
 }

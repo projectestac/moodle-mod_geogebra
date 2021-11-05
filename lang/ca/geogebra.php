@@ -38,6 +38,7 @@ $string['choosescripttype'] = 'Escull el tipus d\'activitat';
 $string['manualgrade'] = 'Qualificació manual?'; //Unused
 $string['contentheader'] = 'Contingut';
 $string['width'] = 'Amplada';
+$string['seed'] = 'Llavor';
 $string['height'] = 'Alçada';
 $string['showsubmit'] = 'Mostra el botó d\'entrega';
 $string['settings'] = 'Paràmetres';
@@ -151,6 +152,7 @@ $string['invalidgeogebrafile'] = 'S\'ha especificat un fitxer GeoGebra no vàlid
 $string['invalidurl'] = 'S\'ha especificat un URL no vàlid. El URL ha de començar amb http(s) i ha d\'enllaçar a un fitxer ".ggb" vàlid.';
 $string['geogebraurl'] = 'URL';
 $string['geogebraurl_help'] = 'Localitzeu la construcció a <a href="https://www.geogebra.org/" target="_blank">geogebra.org</a>, aneu a <strong>Detalls</strong>, feu clic amb el botó dret del ratolí al botó <strong>Descarrega</strong> i seleccioneu <strong>Copia l\'adreça de l\'enllaç</strong>. Finalment, situeu-vos al camp URL i enganxeu l\'enllaç amb <strong>Ctrl+V</strong>.<br/>Per a un exemple pas a pas d\'aquesta operació vegeu: <a href="https://youtu.be/qbp-RuM4NpU" target="_blank">https://youtu.be/qbp-RuM4NpU</a>';
+$string['seed_help'] = 'La llavor ha de ser un número enter positiu entre 0 i 99. Si és zero, les activitats Geogebra generades utilitzant aleatorietat seran diferents cada vegada que es carregui la pàgina. Si no és zero, en tornar-la a carregar es mostrarà la mateixa versió. Utilitzar dues llavors diferents generarà dues versions diferents. Introduïu un zero per fer que cada estudiant tingui un exercici diferent. Introduïu un valor diferent de zero per fer que tots els estudiants rebin el mateix exercici.';
 $string['geogebrafile'] = 'Fitxer GeoGebra';
 $string['geogebrafile_help'] = 'El fitxer ".ggb" que conté l\'activitat GeoGebra.';
 $string['urledit'] = 'Fitxer GeoGebra';
