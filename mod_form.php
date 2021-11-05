@@ -84,6 +84,11 @@ class mod_geogebra_mod_form extends moodleform_mod {
         $mform->addHelpButton('geogebrafile', 'urledit', 'geogebra');
         $mform->disabledIf('geogebrafile', 'filetype', 'noteq', GEOGEBRA_FILE_TYPE_LOCAL);
 
+        $mform->addElement('text', 'seed', get_string('seed', 'geogebra'), ['size' => '2']);
+        $mform->setType('seed', PARAM_INT);
+        $mform->setDefault('seed', '0');
+        $mform->addHelpButton('seed', 'seed', 'geogebra');
+
         $options = get_string_manager()->get_list_of_translations();
         $mform->addElement('select', 'language', get_string('language', 'geogebra'), $options);
 
