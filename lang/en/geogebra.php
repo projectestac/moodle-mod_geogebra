@@ -38,6 +38,7 @@ $string['name'] = 'Name';
 $string['choosescripttype'] = 'Choose the script type';
 $string['manualgrade'] = 'Is manual grade?';
 $string['contentheader'] = 'Content';
+$string['seed'] = 'Seed';
 $string['width'] = 'Width';
 $string['height'] = 'Height';
 $string['showsubmit'] = 'Show submit button';
@@ -154,6 +155,7 @@ $string['invalidgeogebrafile'] = 'Invalid GeoGebra specified. It must have the "
 $string['invalidurl'] = 'Invalid URL specified. It must start with http(s) and has to be a valid ".ggb" file.';
 $string['geogebraurl'] = 'URL';
 $string['geogebraurl_help'] = 'Find the construction on <a href="https://www.geogebra.org/" target="_blank">geogebra.org</a>, go to <strong>Details</strong>, right click on <strong>Download</strong> and select <strong>Copy link address</strong>. Finally, go to the URL field and paste the link with <strong>Ctrl+V</strong>.<br/>See a step-by-step example in: <a href="https://youtu.be/qbp-RuM4NpU" target="_blank">https://youtu.be/qbp-RuM4NpU</a>.';
+$string['seed_help'] = 'Seed can be a positive number between 0 and 99. If zero a Geogebra activity generated using randomness will be different upon every reload. If not zero, upon reload, the same randomized version is presented. Using two different seeds will give two different randomized versions. Use a zero seed to give each student a different test. Use a non zero seed for guided test practicing to be sure that all the students receive the same test.';
 $string['geogebrafile'] = 'GeoGebra file';
 $string['geogebrafile_help'] = 'The .ggb file.';
 $string['urledit'] = 'GeoGebra file';
