@@ -38,8 +38,10 @@ $string['choosescripttype'] = 'Escull el tipus d\'activitat';
 $string['manualgrade'] = 'Qualificació manual?'; //Unused
 $string['contentheader'] = 'Contingut';
 $string['width'] = 'Amplada';
-$string['seed'] = 'Llavor';
 $string['height'] = 'Alçada';
+$string['seed'] = 'Llavor';
+$string['urlggb'] = 'URL GGB personalitzat';
+$string['urlggb_help'] = 'URL alternatiu del fitxer deployggb.js on es troba la distribució del GeoGebra. Si està definit, s\'utilizarà aquest URL en lloc del definit per defecte a la configuració del mòdul. En general, aquest camp es pot deixar en blanc.';
 $string['showsubmit'] = 'Mostra el botó d\'entrega';
 $string['settings'] = 'Paràmetres';
 $string['maxattempts'] = 'Número màxim d\'intents';
@@ -127,7 +129,7 @@ $string['privacy:metadata:geogebra_attempts:dateteacher'] = 'El timestamp que in
 $string['privacy:metadata:geogebra_attempts:datestudent'] = 'El timestamp que indica la finalització per part del estudiant';
 
 /* Revision Moodle 2 */
-$string['modulename_help'] = '<p><a href="http://www.geogebra.org" target="_blank">GeoGebra</a> és una aplicació de matemàtica dinàmica, gratuïta, lliure i multiplataforma, enfocada a tots els nivells educatius, que aglutina la geometria, l\'àlgebra, el full de càlcul, l\'estadística i l\'anàlisi, en un únic paquet integrat, molt fàcil d\'utilitzar.</p>
+$string['modulename_help'] = '<p><a href="https://www.geogebra.org" target="_blank">GeoGebra</a> és una aplicació de matemàtica dinàmica, gratuïta, lliure i multiplataforma, enfocada a tots els nivells educatius, que aglutina la geometria, l\'àlgebra, el full de càlcul, l\'estadística i l\'anàlisi, en un únic paquet integrat, molt fàcil d\'utilitzar.</p>
 <p>Per aquest motiu, el <a href="http://www.gencat.cat/ensenyament/" target="_blank">Departament d\'Ensenyament de Catalunya</a>, en col·laboració amb l\'<a href="http://acgeogebra.cat/" target="_blank">Associació Catalana de GeoGebra</a> (ACG) i l\'equip de desenvolupament de GeoGebra han implementat aquest mòdul que permet la incorporació d\'aquest tipus d\'activitats a Moodle. Les seves característiques principals són:
 <ul>
     <li>Permet incrustar activitats GeoGebra a qualsevol curs de forma molt senzilla.</li>
@@ -173,3 +175,10 @@ $string['lastmodifiedgrade'] = $string['dateteacher'];
 $string['viewattempttab'] = 'Intent';
 $string['extractedfromggb'] = 'arxius extrets des del ggb';
 $string['msg_nosessions'] = 'Aquesta activitat Geogebra encara no té cap sessió';
+
+// Settings.
+$string['configintro'] = 'Els valors que es configuren aquí defineixen els URL per defecte des d\'on es carregarà el GeoGebra.';
+$string['deployggb'] = 'URL de distribució del GeoGebra';
+$string['deployggb_desc'] = 'URL del fitxer deployggb.js de distribució del GeoGebra. Habitualment es troba a geogebra.org. Pot ser un fitxer local.';
+$string['fflate'] = 'URL de distribució del fflate';
+$string['fflate_desc'] = 'URL de l\'script fast flate, utilitzat per descomprimir els fitxers javascript del GeoGebra.';
