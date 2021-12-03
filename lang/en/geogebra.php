@@ -38,9 +38,11 @@ $string['name'] = 'Name';
 $string['choosescripttype'] = 'Choose the script type';
 $string['manualgrade'] = 'Is manual grade?';
 $string['contentheader'] = 'Content';
-$string['seed'] = 'Seed';
 $string['width'] = 'Width';
 $string['height'] = 'Height';
+$string['seed'] = 'Seed';
+$string['urlggb'] = 'Custom URL GGB';
+$string['urlggb_help'] = 'Alternative URL for the deployggb.js file, i.e. where the GeoGebra distribution is located. If it is set, this URL will be used instead of the default value set in module configuration. Usually, this field can be left empty.';
 $string['showsubmit'] = 'Show submit button';
 $string['settings'] = 'Settings';
 $string['maxattempts'] = 'Maximum number of attemps';
@@ -180,3 +182,10 @@ $string['extractedfromggb'] = 'extracted files from ggb';
 $string['event_course_module_viewed'] = 'Course module viewed';
 $string['event_instances_list_viewed'] = 'Instances list viewed';
 $string['msg_nosessions'] = 'This Geogebra activity hasn\'t yet any session';
+
+// Settings.
+$string['configintro'] = 'The values set here define the default URLs from which to load GeoGebra.';
+$string['deployggb'] = 'URL for GeoGebra distribution';
+$string['deployggb_desc'] = 'URL for the deployggb.js distribution file. Usually should point to www.geogebratube.org. Can be a local file.';
+$string['fflate'] = 'URL for fflate distribution';
+$string['fflate_desc'] = 'URL for the fast flate script, used to decompress the GeoGebra javascript files.';

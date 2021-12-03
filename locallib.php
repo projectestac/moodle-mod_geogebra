@@ -318,9 +318,16 @@ function geogebra_print_content($geogebra, $context) {
         return false;
     }
 
-    echo '<script type="text/javascript" src="//unpkg.com/fflate"></script>';
-    echo '<script type="text/javascript" src="//www.geogebra.org/apps/deployggb.js"></script>';
-    echo '<script>window.onload = function() {
+    // Add loading of fflate
+    echo '<script type="text/javascript" src="' . get_config('geogebra', 'fflate') . '"></script>';
+
+    // Check if the activity has a custom URL for deploy ggb
+    $deployggburl = !empty($geogebra->urlggb) ? $geogebra->urlggb : get_config('geogebra', 'deployggb');
+
+    // Add loading of GeoGebra
+    echo '<script type="text/javascript" src="' . $deployggburl . '"></script>';
+
+   echo '<script>window.onload = function() {
         var applet = new GGBApplet({';
     foreach ($attribnames as $name) {
         echo $name.': '.geogebra_get_script_param($name, $attributes).',';

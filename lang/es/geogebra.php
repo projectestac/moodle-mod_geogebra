@@ -38,8 +38,10 @@ $string['choosescripttype'] = 'Escoge el tipo de actividad';
 $string['manualgrade'] = 'Calificación manual?'; //Unused
 $string['contentheader'] = 'Contenido';
 $string['width'] = 'Ancho';
-$string['seed'] = 'Semilla';
 $string['height'] = 'Alto';
+$string['seed'] = 'Semilla';
+$string['urlggb'] = 'URL GGB personalizado';
+$string['urlggb_help'] = 'URL alternativo del fichero deployggb.js donde se encuentra la distribución del GeoGebra. Si está definido, se utilizará este URL en lugar del definido por defecto en la configuración del módulo. En general, este campo se puede dejar en blanco.';
 $string['showsubmit'] = 'Muestra el botón de entrega';
 $string['settings'] = 'Parámetros';
 $string['maxattempts'] = 'Número máximo de intentos';
@@ -177,3 +179,10 @@ $string['lastmodifiedgrade'] = $string['dateteacher'];
 $string['viewattempttab'] = 'Intento';
 $string['extractedfromggb'] = 'archivos extraidos desde el ggb';
 $string['msg_nosessions'] = 'Esta actividad Geogebra todavía no tiene ninguna sessión';
+
+// Settings.
+$string['configintro'] = 'Los valores que se configuran aquí definen los URL por defecto des de donde se cargará el GeoGebra.';
+$string['deployggb'] = 'URL de distribución de GeoGebra';
+$string['deployggb_desc'] = 'URL del fichero deployggb.js de distribución de GeoGebra. Habitualmente se encuentra en geogebra.org. Puede ser un fichero local.';
+$string['fflate'] = 'URL de distribución de fflate';
+$string['fflate_desc'] = 'URL del script fast flate, utilizado para descomprimir los ficheros javascript de GeoGebra.';
