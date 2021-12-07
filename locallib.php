@@ -327,7 +327,10 @@ function geogebra_print_content($geogebra, $context) {
     // Add loading of GeoGebra
     echo '<script type="text/javascript" src="' . $deployggburl . '"></script>';
 
-   echo '<script>window.onload = function() {
+    // Get activity width
+    $width = $geogebra->width === 0 ? '100%' : $geogebra->width . 'px';
+
+    echo '<script>window.onload = function() {
         var applet = new GGBApplet({';
     foreach ($attribnames as $name) {
         echo $name.': '.geogebra_get_script_param($name, $attributes).',';
@@ -339,7 +342,7 @@ function geogebra_print_content($geogebra, $context) {
         applet.inject("applet_container", "preferHTML5");
     }
     </script>
-    <div id="applet_container" style="width: 100%; height: '.$geogebra->height.'px;"></div>';
+    <div id="applet_container" style="width: ' . $width .'; height: ' . $geogebra->height . 'px;"></div>';
 
     // Include also javascript code from GGB file
     geogebra_get_js_from_geogebra($context, $geogebra);

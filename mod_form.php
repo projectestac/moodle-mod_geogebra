@@ -121,11 +121,13 @@ class mod_geogebra_mod_form extends moodleform_mod {
 
         $mform->addElement('text', 'width', get_string('width', 'geogebra'), array('size'=>'5'));
         $mform->setType('width', PARAM_INT);
-        $mform->setDefault('width', '800');
+        $mform->setDefault('width', '');
+        $mform->addHelpButton('width', 'width', 'geogebra');
 
         $mform->addElement('text', 'height', get_string('height', 'geogebra'), array('size'=>'5'));
         $mform->setType('height', PARAM_INT);
         $mform->setDefault('height', '600');
+        $mform->addHelpButton('height', 'height', 'geogebra');
 
         $functionalityoptionsgrp = array();
         $functionalityoptionsgrp[] = &$mform->createElement('checkbox', 'enableRightClick', '', get_string('enableRightClick', 'geogebra'));
