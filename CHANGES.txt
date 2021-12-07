@@ -5,7 +5,10 @@ development home at https://github.com/projectestac/moodle-mod_geogebra
 
 Changes in 3.6.3 (2021/10/10)
 ---------------------------------------------------------------------------------------
-- Fixed an error in geogebra_view.js that prevented submitting or storing attempts 
+- Fixed a bug in the geogebra_view.js that prevented the user from submitting or storing attempts
+- Implemented course user list provider
+- Added filter false on format_module_intro to pass unit tests
+- Fixed undefined properties: stdClass::$timedue and stdClass::$grade 
 
 Changes in 3.6.2 (2021/06/09)
 ---------------------------------------------------------------------------------------
