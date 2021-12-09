@@ -88,11 +88,13 @@ class mod_geogebra_mod_form extends moodleform_mod {
         $mform->setType('seed', PARAM_INT);
         $mform->setDefault('seed', '0');
         $mform->addHelpButton('seed', 'seed', 'geogebra');
+        $mform->setAdvanced('seed');
 
         $mform->addElement('text', 'urlggb', get_string('urlggb', 'geogebra'), ['size' => '60']);
         $mform->setType('urlggb', PARAM_RAW);
         $mform->setDefault('urlggb', '');
         $mform->addHelpButton('urlggb', 'urlggb', 'geogebra');
+        $mform->setAdvanced('urlggb');
 
         $options = get_string_manager()->get_list_of_translations();
         $mform->addElement('select', 'language', get_string('language', 'geogebra'), $options);
