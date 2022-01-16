@@ -3,6 +3,12 @@ Release notes for GeoGebra Module for Moodle (http://moodle.org/plugins/pluginve
 More information on each of the fixes can be found in the project
 development home at https://github.com/projectestac/moodle-mod_geogebra
 
+Changes in 3.6.6 (2022/01/16)
+---------------------------------------------------------------------------------------
+- Set params `seed` and `urlggb` as advanced.
+- Updated language files.
+- Updated help messages about `width` and `height`.
+
 Changes in 3.6.5 (2021/12/07)
 ---------------------------------------------------------------------------------------
 - Added parameters for ggb file distribution
