@@ -324,6 +324,7 @@ function geogebra_print_content($geogebra, $context) {
     // Check if the activity has a custom URL for deploy ggb
     $deployggburl = !empty($geogebra->urlggb) ? $geogebra->urlggb : get_config('geogebra', 'deployggb');
     $urls=explode("|", $deployggburl ); 
+    if(substr(trim($urls[0]),0,2) === "//") $urls[0] = "http:".trim($urls[0]);
     // Add loading of GeoGebra
     echo '<script type="text/javascript" src="' . $urls[0] . '"></script>';
 
