@@ -325,6 +325,7 @@ function geogebra_print_content($geogebra, $context) {
     $deployggburl = !empty($geogebra->urlggb) ? $geogebra->urlggb : get_config('geogebra', 'deployggb');
     $urls=explode("|", $deployggburl ); 
     if(substr(trim($urls[0]),0,2) === "//") $urls[0] = "http:".trim($urls[0]);
+    if(count($urls)>1 && substr(trim($urls[1]),0,2) === "//") $urls[1] = "http:".trim($urls[1]);
     // Add loading of GeoGebra
     echo '<script type="text/javascript" src="' . $urls[0] . '"></script>';
 
