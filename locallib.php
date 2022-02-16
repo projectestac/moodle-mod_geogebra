@@ -323,9 +323,9 @@ function geogebra_print_content($geogebra, $context) {
 
     // Check if the activity has a custom URL for deploy ggb
     $deployggburl = !empty($geogebra->urlggb) ? $geogebra->urlggb : get_config('geogebra', 'deployggb');
-
+    $urls=explode("|", $deployggburl ); 
     // Add loading of GeoGebra
-    echo '<script type="text/javascript" src="' . $deployggburl . '"></script>';
+    echo '<script type="text/javascript" src="' . $urls[0] . '"></script>';
 
     // Get activity width
     $width = $geogebra->width === 0 ? '100%' : $geogebra->width . 'px';
@@ -338,9 +338,16 @@ function geogebra_print_content($geogebra, $context) {
     foreach ($attribs as $name => $value) {
         echo $name.': "'.$value.'",';
     }
-    echo '}, true);
-        applet.inject("applet_container", "preferHTML5");
-    }
+    echo '}, true);'.
+        (count($urls)==1 ?
+            (substr(trim($urls[0]),0,4) === "http"?
+                '' :
+                'applet.setHTML5Codebase("'.str_replace("deployggb.js","",$deployggburl).'HTML5/5.0/web3d/");'
+                ):
+            'applet.setHTML5Codebase("'.$urls[1].'");'
+            ).
+        'applet.inject("applet_container", "preferHTML5");'.
+    '}
     </script>
     <div id="applet_container" style="width: ' . $width .'; height: ' . $geogebra->height . 'px;"></div>';
 
