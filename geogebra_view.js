@@ -26,7 +26,7 @@ var adapter = {
     },
 
     doExit: function () {
-    	if (GGBExitHook) {GGBExitHook(); }
+    	if (RT_GGBExitHook) {RT_GGBExitHook(); }
         var duration = Math.floor(new Date().getTime() / 1000) - this.startTime;
         this.properties.state = this.applet.getBase64();
         this.properties.grade = this.applet.getValue('grade');
