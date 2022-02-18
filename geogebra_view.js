@@ -26,7 +26,7 @@ var adapter = {
     },
 
     doExit: function () {
-    	if (RT_GGBExitHook) {RT_GGBExitHook(); }
+    	try   {RT_GGBExitHook(); }catch(e){};
         var duration = Math.floor(new Date().getTime() / 1000) - this.startTime;
         this.properties.state = this.applet.getBase64();
         this.properties.grade = this.applet.getValue('grade');
@@ -57,7 +57,6 @@ function geogebra_addEvent(object, eventName, callback) {
 
 function geogebra_submit_attempt() {
     var form = document.getElementById('geogebra_form');
-
     adapter.doExit();
     form.appletInformation.value = adapter.propertyString;
     form.submit();
