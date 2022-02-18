@@ -26,6 +26,7 @@ var adapter = {
     },
 
     doExit: function () {
+    	if (GGBExitHook) {GGBExitHook(); }
         var duration = Math.floor(new Date().getTime() / 1000) - this.startTime;
         this.properties.state = this.applet.getBase64();
         this.properties.grade = this.applet.getValue('grade');
@@ -84,7 +85,7 @@ function init_ggb() {
     adapter.init();
 
     var save = document.getElementById('geogebra_form_save');
-
+// here is where to saving starts from. They all end up in calling geogebra_submit-attempt
     geogebra_addEvent(save, 'click', function () {
         return geogebra_submit_attempt();
     });
