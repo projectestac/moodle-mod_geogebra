@@ -52,7 +52,7 @@ class mod_geogebra_privacy_provider_testcase extends \core_privacy\tests\provide
     /**
      * {@inheritdoc}
      */
-    protected function setUp() {
+    protected function setUp(): void {
         $this->resetAfterTest();
         $this->setAdminUser();
 
