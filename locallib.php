@@ -269,8 +269,6 @@ function geogebra_get_script_param($name, $attributes) {
 }
 
 function geogebra_print_content($geogebra, $context) {
-    global $CFG;
-
     parse_str($geogebra->attributes, $attributes);
 
     $attribnames = array('enableRightClick', 'showAlgebraInput', 'showMenuBar', 'showToolBar',
@@ -578,7 +576,15 @@ function geogebra_extract_package($cmid) {
 }
 
 function geogebra_is_valid_external_url($url) {
-    return preg_match('/(http:\/\/|https:\/\/|www).*\/*(\?[a-z+&\$_.-][a-z0-9;:@&%=+\/\$_.-]*)?$/i', $url);
+    // URL of form geogebra.org/m/<id> is invalid.
+    if (preg_match('/^(http:\/\/|https:\/\/)([www\.]*)(geogebra\.org\/m\/)[a-z\d;:@&%=+\/\$_.-]*$/i',$url) === 1) {
+        \core\notification::warning(get_string('invalidurl', 'geogebra'));
+        $result = 0;
+    } else {
+        // Other resources
+        $result = preg_match('/(http:\/\/|https:\/\/|www).*\/*(\?[a-z+&\$_.-][a-z\d;:@&%=+\/\$_.-]*)?$/i', $url);
+    }
+    return $result;
 }
 
 function geogebra_is_valid_file($filename) {
