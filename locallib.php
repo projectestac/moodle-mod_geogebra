@@ -581,7 +581,19 @@ function geogebra_extract_package($cmid) {
 }
 
 function geogebra_is_valid_external_url($url) {
-    return preg_match('/(http:\/\/|https:\/\/|www).*\/*(\?[a-z+&\$_.-][a-z0-9;:@&%=+\/\$_.-]*)?$/i', $url);
+    // file from geogebra materials? (download link)
+    if (preg_match('^(http:\/\/|https:\/\/)([www\.]*)(geogebra\.org\/material\/show\/id\/)[a-z0-9;:@&%=+\/\$_.-]*$',$url) == 1) {
+        $result = 1; // valid
+    } else {
+        // URL of form geogebra.org/m/<id> is invalid.
+        if (preg_match('^(http:\/\/|https:\/\/)([www\.]*)(geogebra\.org\/m\/)[a-z0-9;:@&%=+\/\$_.-]*$',$url) == 1) {
+            $result = 0;
+        // other resources
+        } else {
+            $result = preg_match('/(http:\/\/|https:\/\/|www).*\/*(\?[a-z+&\$_.-][a-z0-9;:@&%=+\/\$_.-]*)?$/i', $url);
+        }
+    }
+    return $result;
 }
 
 function geogebra_is_valid_file($filename) {
