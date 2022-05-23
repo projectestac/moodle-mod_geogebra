@@ -17,7 +17,8 @@ var adapter = {
                 this.properties.duration = 0;
             }
             if (this.properties.state !== undefined) {
-                console.log('Geogebra data loaded');
+                console.log('Geogebra data load');
+                debugger;
                 document.ggbApplet.setBase64(unescape(this.properties.state));
             }
             this.encodeProperties();
@@ -96,7 +97,7 @@ function init_ggb() {
         return geogebra_submit_attempt();
     });
 }
-
+// upon loading launch the initialization
 geogebra_addEvent(window, 'load', function() {
     init_ggb();
 });
