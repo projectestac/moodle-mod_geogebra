@@ -17,7 +17,8 @@ var adapter = {
                 this.properties.duration = 0;
             }
             if (this.properties.state !== undefined) {
-                console.log('Geogebra data loaded');
+                console.log('Geogebra data load');
+                debugger;
                 document.ggbApplet.setBase64(unescape(this.properties.state));
             }
             this.encodeProperties();
@@ -26,6 +27,7 @@ var adapter = {
     },
 
     doExit: function () {
+    	try   {RT_GGBExitHook(); }catch(e){};
         var duration = Math.floor(new Date().getTime() / 1000) - this.startTime;
         this.properties.state = this.applet.getBase64();
         this.properties.grade = this.applet.getValue('grade');
@@ -56,7 +58,6 @@ function geogebra_addEvent(object, eventName, callback) {
 
 function geogebra_submit_attempt() {
     var form = document.getElementById('geogebra_form');
-
     adapter.doExit();
     form.appletInformation.value = adapter.propertyString;
     form.submit();
@@ -84,7 +85,7 @@ function init_ggb() {
     adapter.init();
 
     var save = document.getElementById('geogebra_form_save');
-
+// here is where to saving starts from. They all end up in calling geogebra_submit-attempt
     geogebra_addEvent(save, 'click', function () {
         return geogebra_submit_attempt();
     });
@@ -96,7 +97,7 @@ function init_ggb() {
         return geogebra_submit_attempt();
     });
 }
-
+// upon loading launch the initialization
 geogebra_addEvent(window, 'load', function() {
     init_ggb();
 });

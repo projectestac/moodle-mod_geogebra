@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <title>Geogebra Applet</title>
+    <!--link rel="stylesheet" href="style.css"-->
+	<meta name=viewport content="width=device-width,initial-scale=1">  
+	<meta charset="utf-8"/>
+	<!--  base href="Z:\PortableApps\home\git\GeogebraMultilanguageTranslator\Geogebra/geogebra-math-apps-bundle-5-0-620-0/GeoGebra/" /-->
+	<base href="." />
+  </head>
+  <body>
+	<script src="file:///Z:/PortableApps/home/git/GeogebraMultilanguageTranslator/Geogebra/geogebra-math-apps-bundle-5-0-620-0/GeoGebra/deployggb.js"></script> 
+    <!-- page content -->
+	<div id="ggb-element"></div> 
+	<script>  
+			var ggbApp = new GGBApplet({"appName": "classic","useBrowserForJS": false,  "width": 1366,  "height": 768, //
+				"randomSeed":33,"borderColor": "#00FFFF",
+				//"filename": "hello.ggb", 
+				"showFullscreenButton":true,
+				//"showToolBar":true,
+				"customToolBar":"0,6,17,40,41,42,62,26",
+				"enableRightClick":false,
+				//"showAnimationButton":true,
+				//"allowStyleBar":true,
+				"showToolBar": true, 
+				//for readonly
+				"enableUndoRedo":true,
+				"showMenuBar": true,
+				"enableFileFeatures": true,
+				//for readonly
+				"filename": "hello.ggb"
+				//"showAlgebraInput": true,
+				}, true);
+				// "filename": "hello.ggb",
+				//"randomSeed":33,"showToolBar": true, "showAlgebraInput": true, "showMenuBar": true, "borderColor": "#FF0000", "filename": "Reperage_plan_T5_693x530-FLEN-IT-FR.ggb"  }, true);
+    		window.addEventListener("load", function() { 
+        	ggbApp.inject('ggb-element');
+    });
+	</script>
+  </body>
+</html>
