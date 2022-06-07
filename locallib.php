@@ -144,7 +144,6 @@ function geogebra_view_dates($geogebra, $cm, $timenow=null) {
     echo $OUTPUT->box_end();
 }
 
-
 /**
  * Display the geogebra applet
  *
@@ -372,7 +371,7 @@ function geogebra_get_js_from_geogebra($context, $geogebra) {
 
         $materialid = geogebra_get_id($geogebra->url);
         if ($materialid) {
-            $ggbfile = "http://tube.geogebra.org/material/download/format/file/id/$materialid";
+            $ggbfile = "https://tube.geogebra.org/material/download/format/file/id/$materialid";
         } else {
             $ggbfile = $geogebra->url;
         }
@@ -460,14 +459,13 @@ function geogebra_submittedlink($allgroups = false) {
     return $submitted;
 }
 
-
 /**
  * Get moodle server
  *
  * @return string                myserver.com:port
  */
 function geogebra_get_server() {
-    global $CFG;
+    global $CFG, $OUTPUT;
 
     if (!empty($CFG->wwwroot)) {
         $url = parse_url($CFG->wwwroot);
@@ -484,7 +482,7 @@ function geogebra_get_server() {
     } else if (!empty($_ENV['HTTP_HOST'])) {
         $hostname = $_ENV['HTTP_HOST'];
     } else {
-        notify('Warning: could not find the name of this server!');
+        $OUTPUT->notification('Warning: could not find the name of this server!');
         return false;
     }
 
@@ -498,7 +496,6 @@ function geogebra_get_server() {
 
     return $hostname;
 }
-
 
 /**
  * Get moodle path
@@ -598,7 +595,6 @@ function geogebra_is_valid_file($filename) {
 function geogebra_format_time($time) {
     return floor($time / 60000)."' ".round(fmod($time, 60000) / 1000, 0)."''";
 }
-
 
 /**
  * Format time from milliseconds to string
@@ -1009,7 +1005,6 @@ function geogebra_count_finished_attempts($geogebraid, $userid) {
     return $DB->count_records('geogebra_attempts', array('userid' => $userid, 'geogebra' => $geogebraid, 'finished' => '1'));
 }
 
-
 /**
  * Return the unfinished attempt of a user. Only 1 attempt for each (user, geogebra) can be unfinished
  *
@@ -1148,8 +1143,6 @@ function geogebra_update_attributes(&$geogebra) {
     $geogebra->showsubmit = isset($geogebra->showsubmit);
 }
 
-
-
 /**
  * Calculates number of attempts, the average grade and average duration
  * of all attemps for a given user and geogebra
@@ -1233,7 +1226,6 @@ function geogebra_get_average_grade($geogebraid, $userid) {
         return false;
     }
 }
-
 
 /**
  * Finds the last attempt for a given user and geogebra.
