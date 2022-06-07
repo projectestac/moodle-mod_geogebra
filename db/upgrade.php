@@ -40,6 +40,11 @@ require_once($CFG->dirroot . '/mod/geogebra/lib.php');
  *
  * @param int $oldversion
  * @return bool
+ * @throws ddl_exception
+ * @throws ddl_table_missing_exception
+ * @throws dml_exception
+ * @throws downgrade_exception
+ * @throws upgrade_exception
  */
 function xmldb_geogebra_upgrade($oldversion) {
     global $CFG, $DB;
@@ -48,64 +53,62 @@ function xmldb_geogebra_upgrade($oldversion) {
 
     if ($oldversion < 2012030100) {
         //Add grade field
-        $table = new XMLDBTable('geogebra');
-        $field = new XMLDBField('grade');
+        $table = new xmldb_table('geogebra');
+        $field = new xmldb_field('grade');
         $field->setAttributes(XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, null, null, '100', 'showsubmit');
         $result = $result && add_field($table, $field);
 
         //Add autograde field
-        $field = new XMLDBField('autograde');
+        $field = new xmldb_field('autograde');
         $field->setAttributes(XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, null, null, '0', 'grade');
         $result = $result && add_field($table, $field);
 
         //Delete maxgrade field
-        $field = new XMLDBField('maxgrade');
+        $field = new xmldb_field('maxgrade');
         $result = $result && drop_field($table, $field);
 
         //Make maxattempts signed
-        $field = new XMLDBField('maxattempts');
+        $field = new xmldb_field('maxattempts');
         $field->setAttributes(XMLDB_TYPE_INTEGER, '10', false, XMLDB_NOTNULL, null, null, null, '-1', 'autograde');
         $result = $result && change_field_unsigned($table, $field);
 
         //Add gradecomment field
-        $table = new XMLDBTable('geogebra_attempts');
-        $field = new XMLDBField('gradecomment');
+        $table = new xmldb_table('geogebra_attempts');
+        $field = new xmldb_field('gradecomment');
         $field->setAttributes(XMLDB_TYPE_TEXT, 'small', null, null, null, null, null, null, 'vars');
         $result = $result && add_field($table, $field);
     }
 
     if ($oldversion < 2012030101) {
-        $table = new XMLDBTable('geogebra_attempts');
-        $field = new XMLDBField('dateteacher');
+        $table = new xmldb_table('geogebra_attempts');
+        $field = new xmldb_field('dateteacher');
         $field->setAttributes(XMLDB_TYPE_INTEGER, '10', XMLDB_UNSIGNED, XMLDB_NOTNULL, null, null, null, '0', 'finished');
         $result = $result && add_field($table, $field);
     }
 
     if ($oldversion < 2012082100) {
-        $table = new XMLDBTable('geogebra');
-        $field = new XMLDBField('url');
+        $table = new xmldb_table('geogebra');
+        $field = new xmldb_field('url');
         $field->setAttributes(XMLDB_TYPE_CHAR, '255', null, XMLDB_NOTNULL, null, null, null, null, 'intro');
         $result = $result && change_field_precision($table, $field);
 
-        $table = new XMLDBTable('geogebra_attempts');
-        $field = new XMLDBField('gradecomment');
+        $table = new xmldb_table('geogebra_attempts');
+        $field = new xmldb_field('gradecomment');
         $field->setAttributes(XMLDB_TYPE_TEXT, 'small', null, false, null, null, null, null, 'vars');
         $result = $result && change_field_notnull($table, $field);
 
-        $field = new XMLDBField('date');
+        $field = new xmldb_field('date');
         $field->setAttributes(XMLDB_TYPE_INTEGER, '10', XMLDB_UNSIGNED, XMLDB_NOTNULL, null, null, null, '0');
         $result = $result && rename_field($table, $field, 'datestudent');
-
     }
 
     if ($oldversion < 2011122902) {
-
-        /// Define field introformat to be added to geogebra
+        // Define field introformat to be added to geogebra
         $table = new xmldb_table('geogebra');
         $field = new xmldb_field('introformat');
         $field->set_attributes(XMLDB_TYPE_INTEGER, '4', XMLDB_UNSIGNED, XMLDB_NOTNULL, null, '0', 'intro');
 
-        /// Launch add field introformat
+        // Launch add field introformat
         if (!$dbman->field_exists($table, $field)) {
             $dbman->add_field($table, $field);
         }
@@ -122,14 +125,13 @@ function xmldb_geogebra_upgrade($oldversion) {
             $rs->close();
         }
 
-        /// geogebra savepoint reached
+        // geogebra savepoint reached
         upgrade_mod_savepoint(true, 2011122902, 'geogebra');
     }
 
 //===== 1.9.0 upgrade line ======//
 
     if ($oldversion < 2012042700) {
-
         require_once("$CFG->dirroot/mod/geogebra/db/upgradelib.php");
         // Add upgrading code from 1.9 (+ new file storage system)
         // @TODO: test it!!!!
@@ -139,9 +141,7 @@ function xmldb_geogebra_upgrade($oldversion) {
         upgrade_mod_savepoint(true, 2012042700, 'geogebra');
     }
 
-
     if ($oldversion < 2013050600) {
-
         // @TODO: test it!!!!
         //Add atrributes field
         $table = new xmldb_table('geogebra');
@@ -200,6 +200,24 @@ function xmldb_geogebra_upgrade($oldversion) {
 
         // Geogebra savepoint reached.
         upgrade_mod_savepoint(true, 2021120700, 'geogebra');
+    }
+
+    if ($oldversion < 2022060700) {
+        $table = new xmldb_table('geogebra_attempts');
+
+        // Conditionally launch add indexes
+        $index = new xmldb_index('datestudent', XMLDB_INDEX_NOTUNIQUE, ['datestudent']);
+        if (!$dbman->index_exists($table, $index)) {
+            $dbman->add_index($table, $index);
+        }
+
+        $index = new xmldb_index('geouserfin', XMLDB_INDEX_NOTUNIQUE, ['geogebra, userid, finished']);
+        if (!$dbman->index_exists($table, $index)) {
+            $dbman->add_index($table, $index);
+        }
+
+        // Geogebra savepoint reached.
+        upgrade_mod_savepoint(true, 2022060700, 'geogebra');
     }
 
     // Final return of upgrade result (true, all went good) to Moodle.
