@@ -360,7 +360,7 @@ function geogebra_get_js_from_geogebra($context, $geogebra) {
     if (geogebra_is_valid_external_url($geogebra->url)) {
         require_once("$CFG->libdir/filestorage/zip_packer.php");
         // Prepare tmp dir (create if not exists, download ggb file...)
-        $dirname = 'mod_geogebra_'.time();
+        $dirname = 'mod_geogebra_'.time().rand(0, 9999);
         $tmpdir = make_temp_directory($dirname);
         if (!$tmpdir) {
             debugging("Cannot create temp directory $dirname");
