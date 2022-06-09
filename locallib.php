@@ -117,22 +117,19 @@ function geogebra_view_intro($geogebra, $cm) {
 }
 
 /**
- * Display the geogebra dates
+ * Display the GeoGebra dates
  *
- * Prints the geogebra start and end dates in a box.
+ * Prints the GeoGebra start and end dates in a box.
  */
-function geogebra_view_dates($geogebra, $cm, $timenow=null) {
+function geogebra_view_dates($geogebra) {
     global $OUTPUT;
 
     if (!$geogebra->timeavailable && !$geogebra->timedue) {
         return;
     }
 
-    if (is_null($timenow)) {
-        $timenow = time();
-    }
-
     echo $OUTPUT->box_start('generalbox boxaligncenter geogebradates', 'dates');
+
     if ($geogebra->timeavailable) {
         echo '<div class="title-time">'.get_string('availabledate', 'geogebra').': </div>';
         echo '<div class="data-time">'.userdate($geogebra->timeavailable).'</div>';
@@ -141,21 +138,22 @@ function geogebra_view_dates($geogebra, $cm, $timenow=null) {
         echo '<div class="title-time">'.get_string('duedate', 'geogebra').': </div>';
         echo '<div class="data-time">'.userdate($geogebra->timedue).'</div>';
     }
+
     echo $OUTPUT->box_end();
 }
 
 /**
- * Display the geogebra applet
+ * Display the GeoGebra applet
  *
- * @param type $geogebra
- * @param type $cm
- * @param type $context
- * @param type $attempt
- * @param type $ispreview if is a preview or not
- * @param type $timenow
+ * @param object $geogebra
+ * @param object $cm
+ * @param object $context
+ * @param object $attempt
+ * @param bool $ispreview
+ * @throws coding_exception
  */
 function geogebra_view_applet($geogebra, $cm, $context, $attempt = null, $ispreview = false) {
-    global $OUTPUT, $PAGE, $CFG, $USER;
+    global $OUTPUT, $PAGE, $USER;
 
     $timenow = time();
 
@@ -171,8 +169,9 @@ function geogebra_view_applet($geogebra, $cm, $context, $attempt = null, $isprev
         }
     }
 
-
     $isopen = (empty($geogebra->timeavailable) || $geogebra->timeavailable < $timenow);
+    $content = '';
+
     if (!$isopen) {
         $content .= $OUTPUT->notification(get_string('notopenyet', 'geogebra', userdate($geogebra->timeavailable)));
         if (!$ispreview) {
@@ -198,42 +197,43 @@ function geogebra_view_applet($geogebra, $cm, $context, $attempt = null, $isprev
         } else if (!$ispreview) {
             echo $OUTPUT->box_start('generalbox');
             if ($geogebra->maxattempts < 0) {
-                echo get_string('unlimitedattempts', 'geogebra').'<br/>';
-            } else if ($attempts == $geogebra->maxattempts - 1) {
-                echo get_string('lastattemptremaining', 'geogebra').'<br/>';
+                echo get_string('unlimitedattempts', 'geogebra') . '<br/>';
+            } else if ($attempts == ($geogebra->maxattempts - 1)) {
+                echo get_string('lastattemptremaining', 'geogebra') . '<br/>';
             } else {
-                echo get_string('attemptsremaining', 'geogebra').($geogebra->maxattempts - $attempts).'<br/>';
+                echo get_string('attemptsremaining', 'geogebra') . ($geogebra->maxattempts - $attempts) . '<br/>';
             }
 
             // If there is some unfinished attempt, show it
             $attempt = geogebra_get_unfinished_attempt($geogebra->id, $userid);
             if (!empty($attempt)) {
-                echo '('.get_string('resumeattempt', 'geogebra').')';
+                echo '(' . get_string('resumeattempt', 'geogebra') . ')';
             }
+
             echo $OUTPUT->box_end();
         }
 
         geogebra_print_content($geogebra, $context);
 
-        // If not preview mode, load state
+        // If not preview mode, load status.
         $parsedvars = null;
         if ($attempt) {
             parse_str($attempt->vars, $parsedvars);
         }
         if (isset($parsedvars['state'])) {
-            // Continue previuos attempt
-            $eduxtecadapterparameters = http_build_query(array(
+            // Continue previous attempt.
+            $eduxtecadapterparameters = http_build_query([
                 'state' => $parsedvars['state'],
                 'grade' => $parsedvars['grade'],
                 'duration' => $parsedvars['duration'],
-                'attempts' => $parsedvars['attempts']
-                    ), '', '&');
+                'attempts' => $parsedvars['attempts'],
+            ], '', '&');
         } else {
             // New attempt
             $attempts = geogebra_count_finished_attempts($geogebra->id, $userid) + 1;
-            $eduxtecadapterparameters = http_build_query(array(
-                'attempts' => $attempts
-                    ), '', '&');
+            $eduxtecadapterparameters = http_build_query([
+                'attempts' => $attempts,
+            ], '', '&');
         }
         $PAGE->requires->js('/mod/geogebra/geogebra_view.js');
         echo '<form id="geogebra_form" method="POST" action="attempt.php">';
@@ -251,7 +251,8 @@ function geogebra_view_applet($geogebra, $cm, $context, $attempt = null, $isprev
     } else {
         echo $OUTPUT->box(get_string('msg_noattempts', 'geogebra'), 'generalbox boxaligncenter');
     }
-    geogebra_view_dates($geogebra, $context, $timenow);
+
+    geogebra_view_dates($geogebra);
 }
 
 function geogebra_get_id($url) {
