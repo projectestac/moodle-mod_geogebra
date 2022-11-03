@@ -872,7 +872,7 @@ function geogebra_view_userid_results($geogebra, $userid, $cm, $context, $viewmo
             $action = optional_param('action', false, PARAM_TEXT);
             if ($action == 'submitgrade') {
                 // Upgrade submitted grade
-                $grade = optional_param('grade', '', PARAM_INT);
+                $grade = optional_param('grade', 0, PARAM_LOCALISEDFLOAT);
                 $gradecomment = optional_param_array('comment_editor', '', PARAM_RAW);
                 $attemptid = optional_param('attemptid', '', PARAM_INT);
                 $attempt = geogebra_get_attempt($attemptid);
