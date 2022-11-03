@@ -3,9 +3,17 @@ Release notes for GeoGebra Module for Moodle (http://moodle.org/plugins/pluginve
 More information on each of the fixes can be found in the project
 development home at https://github.com/projectestac/moodle-mod_geogebra
 
-Changes in 3.6.7 (2022/06/09)
+Changes in 3.6.9 (2022/11/03)
+---------------------------------------------------------------------------------------
+- Minor code format changes
+- Allow grades to be float instead of integer
+
+Changes in 3.6.8 (2022/06/09)
 ---------------------------------------------------------------------------------------
 - Add a random value when building the name of a temp directory, to avoid possible concurrency issues
+
+Changes in 3.6.7 (2022/06/07)
+---------------------------------------------------------------------------------------
 - Added indexes to improve performance when there are a lot of attempts
 - Updated validation of external URL
 - Set https in tube.geogebra.org. Fixed deprecated function
