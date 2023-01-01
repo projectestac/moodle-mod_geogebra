@@ -172,3 +172,5 @@ $string['deployggb'] = 'URL for GeoGebra distribution';
 $string['deployggb_desc'] = 'URL for the deployggb.js distribution file. Usually should point to www.geogebratube.org. Can be a local file.';
 $string['fflate'] = 'URL for fflate distribution';
 $string['fflate_desc'] = 'URL for the fast flate script, used to decompress the GeoGebra javascript files.';
+$string['codebase'] = 'GeoGebra codebase location';
+$string['codebase_desc'] = 'Location of the GeoGebra codebase. Useful for offline mode.';

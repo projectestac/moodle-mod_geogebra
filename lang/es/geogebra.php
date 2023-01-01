@@ -172,3 +172,5 @@ $string['deployggb'] = 'URL de distribución de GeoGebra';
 $string['deployggb_desc'] = 'URL del fichero deployggb.js de distribución de GeoGebra. Habitualmente se encuentra en geogebra.org. Puede ser un fichero local.';
 $string['fflate'] = 'URL de distribución de fflate';
 $string['fflate_desc'] = 'URL del script fast flate, utilizado para descomprimir los ficheros javascript de GeoGebra.';
+$string['codebase'] = 'URL del código base de GeoGebra';
+$string['codebase_desc'] = 'Ubicación del código base de GeoGebra. Es útil si se trabaja sin conexión a Internet.';
