@@ -47,6 +47,15 @@ if ($ADMIN->fulltree) {
 
     $settings->add(
         new admin_setting_configtext(
+            'geogebra/codebase',
+            get_string('codebase', 'geogebra'),
+            get_string('codebase_desc', 'geogebra'),
+            '//www.geogebra.org/apps/latest/web3d'
+        )
+    );
+
+    $settings->add(
+        new admin_setting_configtext(
             'geogebra/fflate',
             get_string('fflate', 'geogebra'),
             get_string('fflate_desc', 'geogebra'),

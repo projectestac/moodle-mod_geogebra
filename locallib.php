@@ -321,6 +321,8 @@ function geogebra_print_content($geogebra, $context) {
 
     // Check if the activity has a custom URL for deploy ggb
     $deployggburl = !empty($geogebra->urlggb) ? $geogebra->urlggb : get_config('geogebra', 'deployggb');
+    // Check if the activity has a custom URL for codebase
+    $codebase = !empty($geogebra->codebase) ? $geogebra->codebase : get_config('geogebra', 'codebase');
 
     // Add loading of GeoGebra
     echo '<script type="text/javascript" src="' . $deployggburl . '"></script>';
@@ -336,7 +338,8 @@ function geogebra_print_content($geogebra, $context) {
     foreach ($attribs as $name => $value) {
         echo $name.': "'.$value.'",';
     }
-    echo '}, true);
+    echo '}, true);';
+    echo 'applet.setHTML5Codebase("' . $codebase . '");
         applet.inject("applet_container", "preferHTML5");
     }
     </script>
