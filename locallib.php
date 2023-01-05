@@ -1152,23 +1152,27 @@ function geogebra_update_attributes(&$geogebra) {
 
 /**
  * Calculates number of attempts, the average grade and average duration
- * of all attemps for a given user and geogebra
+ * of all attempts for a given user and GeoGebra.
  *
  * @param int $geogebraid ID of an instance of this module
  * @param int $userid ID of a user
  * @return mixed boolean/object with userid, grade, rawgrade, grademax, attempts, duration and date
+ * @throws dml_exception
  */
 function geogebra_get_nograding_grade($geogebraid, $userid) {
     global $DB;
 
-    if ($attempts = $DB->get_records('geogebra_attempts', array('userid' => $userid, 'geogebra' => $geogebraid, 'finished' => 1))) {
+    if ($attempts = $DB->get_records('geogebra_attempts', ['userid' => $userid, 'geogebra' => $geogebraid, 'finished' => 1])) {
         $count = 0;
         $durationsum = 0;
+
         foreach ($attempts as $attempt) {
             $count++;
             parse_str($attempt->vars, $parsedvars);
-            $durationsum += $parsedvars['duration'];
+            $durationsum += (float)$parsedvars['duration'];
         }
+
+        $result = new stdClass();
 
         $result->userid = $userid;
         $result->grade = 0;
@@ -1186,281 +1190,258 @@ function geogebra_get_nograding_grade($geogebraid, $userid) {
 
 /**
  * Calculates number of attempts, the average grade and average duration
- * of all attemps for a given user and geogebra
+ * of all attempts for a given user and GeoGebra.
  *
  * @param int $geogebraid ID of an instance of this module
  * @param int $userid ID of a user
- * @return mixed boolean/object with userid, grade, rawgrade, grademax, attempts, duration and date
+ * @return boolean|stdClass with userid, grade, rawgrade, grademax, attempts, duration and date
+ * @throws dml_exception
  */
-function geogebra_get_average_grade($geogebraid, $userid) {
+function geogebra_get_average_grade(int $geogebraid, int $userid) {
     global $DB;
 
-    if ($attempts = $DB->get_records('geogebra_attempts', array('userid' => $userid, 'geogebra' => $geogebraid, 'finished' => 1))) {
-        $result = new stdClass();
+    if ($attempts = $DB->get_records('geogebra_attempts', ['userid' => $userid, 'geogebra' => $geogebraid, 'finished' => 1])) {
         $durationsum = 0;
         $gradessum = 0;
         $count = 0;
+
         foreach ($attempts as $attempt) {
             parse_str($attempt->vars, $parsedvars);
-            if ($parsedvars['grade'] >= 0) { // Only attempt with valid grade
-                $gradessum += $parsedvars['grade'];
+            if ((float)$parsedvars['grade'] >= 0) { // Only attempt with valid grade
+                $gradessum += (float)$parsedvars['grade'];
             }
             $count++;
-            $durationsum += $parsedvars['duration'];
+            $durationsum += (float)$parsedvars['duration'];
         }
+
+        $result = new stdClass();
+        $result->userid = $userid;
+
         if ($count > 0) {
-            $result->userid = $userid;
             $result->grade = round($gradessum / $count, 2);
             $result->rawgrade = $result->grade;
             $result->attempts = count($attempts); // TODO: Review (comment from Moodle 1.9)
             $result->duration = round($durationsum / $count, 2);
-            $result->dateteacher = '';
-            $result->datestudent = '';
-
-            return $result;
         } else {
-            $result->userid = $userid;
             $result->grade = '';
             $result->rawgrade = '';
             $result->attempts = count($attempts);
             $result->duration = '';
-            $result->dateteacher = '';
-            $result->datestudent = '';
-
-            return $result;
         }
+
+        $result->dateteacher = '';
+        $result->datestudent = '';
+
+        return $result;
     } else {
         return false;
     }
 }
 
 /**
- * Finds the last attempt for a given user and geogebra.
+ * Finds the last attempt for a given user and GeoGebra.
  *
  * @param int $geogebraid ID of an instance of this module
  * @param int $userid ID of a user
- * @return mixed boolean/object with userid, grade, rawgrade, grademax, attempts, duration and date
+ * @return boolean|stdClass with userid, grade, rawgrade, grademax, attempts, duration and date
+ * @throws dml_exception
  */
-function geogebra_get_last_attempt_grade($geogebraid, $userid) {
-    global $DB;
-
+function geogebra_get_last_attempt_grade(int $geogebraid, int $userid) {
     $sql = 'SELECT * '
           .'FROM {geogebra_attempts} '
           .'WHERE datestudent = (SELECT MAX(datestudent) FROM {geogebra_attempts} '
                                .'WHERE userid = ' . $userid . ' AND geogebra = ' . $geogebraid . ' AND finished = 1)';
 
-    if ($attempt = $DB->get_record_sql($sql)) {
-        if (empty($attempt)) {
-            return false;
-        }
-        parse_str($attempt->vars, $parsedvars);
-        if ($parsedvars['grade'] < 0) { // Last attempt not graded
-            $result->userid = $userid;
-            $result->grade = '';
-            $result->gradecomment = '';
-            $result->rawgrade = '';
-            $result->attempts = geogebra_count_finished_attempts($geogebraid, $userid);
-            $result->duration = '';
-            $result->dateteacher = '';
-            $result->datestudent = '';
-
-            return $result;
-        } else {
-            $result->userid = $userid;
-            $result->grade = $parsedvars['grade'];
-            $result->gradecomment = $attempt->gradecomment;
-            $result->rawgrade = $result->grade;
-            $result->attempts = geogebra_count_finished_attempts($geogebraid, $userid);
-            $result->duration = $parsedvars['duration'];
-            $result->dateteacher = $attempt->dateteacher;
-            $result->datestudent = $attempt->datestudent;
-
-            return $result;
-        }
-    } else {
-        return false;
-    }
+    return geogebra_process_first_last_attempt_grade($sql, $geogebraid, $userid);
 }
 
 /**
- * Finds the firt attempt for a given user and geogebra.
+ * Finds the first attempt for a given user and GeoGebra.
  *
  * @param int $geogebraid ID of an instance of this module
  * @param int $userid ID of a user
- * @return mixed boolean/object with userid, grade, rawgrade, grademax, attempts, duration and date
+ * @return boolean|stdClass with userid, grade, rawgrade, grademax, attempts, duration and date
+ * @throws dml_exception
  */
-function geogebra_get_first_attempt_grade($geogebraid, $userid) {
-    global $DB;
-
+function geogebra_get_first_attempt_grade(int $geogebraid, int $userid) {
     $sql = 'SELECT * '
           .'FROM {geogebra_attempts} '
           .'WHERE datestudent = (SELECT MIN(datestudent) FROM {geogebra_attempts} '
                                .'WHERE userid = ' . $userid . ' AND geogebra = ' . $geogebraid . ' AND finished = 1)';
 
+    return geogebra_process_first_last_attempt_grade($sql, $geogebraid, $userid);
+}
+
+/**
+ * Get the first or the last attempt grade for a user and activity. Removes duplicated code in
+ * functions for first and last attempts.
+ *
+ * @param string $sql
+ * @param int $geogebraid
+ * @param int $userid
+ * @return false|stdClass
+ * @throws dml_exception
+ */
+function geogebra_process_first_last_attempt_grade(string $sql, int $geogebraid, int $userid) {
+    global $DB;
+
     if ($attempt = $DB->get_record_sql($sql)) {
         if (empty($attempt)) {
             return false;
         }
+
+        $parsedvars = [];
         parse_str($attempt->vars, $parsedvars);
-        if ($parsedvars['grade'] < 0) { // First attempt not graded
-            $result->userid = $userid;
-            $result->grade = '';
+
+        $result = new stdClass();
+        $result->userid = $userid;
+
+        if ((float)$parsedvars['grade'] < 0) { // Attempt not graded
+            $result->grade = null;
             $result->gradecomment = '';
-            $result->rawgrade = '';
+            $result->rawgrade = null;
             $result->attempts = geogebra_count_finished_attempts($geogebraid, $userid);
-            $result->duration = '';
+            $result->duration = null;
             $result->dateteacher = '';
             $result->datestudent = '';
-
-            return $result;
         } else {
-
-            $result->userid = $userid;
-            $result->grade = $parsedvars['grade'];
+            $result->grade = (float)$parsedvars['grade'];
             $result->gradecomment = $attempt->gradecomment;
             $result->rawgrade = $result->grade;
             $result->attempts = geogebra_count_finished_attempts($geogebraid, $userid);
-            $result->duration = $parsedvars['duration'];
+            $result->duration = (float)$parsedvars['duration'];
             $result->dateteacher = $attempt->dateteacher;
             $result->datestudent = $attempt->datestudent;
-
-            return $result;
         }
+
+        return $result;
+
     } else {
         return false;
     }
 }
 
 /**
- * Finds the attempt with the highest grade for a given user and geogebra.
+ * Finds the attempt with the highest grade for a given user and GeoGebra.
  * If more than one attempt has the same grade, gets one with less duration.
  *
  * @param int $geogebraid ID of an instance of this module
  * @param int $userid ID of a user
- * @return mixed boolean/object with userid, grade, rawgrade, grademax, attempts, duration and date
+ * @return boolean|stdClass with userid, grade, rawgrade, grademax, attempts, duration and date
+ * @throws dml_exception
  */
-function geogebra_get_highest_attempt_grade($geogebraid, $userid) {
+function geogebra_get_highest_attempt_grade(int $geogebraid, int $userid) {
     global $DB;
 
     // 1. First get all attemps
-    if ($attempts = $DB->get_records('geogebra_attempts', array('userid' => $userid, 'geogebra' => $geogebraid, 'finished' => 1))) {
+    if ($attempts = $DB->get_records('geogebra_attempts', ['userid' => $userid, 'geogebra' => $geogebraid, 'finished' => 1])) {
+
         // 2. Get highest graded attempt
         $maxgrade = 0;
         $maxattempt = null;
         $mintime = PHP_INT_MAX;
+        $parsedvars = [];
 
         foreach ($attempts as $attempt) {
-
             parse_str($attempt->vars, $parsedvars);
-
-            if ($parsedvars['grade'] >= 0) { // Only attempt with valid grade
-                if ($parsedvars['grade'] > $maxgrade) { // Highter grade
+            if ((float)$parsedvars['grade'] >= 0) { // Only attempt with valid grade
+                if ((float)$parsedvars['grade'] > $maxgrade) { // Higher grade
                     $maxattempt = $attempt;
-                    $maxgrade = $parsedvars['grade'];
-                    $mintime = $parsedvars['duration'];
-                } else if ($parsedvars['grade'] == $maxgrade) { // If same grade,
-                    if ($parsedvars['duration'] < $mintime) { // get the faster attempt
+                    $maxgrade = (float)$parsedvars['grade'];
+                    $mintime = (float)$parsedvars['duration'];
+                } else // If same grade,
+                    if (((float)$parsedvars['grade'] == $maxgrade) // If same grade,
+                        && (float)$parsedvars['duration'] < $mintime) { // get the faster attempt
                         $maxattempt = $attempt;
-                        $maxgrade = $parsedvars['grade'];
-                        $mintime = $parsedvars['duration'];
+                        $maxgrade = (float)$parsedvars['grade'];
+                        $mintime = (float)$parsedvars['duration'];
                     }
-                }
             }
         }
+
         // 3. Prepare return values
-        $result = new stdClass();
-        if (isset($maxattempt)) {
-            parse_str($maxattempt->vars, $parsedvars);
-            $result->userid = $userid;
-            $result->grade = $parsedvars['grade'];
-            $result->rawgrade = $result->grade;
-            $result->gradecomment = $maxattempt->gradecomment;
-            $result->attempts = count($attempts);
-            $result->duration = $parsedvars['duration'];
-            $result->dateteacher = $maxattempt->dateteacher;
-            $result->datestudent = $maxattempt->datestudent;
-
-            return $result;
-        } else {
-            $result->userid = $userid;
-            $result->grade = '';
-            $result->rawgrade = '';
-            $result->gradecomment = '';
-            $result->attempts = count($attempts);
-            $result->duration = '';
-            $result->dateteacher = '';
-            $result->datestudent = '';
-
-            return $result;
-        }
+        return geogebra_prepare_return_values_for_attempt_grade($maxattempt, $parsedvars, $userid, $attempts);
     } else {
         return false;
     }
 }
 
 /**
- * Finds the attempt with the lowest grade for a given user and geogebra.
+ * Finds the attempt with the lowest grade for a given user and GeoGebra.
  * If more than one attempt has the same grade, gets the one with more duration.
  *
  * @param int $geogebraid ID of an instance of this module
  * @param int $userid ID of a user
- * @return mixed boolean/object with userid, grade, rawgrade, grademax, attempts, duration and date
+ * @return boolean|stdClass with userid, grade, rawgrade, grademax, attempts, duration and date
+ * @throws dml_exception
  */
-function geogebra_get_lowest_attempt_grade($geogebraid, $userid) {
+function geogebra_get_lowest_attempt_grade(int $geogebraid, int $userid) {
     global $DB;
 
     // 1. First get all attemps
-    if ($attempts = $DB->get_records('geogebra_attempts', array('userid' => $userid, 'geogebra' => $geogebraid, 'finished' => 1))) {
-        // 2. Get highest graded attempt
+    if ($attempts = $DB->get_records('geogebra_attempts', ['userid' => $userid, 'geogebra' => $geogebraid, 'finished' => 1])) {
+
+        // 2. Get lowest graded attempt
         $mingrade = PHP_INT_MAX;
         $minattempt = null;
         $maxtime = 0;
+        $parsedvars = [];
 
         foreach ($attempts as $attempt) {
-
             parse_str($attempt->vars, $parsedvars);
-            if ($parsedvars['grade'] >= 0) { // Only attempt with valid grade
-                if ($parsedvars['grade'] < $mingrade) { // Lowest grade
+            if ((float)$parsedvars['grade'] >= 0) { // Only attempt with valid grade
+                if ((float)$parsedvars['grade'] < $mingrade) { // Lowest grade
                     $minattempt = $attempt;
-                    $mingrade = $parsedvars['grade'];
-                    $maxtime = $parsedvars['duration'];
-                } else if ($parsedvars['grade'] == $mingrade) { // If same grade,
-                    if ($parsedvars['duration'] > $maxtime) { // get the faster attempt
+                    $mingrade = (float)$parsedvars['grade'];
+                    $maxtime = (float)$parsedvars['duration'];
+                } else // If same grade,
+                    if (((float)$parsedvars['grade'] == $mingrade) // If same grade
+                        && (float)$parsedvars['duration'] > $maxtime) { // get the faster attempt
                         $minattempt = $attempt;
-                        $mingrade = $parsedvars['grade'];
-                        $maxtime = $parsedvars['duration'];
+                        $mingrade = (float)$parsedvars['grade'];
+                        $maxtime = (float)$parsedvars['duration'];
                     }
-                }
             }
         }
 
         // 3. Prepare return values
-        if (isset($minattempt)) {
-            parse_str($minattempt->vars, $parsedvars);
-
-            $result->userid = $userid;
-            $result->grade = $parsedvars['grade'];
-            $result->rawgrade = $result->grade;
-            $result->gradecomment = $minattempt->gradecomment;
-            $result->attempts = count($attempts);
-            $result->duration = $parsedvars['duration'];
-            $result->dateteacher = $minattempt->dateteacher;
-            $result->datestudent = $minattempt->datestudent;
-
-            return $result;
-        } else {
-            $result->userid = $userid;
-            $result->grade = '';
-            $result->rawgrade = '';
-            $result->gradecomment = '';
-            $result->attempts = count($attempts);
-            $result->duration = '';
-            $result->dateteacher = '';
-            $result->datestudent = '';
-
-            return $result;
-        }
+        return geogebra_prepare_return_values_for_attempt_grade($minattempt, $parsedvars, $userid, $attempts);
     } else {
         return false;
     }
+}
+
+/**
+ * Prepares an object with the grades of the attempt. Removes duplicated code in
+ * functions for highest and lowest attempts.
+ *
+ * @param $minattempt
+ * @param array $parsedvars
+ * @param int $userid
+ * @param array $attempts
+ * @return stdClass
+ */
+function geogebra_prepare_return_values_for_attempt_grade($minattempt, array $parsedvars, int $userid, array $attempts): stdClass {
+    $result = new stdClass();
+    if (isset($minattempt)) {
+        parse_str($minattempt->vars, $parsedvars);
+        $result->userid = $userid;
+        $result->grade = (float)$parsedvars['grade'];
+        $result->rawgrade = $result->grade;
+        $result->gradecomment = $minattempt->gradecomment;
+        $result->attempts = count($attempts);
+        $result->duration = (float)$parsedvars['duration'];
+        $result->dateteacher = $minattempt->dateteacher;
+        $result->datestudent = $minattempt->datestudent;
+    } else {
+        $result->userid = $userid;
+        $result->grade = null;
+        $result->rawgrade = null;
+        $result->gradecomment = '';
+        $result->attempts = count($attempts);
+        $result->duration = null;
+        $result->dateteacher = '';
+        $result->datestudent = '';
+    }
+    return $result;
 }
