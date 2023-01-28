@@ -78,6 +78,11 @@ require_once($CFG->dirroot.'/calendar/lib.php');
  * @return mixed true if the feature is supported, null if unknown
  */
 function geogebra_supports($feature) {
+    global $CFG;
+    if (($CFG->branch >= 400) && $feature === FEATURE_MOD_PURPOSE) {
+        return MOD_PURPOSE_ASSESSMENT;
+    }
+
     switch($feature) {
         case FEATURE_GROUPS:                  return true;
 //        case FEATURE_GROUPINGS:               return true;
