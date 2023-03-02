@@ -18,7 +18,7 @@ if ($id) {
     $course = $DB->get_record('course', ['id' => $geogebra->course], '*', MUST_EXIST);
     $cm = get_coursemodule_from_instance('geogebra', $geogebra->id, $course->id, false, MUST_EXIST);
 } else {
-    print_error('You must specify a course_module ID or an instance ID');
+    throw new \moodle_exception('You must specify a course_module ID or an instance ID');
 }
 
 $context = context_module::instance($cm->id);
@@ -26,7 +26,7 @@ $context = context_module::instance($cm->id);
 // Activity was sent before the applet was fully loaded.
 parse_str($vars, $parsedVars);
 if (empty($vars)) {
-    print_error('The applet has not sent correct data');
+    throw new \moodle_exception('The applet has not sent correct data');
 }
 
 require_login($course, true, $cm);
@@ -59,10 +59,10 @@ parse_str($vars, $parsedVars);
 
 if ($attempt) { // Exists an unfishined attempt.
     if (!(geogebra_update_attempt($attempt->id, $vars, GEOGEBRA_UPDATE_STUDENT, $attempt->gradecomment, $f))) {
-        print_error(get_string('errorattempt', 'geogebra'));
+        throw new \moodle_exception(get_string('errorattempt', 'geogebra'));
     }
 } else if (!(geogebra_add_attempt($geogebra->id, $USER->id, $vars, $f))) {
-    print_error(get_string('errorattempt', 'geogebra'));
+    throw new \moodle_exception(get_string('errorattempt', 'geogebra'));
 }
 
 // TODO: Show saved information message
