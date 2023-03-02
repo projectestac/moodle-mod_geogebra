@@ -44,7 +44,7 @@ if ($id) {
     $course = $DB->get_record('course', ['id' => $geogebra->course], '*', MUST_EXIST);
     $cm = get_coursemodule_from_instance('geogebra', $geogebra->id, $course->id, false, MUST_EXIST);
 } else {
-    print_error('You must specify a course_module ID or an instance ID');
+    throw new \moodle_exception('You must specify a course_module ID or an instance ID');
 }
 
 require_login($course, true, $cm);
@@ -84,7 +84,7 @@ if ($attemptid) {
     if ($cangrade || $attempt->userid == $USER->id) {
         echo geogebra_view_applet($geogebra, $cm, $context, $attempt, true);
     } else {
-        print_error(get_string('accessdenied', 'admin'));
+        throw new \moodle_exception(get_string('accessdenied', 'admin'));
     }
 } else {
     echo geogebra_view_applet($geogebra, $cm, $context, null, false);

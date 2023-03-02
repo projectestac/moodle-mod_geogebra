@@ -39,7 +39,7 @@ if ($id) {
     $course     = $DB->get_record('course', array('id' => $cm->course), '*', MUST_EXIST);
     $geogebra  = $DB->get_record('geogebra', array('id' => $cm->instance), '*', MUST_EXIST);
 } else {
-    print_error('You must specify a course_module ID or an instance ID');
+    throw new \moodle_exception('You must specify a course_module ID or an instance ID');
 }
 
 require_login($course, true, $cm);
