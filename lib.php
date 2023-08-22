@@ -227,7 +227,7 @@ function geogebra_user_outline($course, $user, $mod, $geogebra) {
     if (!empty($grades->items[0]->grades)) {
         $grade = reset($grades->items[0]->grades);
         $result = new stdClass();
-        $result->info = get_string('grade') . ': ' . $grade->str_long_grade;
+        $result->info = get_string('gradenoun') . ': ' . $grade->str_long_grade;
 
         //if grade was last modified by the user themselves use date graded. Otherwise use date submitted
         if ($grade->usermodified == $user->id || empty($grade->datesubmitted)) {
