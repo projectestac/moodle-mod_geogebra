@@ -76,7 +76,9 @@ echo $OUTPUT->header();
 
 echo '<div class="reportlink">' . geogebra_submittedlink() . '</div>';
 
-geogebra_view_intro($geogebra, $cm);
+if ($CFG->branch < 400) {
+    geogebra_view_intro($geogebra, $cm);
+}
 
 if ($attemptid) {
     $attempt = geogebra_get_attempt($attemptid);
