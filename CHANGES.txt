@@ -3,6 +3,10 @@ Release notes for GeoGebra Module for Moodle (http://moodle.org/plugins/pluginve
 More information on each of the fixes can be found in the project
 development home at https://github.com/projectestac/moodle-mod_geogebra
 
+Changes in 3.6.11 (2024/01/22)
+---------------------------------------------------------------------------------------
+- Removed duplicated intro in Moodle 4 and greater (thanks to Stefan Hanauska)
+
 Changes in 3.6.10 (2023/03/21)
 ---------------------------------------------------------------------------------------
 - Fixed implicit cast from string to float in grades
