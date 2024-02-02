@@ -669,7 +669,7 @@ function geogebra_view_results($geogebra, $context, $cm, $course, $action) {
                 array(
                     get_string('attempts', 'geogebra'),
                     get_string('duration', 'geogebra'),
-                    get_string('grade'),
+                    get_string('gradenoun'),
                     get_string('comment', 'geogebra'),
                     get_string('lastmodifiedsubmission', 'geogebra'),
                     get_string('lastmodifiedgrade', 'geogebra'),
@@ -902,7 +902,7 @@ function geogebra_view_userid_results($geogebra, $userid, $cm, $context, $viewmo
             // Show attempt
             geogebra_add_table_row_tuple($table, get_string('attempt', 'geogebra'), $numattempt);
             geogebra_add_table_row_tuple($table, get_string('duration', 'geogebra'), $duration);
-            geogebra_add_table_row_tuple($table, get_string('grade'), $grade);
+            geogebra_add_table_row_tuple($table, get_string('gradenoun'), $grade);
             geogebra_add_table_row_tuple($table, get_string('comment', 'geogebra'), $attempt->gradecomment);
         }
 
@@ -978,7 +978,7 @@ function geogebra_get_attempt_row($geogebra, $attempt, $user, $cm = null, $conte
         $textlink = get_string('viewattempt', 'geogebra');
         if (is_siteadmin() || has_capability('moodle/grade:viewall', $context, $USER->id, false)) {
             if ($attempt->dateteacher < $attempt->datestudent ) {
-                $textlink = '<span class="pendinggrade" >'. get_string('grade'). '</span>';
+                $textlink = '<span class="pendinggrade" >'. get_string('gradeverb'). '</span>';
             } else {
                 $textlink = get_string('update');
             }
