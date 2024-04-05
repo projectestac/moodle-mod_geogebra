@@ -224,7 +224,7 @@ function geogebra_view_applet($geogebra, $cm, $context, $attempt = null, $isprev
             // Continue previous attempt.
             $eduxtecadapterparameters = http_build_query([
                 'state' => $parsedvars['state'],
-                'grade' => $parsedvars['grade'],
+                'grade' => isset($parsedvars['grade']) ? $parsedvars['grade'] : 0,
                 'duration' => $parsedvars['duration'],
                 'attempts' => $parsedvars['attempts'],
             ], '', '&');
@@ -654,13 +654,14 @@ function geogebra_view_results($geogebra, $context, $cm, $course, $action) {
     if (!empty($users)) {
 
         // Create results table
-        $extrafields = get_extra_user_fields($context);
+        $extrafields = \core_user\fields::for_identity($context, false)->get_required_fields();
+
         $tablecolumns = array_merge(array('picture', 'fullname'), $extrafields,
                 array('attempts', 'duration', 'grade', 'comment', 'datestudent', 'dateteacher', 'status'));
 
         $extrafieldnames = array();
         foreach ($extrafields as $field) {
-            $extrafieldnames[] = get_user_field_name($field);
+            $extrafieldnames[] = \core_user\fields::get_display_name($field);
         }
 
         $tableheaders = array_merge(
@@ -669,7 +670,7 @@ function geogebra_view_results($geogebra, $context, $cm, $course, $action) {
                 array(
                     get_string('attempts', 'geogebra'),
                     get_string('duration', 'geogebra'),
-                    get_string('grade'),
+                    get_string('gradenoun'),
                     get_string('comment', 'geogebra'),
                     get_string('lastmodifiedsubmission', 'geogebra'),
                     get_string('lastmodifiedgrade', 'geogebra'),
@@ -718,16 +719,28 @@ function geogebra_view_results($geogebra, $context, $cm, $course, $action) {
             $where .= ' AND ';
         }
 
+        [$whereusers, $paramsusers] = $DB->get_in_or_equal($users, SQL_PARAMS_NAMED, 'uid');
+        $where .= 'u.id ' . $whereusers;
+
         if ($sort = $table->get_sql_sort()) {
             $sort = ' ORDER BY '.$sort;
         }
 
-        $ufields = user_picture::fields('u', $extrafields);
+        $userpicfields = \core_user\fields::for_userpic();
+        $userpicfields->including(...$extrafields);
+        $ufieldsql = $userpicfields->get_sql('', false, '', '', false);
 
-        $select = "SELECT $ufields ";
-        $sql = 'FROM {user} u WHERE '.$where.'u.id IN ('.implode(',', $users).') ';
+        $params = array_merge($params, $ufieldsql->params, $paramsusers);
 
-        $ausers = $DB->get_records_sql($select.$sql.$sort, $params, $table->get_page_start(), $table->get_page_size());
+        $query = 'SELECT ' . $ufieldsql->selects . ' FROM {user} u';
+
+        if ($ufieldsql->joins) {
+            $query .= ' JOIN ' . $ufieldsql->joins;
+        }
+
+        $query .= ' WHERE ' . $where . $sort;
+
+        $ausers = $DB->get_records_sql($query, $params, $table->get_page_start(), $table->get_page_size());
 
         $table->pagesize($perpage, count($users));
         $offset = $page * $perpage; // Offset used to calculate index of student in that particular query, needed for the pop up to know who's next
@@ -853,7 +866,7 @@ function geogebra_view_userid_results($geogebra, $userid, $cm, $context, $viewmo
             $numattempt .= ' (' . get_string('unfinished', 'geogebra') . ')';
         }
         $duration = geogebra_time2str($parsedvars['duration']);
-        $grade = $parsedvars['grade'];
+        $grade = isset($parsedvars['grade']) ? $parsedvars['grade'] : 0;
 
         if ($grade < 0 ) {
             $grade = '';
@@ -902,7 +915,7 @@ function geogebra_view_userid_results($geogebra, $userid, $cm, $context, $viewmo
             // Show attempt
             geogebra_add_table_row_tuple($table, get_string('attempt', 'geogebra'), $numattempt);
             geogebra_add_table_row_tuple($table, get_string('duration', 'geogebra'), $duration);
-            geogebra_add_table_row_tuple($table, get_string('grade'), $grade);
+            geogebra_add_table_row_tuple($table, get_string('gradenoun'), $grade);
             geogebra_add_table_row_tuple($table, get_string('comment', 'geogebra'), $attempt->gradecomment);
         }
 
@@ -978,7 +991,7 @@ function geogebra_get_attempt_row($geogebra, $attempt, $user, $cm = null, $conte
         $textlink = get_string('viewattempt', 'geogebra');
         if (is_siteadmin() || has_capability('moodle/grade:viewall', $context, $USER->id, false)) {
             if ($attempt->dateteacher < $attempt->datestudent ) {
-                $textlink = '<span class="pendinggrade" >'. get_string('grade'). '</span>';
+                $textlink = '<span class="pendinggrade" >'. get_string('gradenoun'). '</span>';
             } else {
                 $textlink = get_string('update');
             }
@@ -1212,7 +1225,7 @@ function geogebra_get_average_grade(int $geogebraid, int $userid) {
 
         foreach ($attempts as $attempt) {
             parse_str($attempt->vars, $parsedvars);
-            if ((float)$parsedvars['grade'] >= 0) { // Only attempt with valid grade
+            if (!empty($parsedvars['grade']) && (float)$parsedvars['grade'] >= 0) { // Only attempt with valid grade.
                 $gradessum += (float)$parsedvars['grade'];
             }
             $count++;

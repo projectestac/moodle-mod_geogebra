@@ -56,7 +56,7 @@ $attemptid = optional_param('attemptid', null, PARAM_INT); // attempt ID
 
 $params = [
     'context' => $context,
-    'objectid' => $geogebra->id
+    'objectid' => $geogebra->id,
 ];
 
 $event = \mod_geogebra\event\course_module_viewed::create($params);

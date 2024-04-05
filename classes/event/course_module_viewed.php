@@ -52,16 +52,6 @@ class course_module_viewed extends \core\event\course_module_viewed {
     }
 
     /**
-     * Return the legacy event log data.
-     *
-     * @return array|null
-     */
-    protected function get_legacy_logdata() {
-        return array($this->courseid, 'geogebra', 'view', 'view.php?id=' . $this->context->instanceid, $this->objectid,
-            $this->context->instanceid);
-    }
-
-    /**
      * Return localised event name.
      *
      * @return string

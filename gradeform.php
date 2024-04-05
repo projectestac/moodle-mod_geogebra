@@ -69,7 +69,7 @@ class mod_geogebra_grade_form extends moodleform {
             $grademenu = make_grades_menu($geogebra->grade);
             if (count($grademenu) > 0) {
                 $grademenu = array(RATING_UNSET_RATING => get_string('rate', 'rating').'...') + $grademenu;
-                $gradingelement = $mform->addElement('select', 'grade', get_string('grade').':', $grademenu);
+                $gradingelement = $mform->addElement('select', 'grade', get_string('gradenoun').':', $grademenu);
 
                 // The grade is already formatted with format_float so it needs to be converted back to an integer.
                 if (!empty($data->grade)) {
