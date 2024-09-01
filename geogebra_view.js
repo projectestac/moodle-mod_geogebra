@@ -29,6 +29,7 @@ var adapter = {
     doExit: function () {
     	try   {RT_GGBExitHook(); }catch(e){};
         var duration = Math.floor(new Date().getTime() / 1000) - this.startTime;
+        this.applet.refreshViews();
         this.properties.state = this.applet.getBase64();
         this.properties.grade = this.applet.getValue('grade');
         this.properties.duration = parseInt(this.properties.duration) + duration;
@@ -85,7 +86,7 @@ function init_ggb() {
     adapter.init();
 
     var save = document.getElementById('geogebra_form_save');
-// here is where to saving starts from. They all end up in calling geogebra_submit-attempt
+// here is where to saving without submitting  starts from. They all end up in calling geogebra_submit-attempt
     geogebra_addEvent(save, 'click', function () {
         return geogebra_submit_attempt();
     });
@@ -94,6 +95,7 @@ function init_ggb() {
 
     geogebra_addEvent(submit, 'click', function () {
         form.f.value = 1;
+        // this is for save WITH submitting
         return geogebra_submit_attempt();
     });
 }
