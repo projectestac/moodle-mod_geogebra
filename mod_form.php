@@ -30,8 +30,8 @@
 
 defined('MOODLE_INTERNAL') || die();
 
-require_once($CFG->dirroot.'/course/moodleform_mod.php');
-require_once('locallib.php');
+require_once $CFG->dirroot.'/course/moodleform_mod.php';
+require_once 'locallib.php';
 
 /**
  * Module instance settings form
@@ -42,45 +42,43 @@ class mod_geogebra_mod_form extends moodleform_mod {
      * Defines forms elements
      */
     public function definition() {
+
         global $CFG;
 
         $mform = $this->_form;
 
-        //-------------------------------------------------------------------------------
-        // Adding the "general" fieldset, where all the common settings are showed
+        // Adding the "general" fieldset, where all the common settings are shown.
         $mform->addElement('header', 'general', get_string('general', 'form'));
 
-        // Adding the standard "name" field
-        $mform->addElement('text', 'name', get_string('name'), array('size'=>'64'));
+        // Adding the standard "name" field.
+        $mform->addElement('text', 'name', get_string('name'), ['size'=>'64']);
         if (!empty($CFG->formatstringstriptags)) {
             $mform->setType('name', PARAM_TEXT);
         } else {
-            $mform->setType('name', PARAM_CLEAN);
+            $mform->setType('name', PARAM_RAW_TRIMMED);
         }
+ 
         $mform->addRule('name', null, 'required', null, 'client');
         $mform->addRule('name', get_string('maximumchars', '', 255), 'maxlength', 255, 'client');
 
-        // Adding the standard "intro" and "introformat" fields
+        // Adding the standard "intro" and "introformat" fields.
         $this->standard_intro_elements();
 
-        // -------------------------------------------------------------------------------
         $mform->addElement('header', 'timing', get_string('timing', 'geogebra'));
+        $mform->addElement('date_time_selector', 'timeavailable', get_string('availabledate', 'geogebra'), ['optional'=>true]);
+        $mform->addElement('date_time_selector', 'timedue', get_string('duedate', 'geogebra'), ['optional'=>true]);
 
-        $mform->addElement('date_time_selector', 'timeavailable', get_string('availabledate', 'geogebra'), array('optional'=>true));
-        $mform->addElement('date_time_selector', 'timedue', get_string('duedate', 'geogebra'), array('optional'=>true));
-
-        //-------------------------------------------------------------------------------
         // Adding the rest of geogebra settings, spreeading all them into this fieldset
         $mform->addElement('header', 'header_geogebra', get_string('contentheader', 'geogebra'));
 
         $mform->addElement('select', 'filetype', get_string('filetype', 'geogebra'), geogebra_get_file_types());
         $mform->addHelpButton('filetype', 'filetype', 'geogebra');
-        $mform->addElement('text', 'geogebraurl', get_string('geogebraurl', 'geogebra'), array('size'=>60));
+        $mform->addElement('text', 'geogebraurl', get_string('geogebraurl', 'geogebra'), ['size'=>60]);
         $mform->setType('geogebraurl', PARAM_RAW);
         $mform->addHelpButton('geogebraurl', 'geogebraurl', 'geogebra');
         $mform->disabledIf('geogebraurl', 'filetype', 'eq', GEOGEBRA_FILE_TYPE_LOCAL);
 
-        $mform->addElement('filemanager', 'geogebrafile', get_string('geogebrafile', 'geogebra'), array('optional'=>false), geogebra_get_filemanager_options());
+        $mform->addElement('filemanager', 'geogebrafile', get_string('geogebrafile', 'geogebra'), ['optional'=>false], geogebra_get_filemanager_options());
         $mform->addHelpButton('geogebrafile', 'urledit', 'geogebra');
         $mform->disabledIf('geogebrafile', 'filetype', 'noteq', GEOGEBRA_FILE_TYPE_LOCAL);
 
@@ -99,59 +97,65 @@ class mod_geogebra_mod_form extends moodleform_mod {
         $options = get_string_manager()->get_list_of_translations();
         $mform->addElement('select', 'language', get_string('language', 'geogebra'), $options);
 
-        // GRADING
+        // Grading.
         $this->standard_grading_coursemodule_elements();
 
-        $options = array(-1 => get_string('unlimited'), 1 => 1, 2 => 2, 3 => 3, 4 => 4, 5 => 5, 10 => 10);
+        $options = [-1 => get_string('unlimited'), 1 => 1, 2 => 2, 3 => 3, 4 => 4, 5 => 5, 10 => 10];
         $mform->addElement('select', 'maxattempts', get_string('maxattempts', 'geogebra'), $options);
         $mform->setDefault('maxattempts', '-1');
 
-        $options = array(
+        $options = [
             GEOGEBRA_AVERAGE_GRADE => get_string('average', 'geogebra'),
             GEOGEBRA_HIGHEST_GRADE => get_string('highestattempt', 'geogebra'),
             GEOGEBRA_LOWEST_GRADE => get_string('lowestattempt', 'geogebra'),
             GEOGEBRA_FIRST_GRADE => get_string('firstattempt', 'geogebra'),
-            GEOGEBRA_LAST_GRADE => get_string('lastattempt', 'geogebra'));
+            GEOGEBRA_LAST_GRADE => get_string('lastattempt', 'geogebra'),
+        ];
+
         $mform->addElement('select', 'grademethod', get_string('grademethod', 'geogebra'), $options);
         $mform->setDefault('grademethod', '-1');
 
         $mform->addElement('advcheckbox', 'autograde', get_string('autograde', 'geogebra'));
         $mform->setDefault('autograde', 0);
 
-        //---OPTIONS---------------------------------------------------------------------------
+        // Options.
         $mform->addElement('header', 'optionsheader', get_string('appearance'));
 
-        $mform->addElement('text', 'width', get_string('width', 'geogebra'), array('size'=>'5'));
+        $mform->addElement('text', 'width', get_string('width', 'geogebra'), ['size'=>'5']);
         $mform->setType('width', PARAM_INT);
         $mform->setDefault('width', '');
         $mform->addHelpButton('width', 'width', 'geogebra');
 
-        $mform->addElement('text', 'height', get_string('height', 'geogebra'), array('size'=>'5'));
+        $mform->addElement('text', 'height', get_string('height', 'geogebra'), ['size'=>'5']);
         $mform->setType('height', PARAM_INT);
         $mform->setDefault('height', '600');
         $mform->addHelpButton('height', 'height', 'geogebra');
 
-        $functionalityoptionsgrp = array();
+        $functionalityoptionsgrp = [];
         $functionalityoptionsgrp[] = &$mform->createElement('checkbox', 'enableRightClick', '', get_string('enableRightClick', 'geogebra'));
         $functionalityoptionsgrp[] = &$mform->createElement('checkbox', 'enableLabelDrags', '', get_string('enableLabelDrags', 'geogebra'));
         $functionalityoptionsgrp[] = &$mform->createElement('checkbox', 'showResetIcon', '', get_string('showResetIcon', 'geogebra'));
+
         $mform->addGroup($functionalityoptionsgrp, 'functionalityoptionsgrp', get_string('functionalityoptionsgrp', 'geogebra'), "<br>", false);
         $mform->setDefault('enableRightClick', 0);
         $mform->setDefault('enableLabelDrags', 0);
         $mform->setDefault('showResetIcon', 0);
         $mform->setAdvanced('functionalityoptionsgrp');
 
-        $options = array(
+        $options = [
             0 => get_string('useBrowserForJS_geogebra', 'geogebra'),
-            1 => get_string('useBrowserForJS_html', 'geogebra'));
+            1 => get_string('useBrowserForJS_html', 'geogebra'),
+        ];
+
         $mform->addElement('select', 'useBrowserForJS', get_string('useBrowserForJS', 'geogebra'), $options);
         $mform->setDefault('useBrowserForJS', '1');
 
-        $interfaceoptionsgrp = array();
+        $interfaceoptionsgrp = [];
         $interfaceoptionsgrp[] = &$mform->createElement('checkbox', 'showMenuBar', '', get_string('showMenuBar', 'geogebra'));
         $interfaceoptionsgrp[] = &$mform->createElement('checkbox', 'showToolBar', '', get_string('showToolBar', 'geogebra'));
         $interfaceoptionsgrp[] = &$mform->createElement('checkbox', 'showToolBarHelp', '', get_string('showToolBarHelp', 'geogebra'));
         $interfaceoptionsgrp[] = &$mform->createElement('checkbox', 'showAlgebraInput', '', get_string('showAlgebraInput', 'geogebra'));
+
         $mform->addGroup($interfaceoptionsgrp, 'interfaceoptionsgrp', get_string('interfaceoptionsgrp', 'geogebra'), "<br>", false);
         $mform->setDefault('showMenuBar', 0);
         $mform->setDefault('showToolBar', 0);
@@ -161,31 +165,34 @@ class mod_geogebra_mod_form extends moodleform_mod {
 
         // add standard elements, common to all modules
         $this->standard_coursemodule_elements();
-        //-------------------------------------------------------------------------------
+
         // add standard buttons, common to all modules
         $this->add_action_buttons();
     }
 
     function data_preprocessing(&$values) {
+
         if ($this->current->instance) {
             $draftitemid = file_get_submitted_draft_itemid('geogebrafile');
             file_prepare_draft_area($draftitemid, $this->context->id, 'mod_geogebra', 'content', 0, geogebra_get_filemanager_options());
             $values['geogebrafile'] = $draftitemid;
         }
+
     }
 
     public function validation($data, $files) {
+
         global $USER;
 
         $errors = parent::validation($data, $files);
 
         // Check open and close times are consistent.
-        if ($data['timeavailable'] != 0 && $data['timedue'] != 0 &&
-            $data['timedue'] < $data['timeavailable']) {
+        if ($data['timeavailable'] !== 0 && $data['timedue'] !== 0 && $data['timedue'] < $data['timeavailable']) {
             $errors['timedue'] = get_string('closebeforeopen', 'geogebra');
         }
 
         $type = $data['filetype'];
+
         if ($type === GEOGEBRA_FILE_TYPE_LOCAL) {
             $usercontext = context_user::instance($USER->id);
             $fs = get_file_storage();
@@ -206,10 +213,10 @@ class mod_geogebra_mod_form extends moodleform_mod {
         }
 
         return $errors;
+
     }
 
     function set_data($values) {
-        global $CFG;
 
         $values = (array)$values;
 
@@ -225,23 +232,26 @@ class mod_geogebra_mod_form extends moodleform_mod {
 
             // Load attributes
             parse_str($values['attributes'], $attributes);
-            $values['enableRightClick'] = isset($attributes['enableRightClick']) ? $attributes['enableRightClick'] : 0;
-            $values['enableLabelDrags'] = isset($attributes['enableLabelDrags']) ? $attributes['enableLabelDrags'] : 0;
-            $values['showResetIcon'] = isset($attributes['showResetIcon']) ? $attributes['showResetIcon'] : 0;
-            $values['showMenuBar'] = isset($attributes['showMenuBar']) ? $attributes['showMenuBar'] : 0;
-            $values['showToolBar'] = isset($attributes['showToolBar']) ? $attributes['showToolBar'] : 0;
-            $values['showToolBarHelp'] = isset($attributes['showToolBarHelp']) ? $attributes['showToolBarHelp'] : 0;
-            $values['showAlgebraInput'] = isset($attributes['showAlgebraInput']) ? $attributes['showAlgebraInput'] : 0;
-            $values['language'] = isset($attributes['language']) ? $attributes['language'] : 0;
-            $values['useBrowserForJS'] = isset($attributes['useBrowserForJS']) ? $attributes['useBrowserForJS'] : 0;
+            $values['enableRightClick'] = $attributes['enableRightClick'] ?? 0;
+            $values['enableLabelDrags'] = $attributes['enableLabelDrags'] ?? 0;
+            $values['showResetIcon'] = $attributes['showResetIcon'] ?? 0;
+            $values['showMenuBar'] = $attributes['showMenuBar'] ?? 0;
+            $values['showToolBar'] = $attributes['showToolBar'] ?? 0;
+            $values['showToolBarHelp'] = $attributes['showToolBarHelp'] ?? 0;
+            $values['showAlgebraInput'] = $attributes['showAlgebraInput'] ?? 0;
+            $values['language'] = $attributes['language'] ?? 0;
+            $values['useBrowserForJS'] = $attributes['useBrowserForJS'] ?? 0;
         }
+
         unset($values['url']);
 
         $this->data_preprocessing($values);
         parent::set_data($values);
+
     }
 
     function completion_rule_enabled($data) {
         return !empty($data['completionsubmit']);
     }
+
 }

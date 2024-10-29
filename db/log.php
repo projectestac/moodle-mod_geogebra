@@ -33,8 +33,8 @@ defined('MOODLE_INTERNAL') || die();
 
 global $DB;
 
-$logs = array(
-    array('module'=>'geogebra', 'action'=>'add', 'mtable'=>'geogebra', 'field'=>'name'),
-    array('module'=>'geogebra', 'action'=>'view', 'mtable'=>'geogebra', 'field'=>'name'),
-    array('module'=>'geogebra', 'action'=>'update', 'mtable'=>'geogebra', 'field'=>'name'),
-);
+$logs = [
+    ['module'=>'geogebra', 'action'=>'add', 'mtable'=>'geogebra', 'field'=>'name'],
+    ['module'=>'geogebra', 'action'=>'view', 'mtable'=>'geogebra', 'field'=>'name'],
+    ['module'=>'geogebra', 'action'=>'update', 'mtable'=>'geogebra', 'field'=>'name'],
+];

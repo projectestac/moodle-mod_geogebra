@@ -28,15 +28,15 @@
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-require_once(dirname(__DIR__, 2) . '/config.php');
-require_once(__DIR__ . '/locallib.php');
+require_once dirname(__DIR__, 2) . '/config.php';
+require_once __DIR__ . '/locallib.php';
 
 $id = optional_param('id', 0, PARAM_INT); // course_module ID, or
 
 if ($id) {
-    $cm         = get_coursemodule_from_id('geogebra', $id, 0, false, MUST_EXIST);
-    $course     = $DB->get_record('course', array('id' => $cm->course), '*', MUST_EXIST);
-    $geogebra  = $DB->get_record('geogebra', array('id' => $cm->instance), '*', MUST_EXIST);
+    $cm = get_coursemodule_from_id('geogebra', $id, 0, false, MUST_EXIST);
+    $course = $DB->get_record('course', ['id' => $cm->course], '*', MUST_EXIST);
+    $geogebra = $DB->get_record('geogebra', ['id' => $cm->instance], '*', MUST_EXIST);
 } else {
     throw new \moodle_exception('You must specify a course_module ID or an instance ID');
 }
@@ -51,12 +51,11 @@ $PAGE->set_heading(format_string($course->fullname));
 $PAGE->set_context($context);
 
 echo $OUTPUT->header();
-
 echo $OUTPUT->heading(get_string('results', 'geogebra'));
 
 groups_print_activity_menu($cm, $CFG->wwwroot . '/mod/geogebra/report.php?id=' . $cm->id);
 
-echo '<div class="reportlink">'.geogebra_submittedlink().'</div>';
+echo '<div class="reportlink">' . geogebra_submittedlink() . '</div>';
 
 $cangrade = is_siteadmin() || has_capability('moodle/grade:edit', $context, $USER->id, false);
 

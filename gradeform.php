@@ -27,17 +27,15 @@
 
 defined('MOODLE_INTERNAL') || die('Direct access to this script is forbidden.');
 
+require_once $CFG->libdir . '/formslib.php';
+require_once $CFG->dirroot . '/mod/geogebra/locallib.php';
 
-/** Include formslib.php */
-require_once ($CFG->libdir.'/formslib.php');
-/** Include locallib.php */
-require_once($CFG->dirroot . '/mod/geogebra/locallib.php');
-/** Required for advanced grading */
-require_once('HTML/QuickForm/input.php');
-require_once($CFG->dirroot .'/rating/lib.php');
-
+// Required for advanced grading
+require_once 'HTML/QuickForm/input.php';
+require_once $CFG->dirroot . '/rating/lib.php';
 
 class mod_geogebra_grade_form extends moodleform {
+
     /** @var geogebra $geogebra */
     private $geogebra;
 
@@ -45,22 +43,21 @@ class mod_geogebra_grade_form extends moodleform {
      * Define the form - called by parent constructor
      */
     function definition() {
-        global $CFG;
 
         $mform = $this->_form;
 
-        list($geogebra, $data, $params) = $this->_customdata;
+        [$geogebra, $data, $params] = $this->_customdata;
+
         // visible elements
         $this->geogebra = $geogebra;
 
-        $attemptelement = $mform->addElement('text', 'attempt', get_string('attempt', 'geogebra'), array('style' => 'border:none'));
+        $attemptelement = $mform->addElement('text', 'attempt', get_string('attempt', 'geogebra'), ['style' => 'border:none']);
         $mform->setType('attempt', PARAM_TEXT);
         $attemptelement->freeze();
 
-        $durationelement = $mform->addElement('text', 'duration', get_string('duration', 'geogebra'), array('style' => 'border:none'));
+        $durationelement = $mform->addElement('text', 'duration', get_string('duration', 'geogebra'), ['style' => 'border:none']);
         $mform->setType('duration', PARAM_TEXT);
         $durationelement->freeze();
-
 
         if ($geogebra->grade > 0) {
             $gradingelement = $mform->addElement('text', 'grade', get_string('grade', 'geogebra'));
@@ -68,8 +65,8 @@ class mod_geogebra_grade_form extends moodleform {
         } else {
             $grademenu = make_grades_menu($geogebra->grade);
             if (count($grademenu) > 0) {
-                $grademenu = array(RATING_UNSET_RATING => get_string('rate', 'rating').'...') + $grademenu;
-                $gradingelement = $mform->addElement('select', 'grade', get_string('grade').':', $grademenu);
+                $grademenu = array(RATING_UNSET_RATING => get_string('rate', 'rating') . '...') + $grademenu;
+                $gradingelement = $mform->addElement('select', 'grade', get_string('gradenoun') . ':', $grademenu);
 
                 // The grade is already formatted with format_float so it needs to be converted back to an integer.
                 if (!empty($data->grade)) {
@@ -82,7 +79,7 @@ class mod_geogebra_grade_form extends moodleform {
         $mform->addElement('editor', 'comment_editor', get_string('comment', 'geogebra'), null, null);
         $mform->setType('comment_editor', PARAM_RAW);
 
-        // Hidden parameters
+        // Hidden parameters.
         $mform->addElement('hidden', 'id', $data->id);
         $mform->setType('id', PARAM_INT);
         $mform->addElement('hidden', 'student', $data->student);
@@ -92,23 +89,30 @@ class mod_geogebra_grade_form extends moodleform {
         $mform->addElement('hidden', 'action', 'submitgrade');
         $mform->setType('action', PARAM_ALPHA);
 
-        // Buttons
+        // Buttons.
         $this->add_action_buttons(true, get_string('savechanges', 'assign'));
         $mform->closeHeaderBefore('buttonar');
 
         if ($data) {
             $this->set_data($data);
         }
+
     }
 
     /**
      * Perform minimal validation on the grade form
+     *
      * @param array $data
      * @param array $files
+     * @throws coding_exception
+     * @throws dml_exception
+     * @return array
      */
     function validation($data, $files) {
+
         global $DB;
         $errors = parent::validation($data, $files);
+
         // advanced grading
         if (!array_key_exists('grade', $data)) {
             return $errors;
@@ -125,8 +129,7 @@ class mod_geogebra_grade_form extends moodleform {
                 $errors['grade'] = get_string('gradebelowzero', 'assign');
             }
         } else {
-            // this is a scale
-            if ($scale = $DB->get_record('scale', array('id'=>-($this->geogebra->grade)))) {
+            if ($scale = $DB->get_record('scale', ['id' => -($this->geogebra->grade)])) {
                 $scaleoptions = make_menu_from_list($scale->scale);
                 if (!array_key_exists((int)$data['grade'], $scaleoptions)) {
                     $errors['grade'] = get_string('invalidgradeforscale', 'assign');

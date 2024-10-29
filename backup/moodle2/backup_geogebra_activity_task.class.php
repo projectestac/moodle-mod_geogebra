@@ -16,7 +16,6 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- *
  * @package    mod
  * @subpackage geogebra
  * @copyright  2011 Departament d'Ensenyament de la Generalitat de Catalunya
@@ -24,8 +23,8 @@
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-require_once($CFG->dirroot . '/mod/geogebra/locallib.php'); // Because it exists (must)
-require_once($CFG->dirroot . '/mod/geogebra/backup/moodle2/backup_geogebra_stepslib.php'); // Because it exists (must)
+require_once $CFG->dirroot . '/mod/geogebra/locallib.php';
+require_once $CFG->dirroot . '/mod/geogebra/backup/moodle2/backup_geogebra_stepslib.php';
 
 /**
  * geogebra backup task that provides all the settings and steps to perform one
@@ -53,9 +52,10 @@ class backup_geogebra_activity_task extends backup_activity_task {
      * order to get transportable (encoded) links
      */
     static public function encode_content_links($content) {
+
         global $CFG;
 
-        $base = preg_quote($CFG->wwwroot,"/");
+        $base = preg_quote($CFG->wwwroot,'/');
 
         // Link to the list of geogebras
         $search="/(".$base."\/mod\/geogebra\/index.php\?id\=)([0-9]+)/";
@@ -66,5 +66,7 @@ class backup_geogebra_activity_task extends backup_activity_task {
         $content= preg_replace($search, '$@geogebraVIEWBYID*$2@$', $content);
 
         return $content;
+
     }
+
 }

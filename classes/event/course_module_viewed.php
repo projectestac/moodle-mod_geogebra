@@ -36,12 +36,15 @@ class course_module_viewed extends \core\event\course_module_viewed {
      * @return void
      */
     protected function init() {
+
         $this->data['objecttable'] = 'geogebra';
         $this->data['crud'] = 'r';
         $this->data['edulevel'] = self::LEVEL_PARTICIPATING;
+
     }
 
     // TODO: Delete after 2.8 upgrade
+
     /**
      * Returns description of what happened.
      *
@@ -52,18 +55,9 @@ class course_module_viewed extends \core\event\course_module_viewed {
     }
 
     /**
-     * Return the legacy event log data.
-     *
-     * @return array|null
-     */
-    protected function get_legacy_logdata() {
-        return array($this->courseid, 'geogebra', 'view', 'view.php?id=' . $this->context->instanceid, $this->objectid,
-            $this->context->instanceid);
-    }
-
-    /**
      * Return localised event name.
      *
+     * @throws \coding_exception
      * @return string
      */
     public static function get_name() {
@@ -73,10 +67,11 @@ class course_module_viewed extends \core\event\course_module_viewed {
     /**
      * Get URL related to the action.
      *
+     * @throws \moodle_exception
      * @return \moodle_url
      */
     public function get_url() {
-        return new \moodle_url('/mod/geogebra/view.php', array('id' => $this->contextinstanceid));
+        return new \moodle_url('/mod/geogebra/view.php', ['id' => $this->contextinstanceid]);
     }
 
     /**
@@ -86,8 +81,11 @@ class course_module_viewed extends \core\event\course_module_viewed {
      * @return void
      */
     protected function validate_data() {
+
         // Hack to please the parent class. 'view' was the key used in old add_to_log().
         $this->data['other']['content'] = 'view';
         parent::validate_data();
+
     }
+
 }

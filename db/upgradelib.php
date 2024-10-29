@@ -27,15 +27,19 @@
 
 defined('MOODLE_INTERNAL') || die;
 
-require_once($CFG->dirroot . '/mod/geogebra/locallib.php');
+require_once $CFG->dirroot . '/mod/geogebra/locallib.php';
 
 /**
  * Migrate geogebra package to new area if found
  *
- * @return
+ * @throws coding_exception
+ * @throws dml_exception
+ * @throws moodle_exception
+ * @return void
  */
 function geogebra_migrate_files() {
-    global $CFG, $DB;
+
+    global $DB;
 
     $fs = get_file_storage();
     $sqlfrom = "FROM {geogebra} j
@@ -43,6 +47,7 @@ function geogebra_migrate_files() {
                 JOIN {course_modules} cm ON (cm.module = m.id AND cm.instance = j.id)";
     $count = $DB->count_records_sql("SELECT COUNT('x') $sqlfrom");
     $rs = $DB->get_recordset_sql("SELECT j.id, j.url, j.course, cm.id AS cmid $sqlfrom ORDER BY j.course, j.id");
+
     if ($rs->valid()) {
         $pbar = new progress_bar('migrategeogebrafiles', 500, true);
         $i = 0;
@@ -51,16 +56,22 @@ function geogebra_migrate_files() {
             upgrade_set_timeout(180); // set up timeout, may also abort execution
             $pbar->update($i, $count, "Migrating geogebra files - $i/$count.");
 
-            $context       = context_module::instance($geogebra->cmid);
+            $context = context_module::instance($geogebra->cmid);
             $coursecontext = context_course::instance($geogebra->course);
 
             if (!geogebra_is_valid_external_url($geogebra->url)) {
                 // first copy local files if found - do not delete in case they are shared ;-)
                 $geogebrafile = clean_param($geogebra->url, PARAM_PATH);
                 $pathnamehash = sha1("/$coursecontext->id/course/legacy/0/$geogebrafile");
+
                 if ($file = $fs->get_file_by_hash($pathnamehash)) {
-                    $file_record = array('contextid'=>$context->id, 'component'=>'mod_geogebra', 'filearea'=>'content',
-                                         'itemid'=>0, 'filepath'=>'/');
+                    $file_record = [
+                        'contextid' => $context->id,
+                        'component' => 'mod_geogebra',
+                        'filearea' => 'content',
+                        'itemid' => 0,
+                        'filepath' => '/',
+                    ];
                     try {
                         $fs->create_file_from_storedfile($file_record, $file);
                     } catch (Exception $x) {
@@ -70,9 +81,12 @@ function geogebra_migrate_files() {
                 } else {
                     $geogebra->url = '';
                 }
+
                 $DB->update_record('geogebra', $geogebra);
             }
         }
     }
+
     $rs->close();
+
 }

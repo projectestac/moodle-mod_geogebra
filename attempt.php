@@ -1,8 +1,8 @@
 <?php
 
-require_once('../../config.php');
-require_once('lib.php');
-require_once(__DIR__ . '/locallib.php');
+require_once '../../config.php';
+require_once 'lib.php';
+require_once __DIR__ . '/locallib.php';
 
 $id = optional_param('id', 0, PARAM_INT); // Course_module ID
 $n = optional_param('n', 0, PARAM_INT); // GeoGebra instance ID
@@ -33,26 +33,28 @@ require_login($course, true, $cm);
 
 $attempt = geogebra_get_unfinished_attempt($geogebra->id, $USER->id);
 
-if ($geogebra->autograde == 0) {
-    // If geogebra is not autograding, change grade from 0 to undefined or get the one specified by the teacher
+if ((int)$geogebra->autograde === 0) {
+    // If geogebra is not autograding, change grade from 0 to undefined or get the one specified by the teacher.
     $grade = '-1';
+
     if ($attempt) {
         parse_str($attempt->vars, $attemptVars);
         $grade = $attemptVars['grade'];
     }
+
     $vars = http_build_query([
-            'grade' => $grade,
-            'duration' => $parsedVars['duration'],
-            'attempts' => $parsedVars['attempts'],
-            'state' => $parsedVars['state'],
-        ], '', '&');
+        'grade' => $grade,
+        'duration' => $parsedVars['duration'],
+        'attempts' => $parsedVars['attempts'],
+        'state' => $parsedVars['state'],
+    ], '', '&');
 } else {
     $vars = http_build_query([
-            'grade' => round($parsedVars['grade'], 2),
-            'duration' => $parsedVars['duration'],
-            'attempts' => $parsedVars['attempts'],
-            'state' => $parsedVars['state'],
-        ], '', '&');
+        'grade' => round($parsedVars['grade'], 2),
+        'duration' => $parsedVars['duration'],
+        'attempts' => $parsedVars['attempts'],
+        'state' => $parsedVars['state'],
+    ], '', '&');
 }
 
 parse_str($vars, $parsedVars);

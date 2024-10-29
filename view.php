@@ -28,9 +28,9 @@
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-require_once(dirname(__FILE__, 3) . '/config.php');
-require_once(__DIR__ . '/locallib.php');
-require_once($CFG->libdir . '/completionlib.php');
+require_once dirname(__FILE__, 3) . '/config.php';
+require_once __DIR__ . '/locallib.php';
+require_once $CFG->libdir . '/completionlib.php';
 
 $id = optional_param('id', 0, PARAM_INT); // Course_module ID
 $n = optional_param('n', 0, PARAM_INT); // GeoGebra instance ID - it should be named as the first character of the module
@@ -56,7 +56,7 @@ $attemptid = optional_param('attemptid', null, PARAM_INT); // attempt ID
 
 $params = [
     'context' => $context,
-    'objectid' => $geogebra->id
+    'objectid' => $geogebra->id,
 ];
 
 $event = \mod_geogebra\event\course_module_viewed::create($params);
@@ -83,7 +83,7 @@ if ($CFG->branch < 400) {
 if ($attemptid) {
     $attempt = geogebra_get_attempt($attemptid);
     $cangrade = is_siteadmin() || has_capability('moodle/grade:edit', $context, $USER->id, false);
-    if ($cangrade || $attempt->userid == $USER->id) {
+    if ($cangrade || $attempt->userid === $USER->id) {
         echo geogebra_view_applet($geogebra, $cm, $context, $attempt, true);
     } else {
         throw new \moodle_exception(get_string('accessdenied', 'admin'));

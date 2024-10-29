@@ -33,7 +33,7 @@ class restore_geogebra_activity_structure_step extends restore_activity_structur
 
     protected function define_structure() {
 
-        $paths = array();
+        $paths = [];
         $userinfo = $this->get_setting_value('userinfo');
 
         $paths[] = new restore_path_element('geogebra', '/activity/geogebra');
@@ -43,43 +43,49 @@ class restore_geogebra_activity_structure_step extends restore_activity_structur
 
         // Return the paths wrapped into standard activity structure
         return $this->prepare_activity_structure($paths);
+
     }
 
     protected function process_geogebra($data) {
+
         global $DB;
 
         $data = (object)$data;
-        $oldid = $data->id;
         $data->course = $this->get_courseid();
 
         if (empty($data->attributes)) {
             $data->attributes = '&';
         }
+
         $data->timeavailable = $this->apply_date_offset($data->timeavailable);
         $data->timedue = $this->apply_date_offset($data->timedue);
 
-        // insert the geogebra record
+        // Insert the geogebra record.
         $newitemid = $DB->insert_record('geogebra', $data);
+
         // immediately after inserting "activity" record, call this
         $this->apply_activity_instance($newitemid);
+
     }
 
     protected function process_geogebra_attempt($data) {
+
         global $DB;
 
         $data = (object)$data;
-        $oldid = $data->id;
 
         $data->geogebra = $this->get_new_parentid('geogebra');
         $data->userid = $this->get_mappingid('user', $data->userid);
 
-        $newitemid = $DB->insert_record('geogebra_attempts', $data);
+        $DB->insert_record('geogebra_attempts', $data);
+
     }
 
-
     protected function after_execute() {
+
         // Add geogebra related files, no need to match by itemname (just internally handled context)
         $this->add_related_files('mod_geogebra', 'intro', null);
         $this->add_related_files('mod_geogebra', 'content', null);
     }
+
 }

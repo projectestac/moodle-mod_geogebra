@@ -27,7 +27,7 @@
 
 defined('MOODLE_INTERNAL') || die();
 
-require_once($CFG->dirroot . '/mod/geogebra/locallib.php');
+require_once $CFG->dirroot . '/mod/geogebra/locallib.php';
 
 /**
  * GeoGebra conversion handler
@@ -46,19 +46,20 @@ class moodle1_mod_geogebra_handler extends moodle1_mod_handler {
      * actually exist in the file. The last element with the module name was
      * appended by the moodle1_converter class.
      *
+     * @throws convert_path_exception
      * @return array of {@link convert_path} instances
      */
     public function get_paths() {
-        return array(
+        return [
             new convert_path(
                 'geogebra', '/MOODLE_BACKUP/COURSE/MODULES/MOD/GEOGEBRA',
-                array(
-                    'newfields' => array(
+                [
+                    'newfields' => [
                         'introformat' => 0,
-                    ),
-                )
+                    ],
+                ]
             ),
-        );
+        ];
     }
 
     /**
@@ -66,44 +67,44 @@ class moodle1_mod_geogebra_handler extends moodle1_mod_handler {
      * data available
      */
     public function process_geogebra($data) {
+
         // get the course module id and context id
-        $instanceid     = $data['id'];
-        $cminfo         = $this->get_cminfo($instanceid);
+        $instanceid = $data['id'];
+        $cminfo = $this->get_cminfo($instanceid);
         $this->moduleid = $cminfo['id'];
-        $contextid      = $this->converter->get_contextid(CONTEXT_MODULE, $this->moduleid);
+        $contextid = $this->converter->get_contextid(CONTEXT_MODULE, $this->moduleid);
 
         // get a fresh new file manager for this instance
         $this->fileman = $this->converter->get_file_manager($contextid, 'mod_geogebra');
 
         // convert course files embedded into the intro
         $this->fileman->filearea = 'intro';
-        $this->fileman->itemid   = 0;
+        $this->fileman->itemid = 0;
         $data['intro'] = moodle1_converter::migrate_referenced_files($data['intro'], $this->fileman);
 
         // migrate geogebra package file
         $this->fileman->filearea = 'content';
-        $this->fileman->itemid   = 0;
+        $this->fileman->itemid = 0;
 
         // Migrate file
         parse_str($data['url'], $parsedVarsURL);
-        try{
-            $this->fileman->migrate_file('course_files/'.$parsedVarsURL['filename']);
-        } catch (Exception $e){
-            echo 'Caught exception: ',  $e->getMessage(), ' File: \''.$parsedVarsURL['filename'].'\' (from URL \'',$data['url'], '\') on GeoGebra activity \''.$data['name'].'\' <br>';
+        try {
+            $this->fileman->migrate_file('course_files/' . $parsedVarsURL['filename']);
+        } catch (Exception $e) {
+            echo 'Caught exception: ', $e->getMessage(), ' File: \'' . $parsedVarsURL['filename'] . '\' (from URL \'', $data['url'], '\') on GeoGebra activity \'' . $data['name'] . '\' <br>';
         }
         // From Moodle 2, URL field only contains information about the GGB file location
         $data['url'] = $parsedVarsURL['filename'];
 
         if (strrpos($data['url'], '/') !== FALSE) {
             // Remove folder path to leave only file name
-            $data['url']= substr($data['url'], strrpos($data['url'], '/')+1);
+            $data['url'] = substr($data['url'], strrpos($data['url'], '/') + 1);
         }
 
         // Remove filename from parsedVarsURL array (to avoid save twice)
         unset($parsedVarsURL['filename']);
         // Store other attributes in the new param
         $data['attributes'] = http_build_query($parsedVarsURL, '', '&');
-
 
         // start writing geogebra.xml
         $this->open_xml_writer("activities/geogebra_{$this->moduleid}/geogebra.xml");
@@ -112,18 +113,20 @@ class moodle1_mod_geogebra_handler extends moodle1_mod_handler {
         $this->xmlwriter->begin_tag('geogebra', array('id' => $instanceid));
 
         foreach ($data as $field => $value) {
-            if ($field <> 'id') {
+            if ($field !== 'id') {
                 $this->xmlwriter->full_tag($field, $value);
             }
         }
 
         return $data;
+
     }
 
     /**
      * This is executed when we reach the closing </MOD> tag of our 'geogebra' path
      */
     public function on_geogebra_end() {
+
         // finalize geogebra.xml
         $this->xmlwriter->end_tag('geogebra');
         $this->xmlwriter->end_tag('activity');
@@ -139,6 +142,7 @@ class moodle1_mod_geogebra_handler extends moodle1_mod_handler {
         $this->xmlwriter->end_tag('fileref');
         $this->xmlwriter->end_tag('inforef');
         $this->close_xml_writer();
+
     }
 
 }

@@ -16,7 +16,6 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- *
  * @package    mod
  * @subpackage geogebra
  * @copyright  2011 Departament d'Ensenyament de la Generalitat de Catalunya
@@ -26,8 +25,8 @@
 
 defined('MOODLE_INTERNAL') || die();
 
-require_once($CFG->dirroot . '/mod/geogebra/locallib.php'); // Because it exists (must)
-require_once($CFG->dirroot . '/mod/geogebra/backup/moodle2/restore_geogebra_stepslib.php'); // Because it exists (must)
+require_once $CFG->dirroot . '/mod/geogebra/locallib.php';
+require_once $CFG->dirroot . '/mod/geogebra/backup/moodle2/restore_geogebra_stepslib.php';
 
 /**
  * geogebra restore task that provides all the settings and steps to perform one
@@ -46,29 +45,34 @@ class restore_geogebra_activity_task extends restore_activity_task {
      * Define (add) particular steps this activity can have
      */
     protected function define_my_steps() {
+
         geogebra_normalize_date();
+
         // GeoGebra only has one structure step
         $this->add_step(new restore_geogebra_activity_structure_step('geogebra_structure', 'geogebra.xml'));
+
     }
 
     /**
      * Define the contents in the activity that must be
      * processed by the link decoder
      */
-    static public function define_decode_contents() {
-        $contents = array();
+    public static function define_decode_contents() {
 
-        $contents[] = new restore_decode_content('geogebra', array('intro'), 'geogebra');
+        $contents = [];
+        $contents[] = new restore_decode_content('geogebra', ['intro'], 'geogebra');
 
         return $contents;
+
     }
 
     /**
      * Define the decoding rules for links belonging
      * to the activity to be executed by the link decoder
      */
-    static public function define_decode_rules() {
-        $rules = array();
+    public static function define_decode_rules() {
+
+        $rules = [];
 
         $rules[] = new restore_decode_rule('GEOGEBRAVIEWBYID', '/mod/geogebra/view.php?id=$1', 'course_module');
         $rules[] = new restore_decode_rule('GEOGEBRAINDEX', '/mod/geogebra/index.php?id=$1', 'course');
@@ -83,14 +87,16 @@ class restore_geogebra_activity_task extends restore_activity_task {
      * geogebra logs. It must return one array
      * of {@link restore_log_rule} objects
      */
-    static public function define_restore_log_rules() {
-        $rules = array();
+    public static function define_restore_log_rules() {
+
+        $rules = [];
 
         $rules[] = new restore_log_rule('geogebra', 'add', 'view.php?id={course_module}', '{geogebra}');
         $rules[] = new restore_log_rule('geogebra', 'update', 'view.php?id={course_module}', '{geogebra}');
         $rules[] = new restore_log_rule('geogebra', 'view', 'view.php?id={course_module}', '{geogebra}');
 
         return $rules;
+
     }
 
     /**
@@ -99,18 +105,21 @@ class restore_geogebra_activity_task extends restore_activity_task {
      * course logs. It must return one array
      * of {@link restore_log_rule} objects
      *
-     * Note this rules are applied when restoring course logs
+     * Note these rules are applied when restoring course logs
      * by the restore final task, but are defined here at
      * activity level. All them are rules not linked to any module instance (cmid = 0)
      */
-    static public function define_restore_log_rules_for_course() {
-        $rules = array();
+    public static function define_restore_log_rules_for_course() {
+
+        $rules = [];
 
         // Fix old wrong uses (missing extension)
         $rules[] = new restore_log_rule('geogebra', 'view all', 'index?id={course}', null,
-                                        null, null, 'index.php?id={course}');
+            null, null, 'index.php?id={course}');
         $rules[] = new restore_log_rule('geogebra', 'view all', 'index.php?id={course}', null);
 
         return $rules;
+
     }
+
 }

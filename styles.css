@@ -6,38 +6,84 @@
     height: auto;
 }
 
-.geogebra-activity-solved td {background-color:#DFFFDF!important;}
-.geogebra-activity-unsolved td {background-color:#FFDFDF!important;}
+.geogebra-activity-solved td {
+    background-color: #DFFFDF !important;
+}
 
-.geogebra-activities-table{margin:20px!important; width:95%;}
+.geogebra-activity-unsolved td {
+    background-color: #FFDFDF !important;
+}
 
-#page-mod-geogebra-action-student_results #region-main-box{left:0px!important;}
+.geogebra-activities-table {
+    margin: 20px !important;
+    width: 95%;
+}
 
-#dates .title-time{width:150px;float:left;clear:both;}
-#dates .data-time{float:left;}
-#dates.generalbox{height:30px;}
-.geogebradates{margin: 10px;}
+#page-mod-geogebra-action-student_results #region-main-box {
+    left: 0 !important;
+}
 
-#geogebra-summary-all-link {float:left; margin-top:20px;}
-#geogebra-preview-link {float:right; margin-top:20px;}
+#dates .title-time {
+    width: 150px;
+    float: left;
+    clear: both;
+}
 
-.summary-row{font-weight: bold;}
+#dates .data-time {
+    float: left;
+}
 
-.geogebra-session-activities-visible{visibility: visible; ;}
-.geogebra-session-activities-hidden{visibility: hidden; display: none;}
+#dates.generalbox {
+    height: 30px;
+}
 
-.firstinitial{clear:both; margin-top:30px;}
-.initialbar {text-align: center;}
+.geogebradates {
+    margin: 10px;
+}
 
-.pendinggrade{background-color: #FFD991;}
+#geogebra-summary-all-link {
+    float: left;
+    margin-top: 20px;
+}
 
-#applet_container>div{
+#geogebra-preview-link {
+    float: right;
+    margin-top: 20px;
+}
+
+.summary-row {
+    font-weight: bold;
+}
+
+.geogebra-session-activities-visible {
+    visibility: visible;
+}
+
+.geogebra-session-activities-hidden {
+    visibility: hidden;
+    display: none;
+}
+
+.firstinitial {
+    clear: both;
+    margin-top: 30px;
+}
+
+.initialbar {
+    text-align: center;
+}
+
+.pendinggrade {
+    background-color: #FFD991;
+}
+
+#applet_container > div {
     margin: 0 auto;
 }
 
 #applet_container {
     margin: 20px auto;
-    background-image:url([[pix:i/loading_small]]);
+    background-image: url([[pix:i/loading_small]]);
     background-position: center center;
     background-repeat: no-repeat;
 }
