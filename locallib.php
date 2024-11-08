@@ -376,6 +376,31 @@ function geogebra_print_content($geogebra, $context) {
         echo 'applet.setHTML5Codebase("' . $codebase . '");';
     }
     echo 'applet.inject("applet_container", "preferHTML5");
+
+        // Esta parte es para arreglar un problema con la altura del contenedor GeoGebra al cerrar el teclado virtual
+        // Inicia un intervalo que verifica la presencia del elemento GeoGebra objetivo
+        const intervalId = setInterval(() => {
+            const geogebraContainer = document.querySelector("#applet_container .gwt-SplitLayoutPanel.splitterFixed.highlightDraggers.neutral-0");
+
+            // Verifica si el elemento existe
+            if (geogebraContainer) {
+                // Obtiene y almacena la altura inicial visible del contenedor GeoGebra
+                const initialGeogebraHeight = geogebraContainer.offsetHeight + "px";
+
+                // Inicia otro intervalo para verificar cambios en la altura
+                setInterval(() => {
+                    // Verifica que el contenedor aún existe y que su altura ha cambiado respecto a la altura inicial
+                    if (geogebraContainer && geogebraContainer.style.height !== initialGeogebraHeight) {
+                        geogebraContainer.style.height = initialGeogebraHeight; // Restablece la altura inicial
+                    }
+                }, 10); // Verifica cada 10 ms
+
+                // Detiene el primer intervalo, ya que el elemento ahora ha sido encontrado
+                clearInterval(intervalId);
+            }
+        }, 200); // Verifica cada 200 ms si el elemento está presente
+
+            
     }
     </script>
     <div id="applet_container" style="width: ' . $width . '; height: ' . $geogebra->height . 'px;"></div>';
