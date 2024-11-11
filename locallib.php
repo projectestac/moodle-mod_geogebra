@@ -308,6 +308,16 @@ function geogebra_print_content($geogebra, $context) {
     $attribnames = ['enableRightClick', 'showAlgebraInput', 'showMenuBar', 'showToolBar',
         'showToolBarHelp', 'enableLabelDrags', 'showResetIcon', 'useBrowserForJS'];
 
+    // Set safe default values. The value set to zero causes the activity to be inaccesible
+    // when the GeoGebra keyboard is colapsed.
+    if ((int)$geogebra->width === 0) {
+        $geogebra->width = 800;
+    }
+
+    if ((int)$geogebra->height === 0) {
+        $geogebra->height = 600;
+    }
+
     $attribs = [
         'randomSeed' => $geogebra->seed,
         'width' => $geogebra->width,
@@ -360,16 +370,13 @@ function geogebra_print_content($geogebra, $context) {
     // Add loading of GeoGebra
     echo '<script type="text/javascript" src="' . $deployggburl . '"></script>';
 
-    // Get activity width
-    $width = $geogebra->width === 0 ? '100%' : $geogebra->width . 'px';
-
     echo '<script>window.onload = function() {
         var applet = new GGBApplet({';
     foreach ($attribnames as $name) {
-        echo $name . ': ' . geogebra_get_script_param($name, $attributes) . ',';
+        echo $name . ':' . geogebra_get_script_param($name, $attributes) . ', ';
     }
     foreach ($attribs as $name => $value) {
-        echo $name . ': "' . $value . '",';
+        echo $name . ':"' . $value . '", ';
     }
     echo '}, true);';
     if (!empty($codebase)) {
@@ -378,7 +385,7 @@ function geogebra_print_content($geogebra, $context) {
     echo 'applet.inject("applet_container", "preferHTML5");
     }
     </script>
-    <div id="applet_container" style="width: ' . $width . '; height: ' . $geogebra->height . 'px;"></div>';
+    <div id="applet_container"></div>';
 
     // Include also javascript code from GGB file.
     geogebra_get_js_from_geogebra($context, $geogebra);

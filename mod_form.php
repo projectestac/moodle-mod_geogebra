@@ -123,7 +123,7 @@ class mod_geogebra_mod_form extends moodleform_mod {
 
         $mform->addElement('text', 'width', get_string('width', 'geogebra'), ['size'=>'5']);
         $mform->setType('width', PARAM_INT);
-        $mform->setDefault('width', '');
+        $mform->setDefault('width', '800');
         $mform->addHelpButton('width', 'width', 'geogebra');
 
         $mform->addElement('text', 'height', get_string('height', 'geogebra'), ['size'=>'5']);

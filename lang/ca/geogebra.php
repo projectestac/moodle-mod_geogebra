@@ -37,9 +37,9 @@ $string['choosescripttype'] = 'Escull el tipus d\'activitat';
 $string['manualgrade'] = 'Qualificació manual?'; //Unused
 $string['contentheader'] = 'Contingut';
 $string['width'] = 'Amplada';
-$string['width_help'] = 'Valor en píxels. Si està buit o és zero, l\'amplada de l\'activitat GeoGebra serà el 100% del contenidor.';
+$string['width_help'] = 'Valor en píxels. Ha de ser més gran que zero.';
 $string['height'] = 'Alçada';
-$string['height_help'] = 'Valor en píxels.';
+$string['height_help'] = 'Valor en píxels. Ha de ser més gran que zero.';
 $string['seed'] = 'Llavor';
 $string['urlggb'] = 'URL de distribució personalitzat';
 $string['urlggb_help'] = 'URL alternatiu del fitxer deployggb.js on es troba la distribució del GeoGebra. Si està definit, s\'utilizarà aquest URL en lloc del definit per defecte a la configuració del mòdul. En general, aquest camp es pot deixar en blanc.';
@@ -121,7 +121,7 @@ $string['modulename_help'] = '<p><a href="https://www.geogebra.org" target="_bla
 <p>Per aquest motiu, el <a href="http://www.gencat.cat/ensenyament/" target="_blank">Departament d\'Ensenyament de Catalunya</a>, en col·laboració amb l\'<a href="https://acgeogebra.cat/" target="_blank">Associació Catalana de GeoGebra</a> (ACG) i l\'equip de desenvolupament de GeoGebra han implementat aquest mòdul que permet la incorporació d\'aquest tipus d\'activitats a Moodle. Les seves característiques principals són:
 <ul>
     <li>Permet incrustar activitats GeoGebra a qualsevol curs de forma molt senzilla.</li>
-    <li>Facilita el seguiment ja que guarda la puntuació, data, durada i construccions de cadascun dels intents que realitza l\'alumnat.</li>
+    <li>Facilita el seguiment perquè desa la puntuació, data, durada i construccions de cadascun dels intents que realitza l\'alumnat.</li>
     <li>L\'alumnat pot desar l\'estat de les activitats realitzades per continuar-les en un altre moment.</li>
 </ul>
 </p>';
