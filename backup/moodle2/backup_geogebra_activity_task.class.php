@@ -59,11 +59,11 @@ class backup_geogebra_activity_task extends backup_activity_task {
 
         // Link to the list of geogebras
         $search="/(".$base."\/mod\/geogebra\/index.php\?id\=)([0-9]+)/";
-        $content= preg_replace($search, '$@geogebraINDEX*$2@$', $content);
+        $content= preg_replace($search, '$@GEOGEBRAINDEX*$2@$', $content);
 
         // Link to geogebra view by moduleid
         $search="/(".$base."\/mod\/geogebra\/view.php\?id\=)([0-9]+)/";
-        $content= preg_replace($search, '$@geogebraVIEWBYID*$2@$', $content);
+        $content= preg_replace($search, '$@GEOGEBRAVIEWBYID*$2@$', $content);
 
         return $content;
 
