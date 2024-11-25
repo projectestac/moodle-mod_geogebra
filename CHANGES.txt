@@ -3,6 +3,10 @@ Release notes for GeoGebra Module for Moodle (http://moodle.org/plugins/pluginve
 More information on each of the fixes can be found in the project
 development home at https://github.com/projectestac/moodle-mod_geogebra
 
+Changes in 3.7.2 (2024/11/25)
+---------------------------------------------------------------------------------------
+- Fixed encoding/decoding of links to view and index (thanks to Paola Maneggia)
+
 Changes in 3.7.1 (2024/11/11)
 ---------------------------------------------------------------------------------------
 - No longer use the value zero for the width and height of the GeoGebra applet.
