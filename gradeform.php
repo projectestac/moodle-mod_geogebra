@@ -42,7 +42,7 @@ class mod_geogebra_grade_form extends moodleform {
     /**
      * Define the form - called by parent constructor
      */
-    function definition() {
+    function definition(): void {
 
         $mform = $this->_form;
 
@@ -108,7 +108,7 @@ class mod_geogebra_grade_form extends moodleform {
      * @throws dml_exception
      * @return array
      */
-    function validation($data, $files) {
+    function validation($data, $files): array {
 
         global $DB;
         $errors = parent::validation($data, $files);

@@ -71,5 +71,3 @@ if ($attempt) { // Exists an unfishined attempt.
 // echo '<div class="mod-geogebra-redirect">' . get_string("redirecttocourse", "geogebra") . '</div>';
 
 redirect(new moodle_url('view.php', ['id' => $id]));
-
-return;

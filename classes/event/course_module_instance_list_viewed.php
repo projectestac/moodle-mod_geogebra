@@ -22,9 +22,7 @@
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-
 namespace mod_geogebra\event;
-
 defined('MOODLE_INTERNAL') || die();
 
 /**
@@ -44,13 +42,13 @@ class course_module_instance_list_viewed extends \core\event\course_module_insta
      * @throws \coding_exception
      * @return \core\event\base
      */
-    public static function create_from_course(\stdClass $course) {
+    public static function create_from_course(\stdClass $course): self {
 
         $params = [
             'context' => \context_course::instance($course->id)
         ];
 
-        $event = \mod_geogebra\event\course_module_instance_list_viewed::create($params);
+        $event = self::create($params);
         $event->add_record_snapshot('course', $course);
 
         return $event;

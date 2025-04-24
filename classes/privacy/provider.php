@@ -110,7 +110,7 @@ class provider implements
      *
      * @param userlist $userlist The userlist containing the list of users who have data in this context/plugin combination.
      */
-    public static function get_users_in_context(userlist $userlist) {
+    public static function get_users_in_context(userlist $userlist): void {
 
         $context = $userlist->get_context();
 
@@ -142,7 +142,7 @@ class provider implements
      * @throws \coding_exception
      * @throws \dml_exception
      */
-    public static function export_user_data(approved_contextlist $contextlist) {
+    public static function export_user_data(approved_contextlist $contextlist): void {
 
         global $DB;
 
@@ -206,7 +206,7 @@ class provider implements
      * @param \context_module $context the context of geogebra.
      * @param \stdClass $user the user record
      */
-    protected static function export_geogebra_data_for_user(array $choicedata, \context_module $context, \stdClass $user) {
+    protected static function export_geogebra_data_for_user(array $choicedata, \context_module $context, \stdClass $user): void {
 
         // Fetch the generic module data for geogebra attempt.
         $contextdata = helper::get_context_data($context, $user);
@@ -227,7 +227,7 @@ class provider implements
      * @throws \coding_exception
      * @throws \dml_exception
      */
-    public static function delete_data_for_all_users_in_context(\context $context) {
+    public static function delete_data_for_all_users_in_context(\context $context): void {
 
         global $DB;
 
@@ -247,7 +247,7 @@ class provider implements
      * @param approved_contextlist $contextlist a list of contexts approved for deletion.
      * @throws \dml_exception
      */
-    public static function delete_data_for_user(approved_contextlist $contextlist) {
+    public static function delete_data_for_user(approved_contextlist $contextlist): void {
 
         global $DB;
 
@@ -274,7 +274,7 @@ class provider implements
      * @throws \coding_exception
      * @throws \dml_exception
      */
-    public static function delete_data_for_users(approved_userlist $userlist) {
+    public static function delete_data_for_users(approved_userlist $userlist): void {
 
         global $DB;
 
