@@ -754,8 +754,10 @@ function geogebra_view_results($geogebra, $context, $cm, $course, $action) {
         }
 
         $userpicfields = \core_user\fields::for_userpic();
-        $userpicfields->including(...$extrafields);
-        $ufieldsql = $userpicfields->get_sql('', false, '', '', false);
+        if ($extrafields) {
+            $userpicfields->including(...$extrafields);
+        }
+        $ufieldsql = $userpicfields->get_sql('u', false, '', 'id', false);
 
         $params = array_merge($params, $ufieldsql->params, $paramsusers);
 
@@ -769,13 +771,21 @@ function geogebra_view_results($geogebra, $context, $cm, $course, $action) {
         $ausers = $DB->get_records_sql($query, $params, $table->get_page_start(), $table->get_page_size());
         $table->pagesize($perpage, count($users));
 
-        if ($ausers !== false) {
+        if ($ausers) {
             foreach ($ausers as $auser) {
                 $picture = $OUTPUT->user_picture($auser);
                 $userlink = '<a href="' . $CFG->wwwroot . '/user/view.php?id=' . $auser->id . '&amp;course=' . $course->id . '">' .
                     fullname($auser, has_capability('moodle/site:viewfullnames', $context)) . '</a>';
 
-                $row = [$picture, $userlink];
+                $extradata = [];
+                foreach ($extrafields as $field) {
+                    $extradata[] = $auser->{$field};
+                }
+
+                $row = array_merge(
+                    [$picture, $userlink],
+                    $extradata
+                );
 
                 // Attempts summary.
                 $attempts = geogebra_get_user_attempts($geogebra->id, $auser->id);
@@ -803,8 +813,9 @@ function geogebra_view_results($geogebra, $context, $cm, $course, $action) {
                 // Show attempts information
                 foreach ($attempts as $attempt) {
                     $row = [];
-                    // In the attempts row, show only the summary of the attempt (it's not necessary to repeat user information)
-                    for ($i = 0; $i < 2; $i++) {
+                    // In the attempt row, show only the summary of the attempt, because it's not necessary to repeat the user
+                    // information. So, we add three empty cells for the user picture, fullname and extrafields.
+                    for ($i = 0; $i < 3; $i++) {
                         $row[] = '';
                     }
                     // Attempt information
