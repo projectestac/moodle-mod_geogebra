@@ -96,12 +96,12 @@ function geogebra_supports($feature) {
  * of the new instance.
  *
  * @param stdClass $geogebra An object from the form in mod_form.php
- * @param mod_geogebra_mod_form|null $mform
+ * @param ?mod_geogebra_mod_form $mform
  * @throws dml_exception
  * @return int The id of the newly inserted geogebra record
  * @todo: create event (when timedue added)
  */
-function geogebra_add_instance(stdClass $geogebra, mod_geogebra_mod_form $mform = null) {
+function geogebra_add_instance(stdClass $geogebra, ?mod_geogebra_mod_form $mform = null) {
 
     global $DB;
 
@@ -129,11 +129,11 @@ function geogebra_add_instance(stdClass $geogebra, mod_geogebra_mod_form $mform 
  * will update an existing instance with new data.
  *
  * @param stdClass $geogebra An object from the form in mod_form.php
- * @param mod_geogebra_mod_form|null $mform
+ * @param ?mod_geogebra_mod_form $mform
  * @throws dml_exception
  * @return boolean Success/Fail
  */
-function geogebra_update_instance(stdClass $geogebra, mod_geogebra_mod_form $mform = null) {
+function geogebra_update_instance(stdClass $geogebra, ?mod_geogebra_mod_form $mform = null) {
 
     global $DB;
 
@@ -701,11 +701,11 @@ function geogebra_pluginfile($course, $cm, $context, $filearea, array $args, $fo
  * so it is safe to rely on the $PAGE.
  *
  * @param settings_navigation $settingsnav {@link settings_navigation}
- * @param navigation_node|null $geogebranode {@link navigation_node}
+ * @param ?navigation_node $geogebranode {@link navigation_node}
  * @throws coding_exception
  * @throws moodle_exception
  */
-function geogebra_extend_settings_navigation(settings_navigation $settingsnav, navigation_node $geogebranode = null) {
+function geogebra_extend_settings_navigation(settings_navigation $settingsnav, ?navigation_node $geogebranode = null) {
 
     global $PAGE;
 
