@@ -21,6 +21,13 @@
  * @copyright  2018 Salva Valldeoriola <svallde2@xtec.cat>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
+
+namespace mod_geogebra;
+
+use advanced_testcase;
+use core_date;
+use DateTime;
+
 defined('MOODLE_INTERNAL') || die();
 
 global $CFG;
@@ -34,7 +41,7 @@ require_once($CFG->dirroot . '/mod/geogebra/locallib.php');
  * @copyright  2018 Salva Valldeoriola <svallde2@xtec.cat>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-class mod_geogebra_generator_testcase extends advanced_testcase {
+class generator_test extends advanced_testcase {
 
     public function test_create_instance() {
         global $DB;
