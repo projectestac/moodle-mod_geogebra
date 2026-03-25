@@ -22,9 +22,14 @@
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
+namespace mod_geogebra\privacy;
+
+use context_module;
+use context_system;
+use core_date;
 use core_privacy\local\metadata\collection;
-use core_privacy\local\request\deletion_criteria;
-use mod_geogebra\privacy\provider;
+use DateTime;
+use stdClass;
 
 defined('MOODLE_INTERNAL') || die();
 
@@ -39,7 +44,7 @@ require_once($CFG->dirroot . '/mod/geogebra/locallib.php');
  * @copyright  2018 Salva Valldeoriola
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-class mod_geogebra_privacy_provider_testcase extends \core_privacy\tests\provider_testcase {
+class provider_test extends \core_privacy\tests\provider_testcase {
     /** @var stdClass The student object. */
     protected $student;
 
