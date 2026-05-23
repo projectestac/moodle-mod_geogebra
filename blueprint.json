@@ -30,7 +30,7 @@
       "step": "installMoodlePlugin",
       "pluginType": "mod",
       "pluginName": "geogebra",
-      "url": "https://github.com/erseco/moodle-mod_geogebra/archive/refs/heads/main.zip"
+      "url": "https://github.com/projectestac/moodle-mod_geogebra/archive/refs/heads/master.zip"
     },
     {
       "step": "createCategory",

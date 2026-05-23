@@ -18,7 +18,7 @@ can preview and try it without any local setup. Every pull request also
 automatically generates a playground preview link appended to the PR
 description, so reviewers can test changes in a live Moodle instance.
 
-<a href="https://moodle-playground.com/?blueprint-url=https://raw.githubusercontent.com/erseco/moodle-mod_geogebra/refs/heads/main/blueprint.json" target="_blank" rel="noopener"><img src="https://raw.githubusercontent.com/ateeducacion/action-moodle-playground-pr-preview/refs/heads/main/assets/playground-preview-button.svg" alt="Preview in Moodle Playground" width="200"></a>
+<a href="https://moodle-playground.com/?blueprint-url=https://raw.githubusercontent.com/projectestac/moodle-mod_geogebra/refs/heads/master/blueprint.json" target="_blank" rel="noopener"><img src="https://raw.githubusercontent.com/ateeducacion/action-moodle-playground-pr-preview/refs/heads/main/assets/playground-preview-button.svg" alt="Preview in Moodle Playground" width="200"></a>
 
 The PR preview links are produced by the
 [ateeducacion/action-moodle-playground-pr-preview](https://github.com/ateeducacion/action-moodle-playground-pr-preview)
