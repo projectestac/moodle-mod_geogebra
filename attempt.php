@@ -30,6 +30,7 @@ if (empty($vars)) {
 }
 
 require_login($course, true, $cm);
+require_sesskey();
 
 $attempt = geogebra_get_unfinished_attempt($geogebra->id, $USER->id);
 

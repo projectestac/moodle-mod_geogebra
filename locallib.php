@@ -256,6 +256,7 @@ function geogebra_view_applet($geogebra, $cm, $context, $attempt = null, $isprev
         $PAGE->requires->js('/mod/geogebra/geogebra_view.js');
 
         echo '<form id="geogebra_form" method="POST" action="attempt.php">';
+        echo '<input type="hidden" name="sesskey" value="' . sesskey() . '"/>';
         echo '<input type="hidden" name="appletInformation" />';
         echo '<input type="hidden" name="id" value="' . $context->instanceid . '"/>';
         echo '<input type="hidden" name="n" value="' . $geogebra->id . '"/>';
