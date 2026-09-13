@@ -894,7 +894,7 @@ function geogebra_view_userid_results($geogebra, $userid, $cm, $context, $viewmo
         $table->size = ['10%', '90%'];
 
         parse_str($attempt->vars, $parsedvars);
-        $numattempt = $parsedvars['attempts'];
+        $numattempt = s($parsedvars['attempts']);
 
         if (!$attempt->finished) {
             $numattempt .= ' (' . get_string('unfinished', 'geogebra') . ')';
@@ -1001,7 +1001,7 @@ function geogebra_get_attempt_row($geogebra, $attempt, $user, $cm = null, $conte
     }
 
     parse_str($attempt->vars, $parsedvars);
-    $numattempt = $parsedvars['attempts'];
+    $numattempt = s($parsedvars['attempts']);
 
     if (!$attempt->finished) {
         $numattempt .= ' (' . get_string('unfinished', 'geogebra') . ')';
