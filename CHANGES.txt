@@ -3,6 +3,13 @@ Release notes for GeoGebra Module for Moodle (http://moodle.org/plugins/pluginve
 More information on each of the fixes can be found in the project
 development home at https://github.com/projectestac/moodle-mod_geogebra
 
+Changes in 3.7.6 (2026/09/22)
+---------------------------------------------------------------------------------------
+Prevent SSRF when fetching external GGB files (thanks to Philipp Memmel - @PhMemmel)
+Escape untrusted output to prevent XSS (thanks to Peter Mayer - @PM84)
+Validate sesskey before state-changing actions (thanks to Peter Mayer - @PM84)
+Fixed Stored XSS vulnerability (thanks to @jotasevic)
+
 Changes in 3.7.5 (2026/06/23)
 ---------------------------------------------------------------------------------------
 - Fix implicit nullables for PHP 8.4 (thanks to @PhMemmel)
