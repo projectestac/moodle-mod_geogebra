@@ -300,6 +300,7 @@ function geogebra_get_script_param($name, $attributes) {
 /**
  * @throws \Random\RandomException
  * @throws dml_exception
+ * @throws JsonException
  * @return void
  */
 function geogebra_print_content($geogebra, $context) {
@@ -377,7 +378,7 @@ function geogebra_print_content($geogebra, $context) {
         echo $name . ':' . geogebra_get_script_param($name, $attributes) . ', ';
     }
     foreach ($attribs as $name => $value) {
-        echo $name . ':"' . $value . '", ';
+        echo $name . ':' . json_encode((string)$value, JSON_THROW_ON_ERROR | JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS | JSON_HEX_QUOT) . ', ';
     }
     echo '}, true);';
     if (!empty($codebase)) {
