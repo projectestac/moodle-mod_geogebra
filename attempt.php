@@ -29,7 +29,8 @@ if (empty($vars)) {
     throw new \moodle_exception('The applet has not sent correct data');
 }
 
-require_login($course, true, $cm);
+require_login($course, false, $cm);
+require_capability('mod/geogebra:submit', $context);
 require_sesskey();
 
 $attempt = geogebra_get_unfinished_attempt($geogebra->id, $USER->id);

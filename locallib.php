@@ -266,7 +266,7 @@ function geogebra_view_applet($geogebra, $cm, $context, $attempt = null, $isprev
         echo '<input type="hidden" name="f" value="0"/>';
 
         // Only show submit buttons if not view mode
-        if (empty($attempt) || !$attempt->finished) {
+        if ((empty($attempt) || !$attempt->finished) && has_capability('mod/geogebra:submit', $context)) {
             echo '<input id="geogebra_form_save" type="button" value="' . get_string('savewithoutsubmitting', 'geogebra') . '" />';
             echo '<input id="geogebra_form_submit" type="button" value="' . get_string('submitandfinish', 'geogebra') . '" />';
         }
