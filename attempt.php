@@ -51,7 +51,7 @@ if ((int)$geogebra->autograde === 0) {
     ], '', '&');
 } else {
     $vars = http_build_query([
-        'grade' => round($parsedVars['grade'], 2),
+        'grade' => geogebra_get_bounded_autograde($geogebra, $parsedVars['grade']),
         'duration' => (int) $parsedVars['duration'],
         'attempts' => (int) $parsedVars['attempts'],
         'state' => $parsedVars['state'],

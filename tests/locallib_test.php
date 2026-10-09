@@ -37,7 +37,29 @@ require_once($CFG->dirroot . '/mod/geogebra/locallib.php');
  */
 #[CoversFunction('geogebra_is_valid_external_url')]
 #[CoversFunction('geogebra_print_content')]
+#[CoversFunction('geogebra_get_bounded_autograde')]
 final class locallib_test extends advanced_testcase {
+    #[\PHPUnit\Framework\Attributes\Group('baseline')]
+    /**
+     * Tests that a self-graded score outside the configured range is limited to it.
+     */
+    public function test_get_bounded_autograde_limits_out_of_range_grades(): void {
+        $geogebra = (object)['grade' => 10];
+
+        $this->assertSame(10.0, geogebra_get_bounded_autograde($geogebra, '100'));
+        $this->assertSame(0.0, geogebra_get_bounded_autograde($geogebra, '-5'));
+    }
+
+    #[\PHPUnit\Framework\Attributes\Group('baseline')]
+    /**
+     * Tests that a self-graded score within the configured range is kept.
+     */
+    public function test_get_bounded_autograde_keeps_valid_grades(): void {
+        $geogebra = (object)['grade' => 10];
+
+        $this->assertSame(7.46, geogebra_get_bounded_autograde($geogebra, '7.456'));
+    }
+
     /**
      * Tests that a non http(s) url is never passed to the HTTP client when the activity is rendered.
      *

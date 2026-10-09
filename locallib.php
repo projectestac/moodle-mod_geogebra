@@ -651,6 +651,21 @@ function geogebra_is_valid_file($filename) {
     return preg_match('/.ggb$/i', $filename);
 }
 
+/**
+ * Limits a grade sent by the browser of a self-graded activity to the configured point range.
+ *
+ * @param stdClass $geogebra The activity instance.
+ * @param mixed $grade The submitted grade.
+ * @return float The grade to store.
+ */
+function geogebra_get_bounded_autograde($geogebra, $grade) {
+    $grade = (float)$grade;
+    if ($geogebra->grade > 0) {
+        $grade = max(0, min($grade, (float)$geogebra->grade));
+    }
+    return round($grade, 2);
+}
+
 // Attempts.
 
 /**
