@@ -89,7 +89,7 @@ class mod_geogebra_mod_form extends moodleform_mod {
         $mform->setAdvanced('seed');
 
         $mform->addElement('text', 'urlggb', get_string('urlggb', 'geogebra'), ['size' => '60']);
-        $mform->setType('urlggb', PARAM_RAW);
+        $mform->setType('urlggb', PARAM_URL);
         $mform->setDefault('urlggb', '');
         $mform->addHelpButton('urlggb', 'urlggb', 'geogebra');
         $mform->setAdvanced('urlggb');
@@ -210,6 +210,10 @@ class mod_geogebra_mod_form extends moodleform_mod {
             if (!geogebra_is_valid_external_url($reference)) {
                 $errors['geogebraurl'] = get_string('invalidurl', 'geogebra');
             }
+        }
+
+        if (!empty($data['urlggb']) && !geogebra_is_valid_external_url($data['urlggb'])) {
+            $errors['urlggb'] = get_string('invalidurl', 'error');
         }
 
         return $errors;

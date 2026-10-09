@@ -92,6 +92,69 @@ final class locallib_test extends advanced_testcase {
         $this->assertDebuggingCalledCount(2);
     }
 
+    #[\PHPUnit\Framework\Attributes\Group('baseline')]
+    /**
+     * Tests that a stored custom deploy url cannot break out of the script src attribute.
+     */
+    public function test_print_content_escapes_custom_deploy_url(): void {
+        $output = $this->print_content_with_deploy_url(
+            'https://example.com/deployggb.js"></script><script>alert(1)</script><script src="'
+        );
+
+        $this->assertStringNotContainsString('<script>alert(1)</script>', $output);
+        $this->assertStringContainsString(
+            'src="https://example.com/deployggb.js&quot;&gt;&lt;/script&gt;&lt;script&gt;alert(1)',
+            $output
+        );
+    }
+
+    #[\PHPUnit\Framework\Attributes\Group('baseline')]
+    /**
+     * Tests that a valid custom deploy url is still loaded.
+     */
+    public function test_print_content_loads_custom_deploy_url(): void {
+        $output = $this->print_content_with_deploy_url('https://example.com/deployggb.js?v=1&lang=de');
+
+        $this->assertStringContainsString(
+            '<script type="text/javascript" src="https://example.com/deployggb.js?v=1&amp;lang=de"></script>',
+            $output
+        );
+    }
+
+    /**
+     * Renders a GeoGebra activity using a local file and the given custom deploy url.
+     *
+     * @param string $urlggb The custom deploy url stored in the activity.
+     * @return string The rendered output.
+     */
+    private function print_content_with_deploy_url(string $urlggb): string {
+        global $DB;
+
+        $this->resetAfterTest();
+        $this->setAdminUser();
+
+        $course = $this->getDataGenerator()->create_course();
+        $geogebra = $this->getDataGenerator()->create_module('geogebra', [
+            'course' => $course->id,
+            'url' => 'activity.ggb',
+        ]);
+        $context = \core\context\module::instance($geogebra->cmid);
+        get_file_storage()->create_file_from_string([
+            'contextid' => $context->id,
+            'component' => 'mod_geogebra',
+            'filearea' => 'content',
+            'itemid' => 0,
+            'filepath' => '/',
+            'filename' => 'activity.ggb',
+        ], 'ggb');
+        $DB->set_field('geogebra', 'urlggb', $urlggb, ['id' => $geogebra->id]);
+        $geogebra->urlggb = $urlggb;
+
+        ob_start();
+        geogebra_print_content($geogebra, $context);
+        return ob_get_clean();
+    }
+
     /**
      * Tests that only absolute http(s) URLs are accepted as external references.
      *

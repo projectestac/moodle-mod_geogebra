@@ -381,7 +381,7 @@ function geogebra_print_content($geogebra, $context) {
     $codebase = get_config('geogebra', 'codebase');
 
     // Add loading of GeoGebra
-    echo '<script type="text/javascript" src="' . $deployggburl . '"></script>';
+    echo '<script type="text/javascript" src="' . s($deployggburl) . '"></script>';
 
     echo '<script>window.onload = function() {
         var applet = new GGBApplet({';
