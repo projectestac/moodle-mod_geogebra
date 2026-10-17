@@ -20,6 +20,7 @@ use advanced_testcase;
 use GuzzleHttp\Handler\MockHandler;
 use PHPUnit\Framework\Attributes\CoversFunction;
 use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\Group;
 
 defined('MOODLE_INTERNAL') || die();
 
@@ -37,7 +38,53 @@ require_once($CFG->dirroot . '/mod/geogebra/locallib.php');
  */
 #[CoversFunction('geogebra_is_valid_external_url')]
 #[CoversFunction('geogebra_print_content')]
+#[CoversFunction('geogebra_view_userid_results')]
 final class locallib_test extends advanced_testcase {
+    /**
+     * Tests that script in a grading comment is removed when the student views the attempt.
+     */
+    #[Group('baseline')]
+    public function test_view_userid_results_cleans_grade_comment(): void {
+        $output = $this->render_graded_attempt_for_student('<img src="x" onerror="alert(1)">');
+
+        $this->assertStringNotContainsString('onerror', $output);
+    }
+
+    /**
+     * Tests that a formatted grading comment is still shown to the student.
+     */
+    #[Group('baseline')]
+    public function test_view_userid_results_keeps_formatted_grade_comment(): void {
+        $output = $this->render_graded_attempt_for_student('<p><strong>Well done</strong> äöü</p>');
+
+        $this->assertStringContainsString('<strong>Well done</strong> äöü', $output);
+    }
+
+    /**
+     * Renders a graded attempt with the given comment as seen by the graded student.
+     *
+     * @param string $gradecomment The comment stored by the teacher.
+     * @return string The rendered output.
+     */
+    private function render_graded_attempt_for_student(string $gradecomment): string {
+        global $DB;
+        $this->resetAfterTest();
+
+        $course = $this->getDataGenerator()->create_course();
+        $geogebra = $this->getDataGenerator()->create_module('geogebra', ['course' => $course->id]);
+        $student = $this->getDataGenerator()->create_and_enrol($course, 'student');
+        geogebra_add_attempt($geogebra->id, $student->id, 'attempts=1&duration=1&grade=5');
+        $attempt = $DB->get_record('geogebra_attempts', ['geogebra' => $geogebra->id]);
+        $DB->set_field('geogebra_attempts', 'gradecomment', $gradecomment, ['id' => $attempt->id]);
+        $attempt->gradecomment = $gradecomment;
+        $cm = get_coursemodule_from_instance('geogebra', $geogebra->id);
+        $this->setUser($student);
+
+        ob_start();
+        geogebra_view_userid_results($geogebra, $student->id, $cm, \core\context\module::instance($cm->id), 'view', $attempt);
+        return ob_get_clean();
+    }
+
     /**
      * Tests that a non http(s) url is never passed to the HTTP client when the activity is rendered.
      *

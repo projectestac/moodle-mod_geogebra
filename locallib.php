@@ -983,7 +983,11 @@ function geogebra_view_userid_results($geogebra, $userid, $cm, $context, $viewmo
             geogebra_add_table_row_tuple($table, get_string('attempt', 'geogebra'), $numattempt);
             geogebra_add_table_row_tuple($table, get_string('duration', 'geogebra'), $duration);
             geogebra_add_table_row_tuple($table, get_string('gradenoun'), $grade);
-            geogebra_add_table_row_tuple($table, get_string('comment', 'geogebra'), $attempt->gradecomment);
+            geogebra_add_table_row_tuple(
+                $table,
+                get_string('comment', 'geogebra'),
+                format_text($attempt->gradecomment, FORMAT_HTML, ['context' => $context])
+            );
         }
 
         // Print attempt information with grade and comment form if user can grade
