@@ -960,7 +960,7 @@ function geogebra_view_userid_results($geogebra, $userid, $cm, $context, $viewmo
                 $grade = optional_param('grade', 0, PARAM_LOCALISEDFLOAT);
                 $gradecomment = optional_param_array('comment_editor', '', PARAM_RAW);
                 $attemptid = optional_param('attemptid', '', PARAM_INT);
-                $attempt = geogebra_get_attempt($attemptid);
+                $attempt = geogebra_get_attempt($attemptid, $geogebra->id);
                 parse_str($attempt->vars, $parsedvars);
                 $parsedvars['grade'] = $grade;
                 $attempt->vars = http_build_query($parsedvars, '', '&');
@@ -1129,12 +1129,13 @@ function geogebra_get_unfinished_attempt($geogebraid, $userid) {
  * Returns a geogebra attempt
  *
  * @param int $attemptid ID of the attempt
+ * @param int $geogebraid ID of the geogebra instance the attempt has to belong to
  * @throws dml_exception
  * @return object attempt
  */
-function geogebra_get_attempt($attemptid) {
+function geogebra_get_attempt($attemptid, $geogebraid) {
     global $DB;
-    return $DB->get_record('geogebra_attempts', ['id' => $attemptid]);
+    return $DB->get_record('geogebra_attempts', ['id' => $attemptid, 'geogebra' => $geogebraid], '*', MUST_EXIST);
 }
 
 /**

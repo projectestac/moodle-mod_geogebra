@@ -20,6 +20,7 @@ use advanced_testcase;
 use GuzzleHttp\Handler\MockHandler;
 use PHPUnit\Framework\Attributes\CoversFunction;
 use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\Group;
 
 defined('MOODLE_INTERNAL') || die();
 
@@ -37,7 +38,47 @@ require_once($CFG->dirroot . '/mod/geogebra/locallib.php');
  */
 #[CoversFunction('geogebra_is_valid_external_url')]
 #[CoversFunction('geogebra_print_content')]
+#[CoversFunction('geogebra_get_attempt')]
 final class locallib_test extends advanced_testcase {
+    /**
+     * Tests that an attempt of another activity is not returned for the requested activity.
+     */
+    #[Group('baseline')]
+    public function test_get_attempt_of_other_activity_is_rejected(): void {
+        global $DB;
+        $this->resetAfterTest();
+
+        $course = $this->getDataGenerator()->create_course();
+        $geogebraa = $this->getDataGenerator()->create_module('geogebra', ['course' => $course->id]);
+        $geogebrab = $this->getDataGenerator()->create_module('geogebra', ['course' => $course->id]);
+        $student = $this->getDataGenerator()->create_and_enrol($course, 'student');
+        geogebra_add_attempt($geogebrab->id, $student->id, 'attempts=1&duration=1&grade=5');
+        $attemptid = $DB->get_field('geogebra_attempts', 'id', ['geogebra' => $geogebrab->id]);
+
+        $this->expectException(\dml_missing_record_exception::class);
+        geogebra_get_attempt($attemptid, $geogebraa->id);
+    }
+
+    /**
+     * Tests that an attempt of the requested activity is still returned.
+     */
+    #[Group('baseline')]
+    public function test_get_attempt_of_own_activity(): void {
+        global $DB;
+        $this->resetAfterTest();
+
+        $course = $this->getDataGenerator()->create_course();
+        $geogebra = $this->getDataGenerator()->create_module('geogebra', ['course' => $course->id]);
+        $student = $this->getDataGenerator()->create_and_enrol($course, 'student');
+        geogebra_add_attempt($geogebra->id, $student->id, 'attempts=1&duration=1&grade=5');
+        $attemptid = $DB->get_field('geogebra_attempts', 'id', ['geogebra' => $geogebra->id]);
+
+        $attempt = geogebra_get_attempt($attemptid, $geogebra->id);
+
+        $this->assertEquals($attemptid, $attempt->id);
+        $this->assertEquals($student->id, $attempt->userid);
+    }
+
     /**
      * Tests that a non http(s) url is never passed to the HTTP client when the activity is rendered.
      *

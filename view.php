@@ -81,7 +81,7 @@ if ($CFG->branch < 400) {
 }
 
 if ($attemptid) {
-    $attempt = geogebra_get_attempt($attemptid);
+    $attempt = geogebra_get_attempt($attemptid, $geogebra->id);
     $cangrade = is_siteadmin() || has_capability('moodle/grade:edit', $context, $USER->id, false);
     if ($cangrade || $attempt->userid === $USER->id) {
         echo geogebra_view_applet($geogebra, $cm, $context, $attempt, true);
