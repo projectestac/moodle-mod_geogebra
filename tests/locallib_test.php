@@ -37,6 +37,8 @@ require_once($CFG->dirroot . '/mod/geogebra/locallib.php');
  */
 #[CoversFunction('geogebra_is_valid_external_url')]
 #[CoversFunction('geogebra_print_content')]
+#[CoversFunction('geogebra_get_first_attempt_grade')]
+#[CoversFunction('geogebra_get_last_attempt_grade')]
 final class locallib_test extends advanced_testcase {
     /**
      * Tests that a non http(s) url is never passed to the HTTP client when the activity is rendered.
@@ -192,5 +194,51 @@ final class locallib_test extends advanced_testcase {
             'with_www' => ['url' => 'https://www.geogebra.org/m/abcd1234'],
             'http_scheme' => ['url' => 'http://www.geogebra.org/m/abcd1234'],
         ];
+    }
+
+    #[\PHPUnit\Framework\Attributes\Group('baseline')]
+    /**
+     * Tests that an attempt of another user in another activity with the same timestamp is not used.
+     */
+    public function test_first_last_attempt_grade_ignores_other_users_attempts(): void {
+        global $DB;
+
+        $this->resetAfterTest();
+        $generator = $this->getDataGenerator();
+        $student = $generator->create_user();
+        $other = $generator->create_user();
+        $geogebra = $generator->create_module('geogebra', ['course' => $generator->create_course()->id]);
+        $othergeogebra = $generator->create_module('geogebra', ['course' => $generator->create_course()->id]);
+        $time = time();
+
+        $DB->insert_record('geogebra_attempts', (object)['geogebra' => $othergeogebra->id, 'userid' => $other->id,
+            'vars' => 'grade=9&duration=5', 'finished' => 1, 'datestudent' => $time]);
+        $DB->insert_record('geogebra_attempts', (object)['geogebra' => $geogebra->id, 'userid' => $student->id,
+            'vars' => 'grade=3&duration=5', 'finished' => 1, 'datestudent' => $time]);
+
+        $this->assertSame(3.0, geogebra_get_last_attempt_grade($geogebra->id, $student->id)->grade);
+        $this->assertSame(3.0, geogebra_get_first_attempt_grade($geogebra->id, $student->id)->grade);
+    }
+
+    #[\PHPUnit\Framework\Attributes\Group('baseline')]
+    /**
+     * Tests that the first and the last own attempt are returned.
+     */
+    public function test_first_last_attempt_grade_returns_own_attempts(): void {
+        global $DB;
+
+        $this->resetAfterTest();
+        $generator = $this->getDataGenerator();
+        $student = $generator->create_user();
+        $geogebra = $generator->create_module('geogebra', ['course' => $generator->create_course()->id]);
+        $time = time();
+
+        $DB->insert_record('geogebra_attempts', (object)['geogebra' => $geogebra->id, 'userid' => $student->id,
+            'vars' => 'grade=4&duration=5', 'finished' => 1, 'datestudent' => $time - 60]);
+        $DB->insert_record('geogebra_attempts', (object)['geogebra' => $geogebra->id, 'userid' => $student->id,
+            'vars' => 'grade=7&duration=5', 'finished' => 1, 'datestudent' => $time]);
+
+        $this->assertSame(7.0, geogebra_get_last_attempt_grade($geogebra->id, $student->id)->grade);
+        $this->assertSame(4.0, geogebra_get_first_attempt_grade($geogebra->id, $student->id)->grade);
     }
 }

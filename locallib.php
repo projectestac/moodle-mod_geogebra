@@ -1369,8 +1369,10 @@ function geogebra_get_last_attempt_grade(int $geogebraid, int $userid) {
 
     $sql = 'SELECT * '
         . 'FROM {geogebra_attempts} '
-        . 'WHERE datestudent = (SELECT MAX(datestudent) FROM {geogebra_attempts} '
-        . 'WHERE userid = ' . $userid . ' AND geogebra = ' . $geogebraid . ' AND finished = 1)';
+        . 'WHERE userid = :userid AND geogebra = :geogebraid AND finished = 1 '
+        . 'AND datestudent = (SELECT MAX(datestudent) FROM {geogebra_attempts} '
+        . 'WHERE userid = :userid2 AND geogebra = :geogebraid2 AND finished = 1) '
+        . 'ORDER BY id DESC';
 
     return geogebra_process_first_last_attempt_grade($sql, $geogebraid, $userid);
 
@@ -1388,8 +1390,10 @@ function geogebra_get_first_attempt_grade(int $geogebraid, int $userid) {
 
     $sql = 'SELECT * '
         . 'FROM {geogebra_attempts} '
-        . 'WHERE datestudent = (SELECT MIN(datestudent) FROM {geogebra_attempts} '
-        . 'WHERE userid = ' . $userid . ' AND geogebra = ' . $geogebraid . ' AND finished = 1)';
+        . 'WHERE userid = :userid AND geogebra = :geogebraid AND finished = 1 '
+        . 'AND datestudent = (SELECT MIN(datestudent) FROM {geogebra_attempts} '
+        . 'WHERE userid = :userid2 AND geogebra = :geogebraid2 AND finished = 1) '
+        . 'ORDER BY id ASC';
 
     return geogebra_process_first_last_attempt_grade($sql, $geogebraid, $userid);
 
@@ -1409,7 +1413,9 @@ function geogebra_process_first_last_attempt_grade(string $sql, int $geogebraid,
 
     global $DB;
 
-    if ($attempt = $DB->get_record_sql($sql)) {
+    $params = ['userid' => $userid, 'geogebraid' => $geogebraid, 'userid2' => $userid, 'geogebraid2' => $geogebraid];
+    // Several own attempts in the same second are resolved by the ORDER BY of the caller.
+    if ($attempt = $DB->get_record_sql($sql, $params, IGNORE_MULTIPLE)) {
         if (empty($attempt)) {
             return false;
         }
