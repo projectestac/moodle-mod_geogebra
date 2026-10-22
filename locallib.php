@@ -432,7 +432,7 @@ function geogebra_get_js_from_geogebra($context, $geogebra) {
 
         $materialid = geogebra_get_id($geogebra->url);
         if ($materialid) {
-            $ggbfile = "https://tube.geogebra.org/material/download/format/file/id/$materialid";
+            $ggbfile = "https://geogebra.org/material/download/format/file/id/$materialid";
         } else {
             $ggbfile = $geogebra->url;
         }

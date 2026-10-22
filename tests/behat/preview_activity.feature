@@ -21,7 +21,7 @@ Feature: Preview GeoGebra activity
       | Name | Test GeoGebra |
       | Description | A testing GeoGebra activity |
       | Type | External URL |
-      | URL | https://tube.geogebra.org/files/00/02/92/27/material-2922763.ggb?v=1458139106 |
+      | URL | https://geogebra.org/files/00/02/92/27/material-2922763.ggb?v=1458139106 |
 
   Scenario: Preview GeoGebra
     Given I follow "Test GeoGebra"
